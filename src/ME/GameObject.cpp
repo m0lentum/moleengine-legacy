@@ -1,4 +1,4 @@
-#include <ME/GameObject.hpp>
+#include <GameObject.hpp>
 
 //=======================GAMEOBJECT_ANIMATED====================================
 void me::GameObjectAnimated::update()

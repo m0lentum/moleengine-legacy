@@ -1,4 +1,4 @@
-#include <ME/Game.hpp>
+#include <Game.hpp>
 
 
 namespace me

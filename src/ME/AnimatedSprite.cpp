@@ -1,4 +1,4 @@
-#include <ME/AnimatedSprite.hpp>
+#include <AnimatedSprite.hpp>
 
 namespace me
 {

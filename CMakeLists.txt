@@ -1,4 +1,4 @@
-#taken from the SFML wiki and modified to create a library instead of an executable
+#modified from the SFML wiki
 
 cmake_minimum_required(VERSION 2.6)
 
@@ -12,23 +12,23 @@ project(MoleEngine)
 
 # Define sources and library
 set(LIBRARY_NAME "LibMoleEngine")
-set(SOURCES)
-set(HEADERS)
-add_subdirectory(src/ME)
-add_subdirectory(include/ME)
+file(GLOB SOURCES src/ME/*.cpp)
+file(GLOB HEADERS include/ME/*.hpp)
 include_directories(include/ME)
-add_library(${LIBRARY_NAME} ${SOURCES} ${HEADERS})
+add_library(${LIBRARY_NAME} STATIC ${SOURCES})
 
-set(CMAKE_PREFIX_PATH "" CACHE PATH "Specify your SFML install folder here if not found automatically")
-
+set(SFML_ROOT "" CACHE PATH "Specify your SFML install folder here if not found automatically")
 # Detect and add SFML
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH})
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH})
 #Find any version 2.X of SFML
 #See the FindSFML.cmake file for additional details and instructions
 find_package(SFML 2 REQUIRED network audio graphics window system)
 if(SFML_FOUND)
   include_directories(${SFML_INCLUDE_DIR})
   target_link_libraries(${LIBRARY_NAME} ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})
+  #from Stack Overflow: expose includes to other projects
+  set(${PROJECT_NAME}_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/include ${SFML_INCLUDE_DIR}
+    CACHE INTERNAL "${PROJECT_NAME}: Include Directories" FORCE)
 endif()
 
 # Install library

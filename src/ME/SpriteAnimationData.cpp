@@ -29,17 +29,17 @@ namespace me
 		m_defaultDuration = duration;
 	}
 
-	sf::IntRect SpriteAnimationData::getRect(int index)
+	sf::IntRect SpriteAnimationData::getRect(unsigned int index) const
 	{
 		return m_frames[index].rect;
 	}
 
-	sf::Time SpriteAnimationData::getDuration(int index)
+	sf::Time SpriteAnimationData::getDuration(unsigned int index) const
 	{
 		return m_frames[index].duration;
 	}
 
-	unsigned int SpriteAnimationData::getLength()
+	unsigned int SpriteAnimationData::getLength() const
 	{
 		return m_frames.size();
 	}

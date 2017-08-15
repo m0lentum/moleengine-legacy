@@ -34,6 +34,16 @@ namespace me
 		m_numLoops = loops;
 	}
 
+	inline void AnimatedSprite::pause()
+	{
+		m_isPlaying = false;
+	}
+
+	inline void AnimatedSprite::resume()
+	{
+		m_isPlaying = true;
+	}
+
 	void AnimatedSprite::reset()
 	{
 		m_isPlaying = false;
@@ -88,11 +98,19 @@ namespace me
 		initVertices();
 	}
 
-	AnimatedSprite::AnimatedSprite(const sf::Texture *texture, const sf::Vector2i &size) :
-		m_size(size)
+	AnimatedSprite::AnimatedSprite(const sf::Texture *texture, const SpriteAnimationData &anim, const sf::Vector2i &size) :
+		m_size(size),
+		m_anim(anim)
 	{
 		m_texture = texture;
 		initVertices();
+	}
+
+	AnimatedSprite::AnimatedSprite(const sf::Texture *texture, const SpriteAnimationData &anim)
+	{
+		//default size to size of first frame of animation
+		sf::IntRect firstFrame = anim.getRect(0);
+		AnimatedSprite(texture, anim, sf::Vector2i(firstFrame.width, firstFrame.height));
 	}
 
 	AnimatedSprite::AnimatedSprite(const AnimatedSprite &copy) :

@@ -27,9 +27,9 @@ namespace me
 		///Start the animation and play it for the specified number of loops
 		void play(int loops = -1);
 		///Pause the animation without resetting
-		void pause() { m_isPlaying = false; }
+		void pause();
 		///Continue the animation from where it left off
-		void resume() { m_isPlaying = true; }
+		void resume();
 		///Stop the animation and reset it to the first frame
 		void reset();
 		///Jump to the specified frame of animation
@@ -42,13 +42,13 @@ namespace me
 		void setAnimation(const SpriteAnimationData &anim);
 
 
-		///Constructor that creates an animation from a horizontal strip spritesheet
+		///Constructor that generates an animation from a horizontal strip spritesheet
 		AnimatedSprite(const sf::Texture *texture, const sf::Vector2i &startPosition, const sf::Vector2i &size,
 			unsigned int numFrames, sf::Time frameDuration);
-		///Constructor that only takes the texture to use (add frames with addFrame() or addStrip())
-		AnimatedSprite(const sf::Texture *texture, const sf::Vector2i &size);
-		///Constructor that takes a pre-created animation (not yet implemented)
-		//AnimatedSprite(const sf::Texture *texture, const SpriteAnimationData &anim);
+		///Constructor that takes both a pre-created animation and a size (use in case animation has varying frame sizes)
+		AnimatedSprite(const sf::Texture *texture, const SpriteAnimationData &anim, const sf::Vector2i &size);
+		///Constructor that takes a pre-created animation (assumes size based on first frame)
+		AnimatedSprite(const sf::Texture *texture, const SpriteAnimationData &anim);
 		///Copy constructor
 		AnimatedSprite(const AnimatedSprite &copy);
 		~AnimatedSprite();

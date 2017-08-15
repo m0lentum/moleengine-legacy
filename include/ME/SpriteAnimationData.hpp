@@ -33,11 +33,11 @@ namespace me
 		void setDefaultDuration(sf::Time duration);
 
 		/// Rect of frame specified by index
-		sf::IntRect getRect(int index);
+		sf::IntRect getRect(unsigned int index) const;
 		/// Duration of frame specified by index
-		sf::Time getDuration(int index);
+		sf::Time getDuration(unsigned int index) const;
 		/// Number of frames in the animation
-		unsigned int getLength();
+		unsigned int getLength() const;
 
 
 		SpriteAnimationData();

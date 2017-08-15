@@ -16,7 +16,7 @@ namespace me
 
 	public:
 		/// This should be called every frame
-		virtual void update(sf::Time timeElapsed) = 0;
+		virtual void continuousUpdate(sf::Time timeElapsed) = 0;
 
 		Graphic();
 		virtual ~Graphic();

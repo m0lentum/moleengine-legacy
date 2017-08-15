@@ -23,9 +23,18 @@ namespace me
 				continue;
 			}
 			handleWindowEvents();
+
 			sf::Time timeElapsed = m_clock.restart();
-			std::cout << "Update loop, time elapsed: " << timeElapsed.asMilliseconds() << " ms" << std::endl;
-			update(timeElapsed);
+
+			continuousUpdate(timeElapsed);
+
+			m_timeSinceFixedUpdate += timeElapsed;
+			if (m_timeSinceFixedUpdate > m_fixedUpdateInterval)
+			{
+				m_timeSinceFixedUpdate -= m_fixedUpdateInterval;
+				fixedUpdate();
+			}
+
 			draw();
 		}
 	}

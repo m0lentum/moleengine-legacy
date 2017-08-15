@@ -1,7 +1,7 @@
 #include <GameObject.hpp>
 
 //=======================GAMEOBJECT_ANIMATED====================================
-void me::GameObjectAnimated::update()
+void me::GameObjectAnimated::continuousUpdate()
 {
 	//will fix this when remaking the GameObject class
 	//graphic->update(sf::Time());
@@ -34,7 +34,7 @@ void me::GameObjectAnimated::draw(sf::RenderTarget &target, sf::RenderStates sta
 
 
 //===================GAMEOBJECT_STATIC=================================
-void me::GameObjectStatic::update()
+void me::GameObjectStatic::continuousUpdate()
 {
 	//nothing to do here
 }

@@ -16,7 +16,7 @@ namespace me
 		m_bounds = m_vertices.getBounds();
 
 		updateTexCoords();
-		//TODO also update outline
+		//TODO also continuousUpdate outline
 	}
 
 	void Graphic::updateTexCoords()

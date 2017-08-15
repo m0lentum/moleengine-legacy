@@ -21,8 +21,8 @@ namespace me
 		SpriteAnimationData m_anim;
 
 	public:
-		///Should be called once in each update loop. Handles frame transitions.
-		void update(sf::Time timeElapsed);
+		///Should be called once in each continuousUpdate loop of the game. Handles frame transitions.
+		void continuousUpdate(sf::Time timeElapsed);
 
 		///Start the animation and play it for the specified number of loops
 		void play(int loops = -1);

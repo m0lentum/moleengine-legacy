@@ -19,15 +19,18 @@ namespace me
 		sf::View m_view;
 		sf::Clock m_clock;
 
+		sf::Time m_fixedUpdateInterval; //TODO: have a separate settings class for this
+
 		void createWindow(unsigned int width, unsigned int height);
 
 	private:
 		bool m_isTerminated;
-
+		sf::Time m_timeSinceFixedUpdate;
 
 		void gameLoop();
 
-		virtual void update(sf::Time timeElapsed) = 0;
+		virtual void continuousUpdate(sf::Time timeElapsed) = 0;
+		virtual void fixedUpdate() = 0;
 		virtual void draw() = 0;
 
 		void handleWindowEvents();

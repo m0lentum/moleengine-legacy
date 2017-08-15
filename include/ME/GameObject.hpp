@@ -13,7 +13,7 @@ namespace me
 	{
 	public:
 
-		virtual void update() = 0;
+		virtual void continuousUpdate() = 0;
 
 	private:
 
@@ -26,7 +26,7 @@ namespace me
 	{
 	public:
 
-		void update();
+		void continuousUpdate();
 
 		void setGraphic(const me::AnimatedSprite &theGraphic);
 
@@ -45,7 +45,7 @@ namespace me
 	{
 	public:
 
-		void update();
+		void continuousUpdate();
 
 		void setGraphic(sf::Drawable *theGraphic);
 

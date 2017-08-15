@@ -2,7 +2,7 @@
 
 namespace me
 {
-	void AnimatedSprite::update(sf::Time timeElapsed)
+	void AnimatedSprite::continuousUpdate(sf::Time timeElapsed)
 	{
 		if (m_isPlaying)
 		{

@@ -3,7 +3,8 @@
 //=======================GAMEOBJECT_ANIMATED====================================
 void me::GameObjectAnimated::update()
 {
-	graphic->update();
+	//will fix this when remaking the GameObject class
+	//graphic->update(sf::Time());
 }
 
 void me::GameObjectAnimated::setGraphic(const me::AnimatedSprite &theGraphic)

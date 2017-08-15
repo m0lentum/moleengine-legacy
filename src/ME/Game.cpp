@@ -1,37 +1,39 @@
 #include <Game.hpp>
-
+#include <iostream>
 
 namespace me
 {
 	void Game::handleWindowEvents()
 	{
 		sf::Event event;
-		while (mainWindow.pollEvent(event))
+		while (m_mainWindow.pollEvent(event))
 		{
 			if (event.type == sf::Event::Closed)
-				mainWindow.close();
+				m_mainWindow.close();
 		}
 	}
 
 	void Game::gameLoop()
 	{
-		while (!isTerminated)
+		while (!m_isTerminated)
 		{
-			if (!mainWindow.isOpen())
+			if (!m_mainWindow.isOpen())
 			{
 				terminate();
 				continue;
 			}
 			handleWindowEvents();
-			update();
+			sf::Time timeElapsed = m_clock.restart();
+			std::cout << "Update loop, time elapsed: " << timeElapsed.asMilliseconds() << " ms" << std::endl;
+			update(timeElapsed);
 			draw();
 		}
 	}
 
 	void Game::createWindow(unsigned int width, unsigned int height)
 	{
-		mainWindow.create(sf::VideoMode(width, height), title, sf::Style::Close);
-		view.setSize((float)width, (float)height);
+		m_mainWindow.create(sf::VideoMode(width, height), m_title, sf::Style::Close);
+		m_view.setSize((float)width, (float)height);
 	}
 
 	void Game::begin()
@@ -41,11 +43,11 @@ namespace me
 
 	void Game::terminate()
 	{
-		isTerminated = true;
+		m_isTerminated = true;
 	}
 
 	Game::Game() :
-		isTerminated(false)
+		m_isTerminated(false)
 	{
 	}
 }

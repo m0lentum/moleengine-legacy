@@ -5,6 +5,7 @@
 #include <memory>
 #include "AnimatedSprite.hpp"
 
+//TODO this will have to be entirely reworked for use with Graphic
 
 namespace me
 {

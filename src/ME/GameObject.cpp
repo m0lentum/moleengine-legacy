@@ -1,64 +1,46 @@
 #include <GameObject.hpp>
 
-//=======================GAMEOBJECT_ANIMATED====================================
-void me::GameObjectAnimated::continuousUpdate()
+namespace me
 {
-	//will fix this when remaking the GameObject class
-	//graphic->update(sf::Time());
-}
+	void GameObject::continuousUpdate(const sf::Time &timeElapsed)
+	{
+		if (m_graphic) m_graphic->continuousUpdate(timeElapsed);
+	}
 
-void me::GameObjectAnimated::setGraphic(const me::AnimatedSprite &theGraphic)
-{
-	graphic = std::unique_ptr<me::AnimatedSprite>(new me::AnimatedSprite(theGraphic));
-}
+	void GameObject::fixedUpdate()
+	{
+		//A generic GameObject does nothing on fixed update
+	}
 
-me::GameObjectAnimated::GameObjectAnimated(const GameObjectAnimated &copy) :
-	graphic(new me::AnimatedSprite(*copy.graphic))
-{
-	setPosition(copy.getPosition());
-	setOrigin(copy.getOrigin());
-	setRotation(copy.getRotation());
-	setScale(copy.getScale());
-}
+	void GameObject::draw(sf::RenderTarget &target, sf::RenderStates states) const
+	{
+		if (m_graphic)
+		{
+			states.transform *= getTransform();
+			target.draw(*m_graphic, states);
+		}
+	}
 
-me::GameObjectAnimated::GameObjectAnimated(const me::AnimatedSprite &graphic) :
-	graphic(new me::AnimatedSprite(graphic))
-{
-}
+	void GameObject::setGraphic(Graphic *graphic)
+	{
+		m_graphic.reset(graphic);
+	}
 
-void me::GameObjectAnimated::draw(sf::RenderTarget &target, sf::RenderStates states) const
-{
-	target.draw(*graphic, states.transform.combine(this->getTransform()));
-}
+	GameObject::GameObject()
+	{
+	}
 
+	GameObject::GameObject(Graphic *graphic) :
+		m_graphic(graphic)
+	{
+	}
 
+	GameObject::GameObject(const GameObject &copy) :
+		m_graphic(new Graphic(*copy.m_graphic))
+	{
+	}
 
-//===================GAMEOBJECT_STATIC=================================
-void me::GameObjectStatic::continuousUpdate()
-{
-	//nothing to do here
-}
-
-void me::GameObjectStatic::setGraphic(sf::Drawable *theGraphic)
-{
-	graphic.reset(theGraphic);
-}
-
-me::GameObjectStatic::GameObjectStatic(GameObjectStatic &copy) :
-	graphic(copy.graphic.get())
-{
-	setPosition(copy.getPosition());
-	setOrigin(copy.getOrigin());
-	setRotation(copy.getRotation());
-	setScale(copy.getScale());
-}
-
-me::GameObjectStatic::GameObjectStatic(sf::Drawable *graphic) :
-	graphic(graphic) //cannot copy abstract class, have to settle with this
-{
-}
-
-void me::GameObjectStatic::draw(sf::RenderTarget &target, sf::RenderStates states) const
-{
-	target.draw(*graphic, states.transform.combine(this->getTransform()));
+	GameObject::~GameObject()
+	{
+	}
 }

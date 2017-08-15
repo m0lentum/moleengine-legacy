@@ -22,7 +22,7 @@ namespace me
 
 	public:
 		///Should be called once in each continuousUpdate loop of the game. Handles frame transitions.
-		void continuousUpdate(sf::Time timeElapsed);
+		virtual void continuousUpdate(const sf::Time &timeElapsed);
 
 		///Start the animation and play it for the specified number of loops
 		void play(int loops = -1);
@@ -44,11 +44,11 @@ namespace me
 
 		///Constructor that generates an animation from a horizontal strip spritesheet
 		AnimatedSprite(const sf::Texture *texture, const sf::Vector2i &startPosition, const sf::Vector2i &size,
-			unsigned int numFrames, sf::Time frameDuration);
+			unsigned int numFrames, sf::Time frameDuration, bool playOnCreate = true);
 		///Constructor that takes both a pre-created animation and a size (use in case animation has varying frame sizes)
-		AnimatedSprite(const sf::Texture *texture, const SpriteAnimationData &anim, const sf::Vector2i &size);
+		AnimatedSprite(const sf::Texture *texture, const SpriteAnimationData &anim, const sf::Vector2i &size, bool playOnCreate = true);
 		///Constructor that takes a pre-created animation (assumes size based on first frame)
-		AnimatedSprite(const sf::Texture *texture, const SpriteAnimationData &anim);
+		AnimatedSprite(const sf::Texture *texture, const SpriteAnimationData &anim, bool playOnCreate = true);
 		///Copy constructor
 		AnimatedSprite(const AnimatedSprite &copy);
 		~AnimatedSprite();

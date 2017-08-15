@@ -1,8 +1,9 @@
 #include <AnimatedSprite.hpp>
+//#include <iostream>
 
 namespace me
 {
-	void AnimatedSprite::continuousUpdate(sf::Time timeElapsed)
+	void AnimatedSprite::continuousUpdate(const sf::Time &timeElapsed)
 	{
 		if (m_isPlaying)
 		{
@@ -34,12 +35,12 @@ namespace me
 		m_numLoops = loops;
 	}
 
-	inline void AnimatedSprite::pause()
+	void AnimatedSprite::pause()
 	{
 		m_isPlaying = false;
 	}
 
-	inline void AnimatedSprite::resume()
+	void AnimatedSprite::resume()
 	{
 		m_isPlaying = true;
 	}
@@ -86,11 +87,11 @@ namespace me
 
 
 	AnimatedSprite::AnimatedSprite(const sf::Texture *texture, const sf::Vector2i &startPosition, const sf::Vector2i &size,
-		unsigned int numFrames, sf::Time frameDuration) :
+		unsigned int numFrames, sf::Time frameDuration, bool playOnCreate) :
 		m_size(size),
 		m_currentFrame(0),
 		m_numLoops(-1),
-		m_isPlaying(true)
+		m_isPlaying(playOnCreate)
 	{
 		m_texture = texture;
 		m_textureRect = sf::IntRect(startPosition, size);
@@ -98,15 +99,17 @@ namespace me
 		initVertices();
 	}
 
-	AnimatedSprite::AnimatedSprite(const sf::Texture *texture, const SpriteAnimationData &anim, const sf::Vector2i &size) :
+	AnimatedSprite::AnimatedSprite(const sf::Texture *texture, const SpriteAnimationData &anim, const sf::Vector2i &size, bool playOnCreate) :
 		m_size(size),
-		m_anim(anim)
+		m_anim(anim),
+		m_isPlaying(playOnCreate)
 	{
 		m_texture = texture;
 		initVertices();
 	}
 
-	AnimatedSprite::AnimatedSprite(const sf::Texture *texture, const SpriteAnimationData &anim)
+	AnimatedSprite::AnimatedSprite(const sf::Texture *texture, const SpriteAnimationData &anim, bool playOnCreate) :
+		m_isPlaying(playOnCreate)
 	{
 		//default size to size of first frame of animation
 		sf::IntRect firstFrame = anim.getRect(0);

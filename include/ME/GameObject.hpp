@@ -3,60 +3,29 @@
 
 #include <SFML/Graphics.hpp>
 #include <memory>
-#include "AnimatedSprite.hpp"
-
-//TODO this will have to be entirely reworked for use with Graphic
+#include "Graphic.hpp"
 
 namespace me
 {
 	class GameObject : public sf::Transformable, public sf::Drawable
 	{
-	public:
+	private:
+		std::shared_ptr<Graphic> m_graphic;
 
-		virtual void continuousUpdate() = 0;
+	public:
+		virtual void continuousUpdate(const sf::Time &timeElapsed);
+		virtual void fixedUpdate();
+
+		void setGraphic(Graphic *graphic);
+
+		GameObject();
+		GameObject(Graphic *graphic);
+		GameObject(const GameObject &copy);
+		~GameObject();
 
 	private:
+		virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
-		virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const = 0;
-
-	};
-
-
-	class GameObjectAnimated : public GameObject
-	{
-	public:
-
-		void continuousUpdate();
-
-		void setGraphic(const me::AnimatedSprite &theGraphic);
-
-		GameObjectAnimated(const GameObjectAnimated &copy);
-		GameObjectAnimated(const me::AnimatedSprite &graphic);
-
-	private:
-
-		std::unique_ptr<me::AnimatedSprite> graphic;
-
-		void draw(sf::RenderTarget& target, sf::RenderStates states) const;
-	};
-
-
-	class GameObjectStatic : public GameObject
-	{
-	public:
-
-		void continuousUpdate();
-
-		void setGraphic(sf::Drawable *theGraphic);
-
-		GameObjectStatic(GameObjectStatic &copy);
-		GameObjectStatic(sf::Drawable *graphic);
-
-	private:
-
-		std::unique_ptr<sf::Drawable> graphic;
-
-		void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 	};
 }
 

@@ -3,6 +3,12 @@
 
 namespace me
 {
+	void Graphic::continuousUpdate(const sf::Time &timeElapsed)
+	{
+		//Do nothing if there's no animation
+		std::cout << "Graphic::continuousUpdate called" << std::endl;
+	}
+
 	void Graphic::fillWithColor(const sf::Color& color)
 	{
 		for (std::size_t i = 0; i < m_vertices.getVertexCount(); i++)
@@ -16,7 +22,7 @@ namespace me
 		m_bounds = m_vertices.getBounds();
 
 		updateTexCoords();
-		//TODO also continuousUpdate outline
+		//TODO also update outline
 	}
 
 	void Graphic::updateTexCoords()
@@ -45,8 +51,24 @@ namespace me
 	Graphic::Graphic() :
 		m_texture(NULL),
 		m_textureRect(),
-		m_vertices(sf::TriangleFan),
+		m_vertices(),
 		m_bounds()
+	{
+	}
+
+	Graphic::Graphic(const sf::Texture *texture, const sf::IntRect &textureRect, const sf::VertexArray &vertices) :
+		m_texture(texture),
+		m_textureRect(textureRect),
+		m_vertices(vertices)
+	{
+		updateVertices();
+	}
+
+	Graphic::Graphic(const Graphic &copy) :
+		m_texture(copy.m_texture),
+		m_textureRect(copy.m_textureRect),
+		m_vertices(copy.m_vertices),
+		m_bounds(copy.m_bounds)
 	{
 	}
 

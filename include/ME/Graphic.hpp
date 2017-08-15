@@ -15,10 +15,14 @@ namespace me
 		sf::FloatRect		m_bounds;		//bounding box containing the vertices
 
 	public:
-		/// This should be called every frame
-		virtual void continuousUpdate(sf::Time timeElapsed) = 0;
+		/// This should be called every frame if there's an animation to update
+		virtual void continuousUpdate(const sf::Time &timeElapsed);
 
 		Graphic();
+		/// Completely custom graphic
+		Graphic(const sf::Texture *texture, const sf::IntRect &textureRect, const sf::VertexArray &vertices);
+		/// Copy constructor
+		Graphic(const Graphic &copy);
 		virtual ~Graphic();
 
 	protected:

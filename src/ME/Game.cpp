@@ -35,7 +35,7 @@ namespace me
 				fixedUpdate();
 			}
 
-			draw();
+			draw(); //TODO move draw and continuousUpdate loops to separate thread
 		}
 	}
 
@@ -47,6 +47,7 @@ namespace me
 
 	void Game::begin()
 	{
+		m_stateManager.registerGame(this);
 		gameLoop();
 	}
 

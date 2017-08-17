@@ -2,6 +2,7 @@
 #define GAME_HPP
 
 #include <SFML/Graphics.hpp>
+#include "GameStateManager.hpp"
 
 namespace me
 {
@@ -10,8 +11,8 @@ namespace me
 	public:
 		Game();
 
-		void begin();
-		void terminate();
+		virtual void begin();
+		virtual void terminate();
 
 	protected:
 		sf::RenderWindow m_mainWindow;
@@ -21,11 +22,15 @@ namespace me
 
 		sf::Time m_fixedUpdateInterval; //TODO: have a separate settings class for this
 
+		GameStateManager m_stateManager;
+
+
 		void createWindow(unsigned int width, unsigned int height);
 
 	private:
 		bool m_isTerminated;
 		sf::Time m_timeSinceFixedUpdate;
+
 
 		void gameLoop();
 

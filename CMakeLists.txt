@@ -12,8 +12,8 @@ project(MoleEngine)
 
 # Define sources and library
 set(LIBRARY_NAME "LibMoleEngine")
-file(GLOB SOURCES src/ME/*.cpp)
-file(GLOB HEADERS include/ME/*.hpp)
+file(GLOB_RECURSE SOURCES src/ME/*.cpp)
+file(GLOB_RECURSE HEADERS include/ME/*.hpp)
 include_directories(include/ME)
 add_library(${LIBRARY_NAME} STATIC ${SOURCES})
 

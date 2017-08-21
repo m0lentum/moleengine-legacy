@@ -7,6 +7,8 @@ namespace me
 	{
 		m_states[key] = std::shared_ptr<GameState>(state);
 		state->registerManager(this);
+
+		if (!m_currentState) transitionTo(key); //automatically transition into the first state created
 	}
 
 	void GameStateManager::transitionTo(const std::string &key)

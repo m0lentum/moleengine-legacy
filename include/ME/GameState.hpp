@@ -4,6 +4,7 @@
 #include <SFML/Graphics/RenderStates.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/System/Time.hpp>
+#include "AssetManager.hpp"
 
 namespace me
 {
@@ -15,7 +16,8 @@ namespace me
 	class GameState
 	{
 	protected:
-		GameStateManager *m_manager;
+		GameStateManager *m_stateManager;
+		AssetManager *m_assetManager;
 
 	public:
 		/// Transition events are not mandatory and do nothing by default
@@ -27,9 +29,10 @@ namespace me
 		virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const = 0;
 
 
-		inline void registerManager(GameStateManager *manager) { m_manager = manager; }
-		inline GameStateManager* getManager() const { return m_manager; }
-
+		inline void registerStateManager(GameStateManager *manager) { m_stateManager = manager; }
+		inline GameStateManager* getStateManager() const { return m_stateManager; }
+		inline void registerAssetManager(AssetManager *manager) { m_assetManager = manager; }
+		inline AssetManager* getAssetManager() const { return m_assetManager; }
 
 		virtual ~GameState() {}
 	};

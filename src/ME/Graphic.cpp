@@ -6,7 +6,6 @@ namespace me
 	void Graphic::continuousUpdate(const sf::Time &timeElapsed)
 	{
 		//Do nothing if there's no animation
-		std::cout << "Graphic::continuousUpdate called" << std::endl;
 	}
 
 	void Graphic::fillWithColor(const sf::Color& color)
@@ -40,7 +39,7 @@ namespace me
 	void Graphic::draw(sf::RenderTarget& target, sf::RenderStates states) const
 	{
 		states.transform *= getTransform();
-		states.texture = m_texture;
+		states.texture = m_texture.get();
 
 		target.draw(m_vertices, states);
 
@@ -56,7 +55,7 @@ namespace me
 	{
 	}
 
-	Graphic::Graphic(const sf::Texture *texture, const sf::IntRect &textureRect, const sf::VertexArray &vertices) :
+	Graphic::Graphic(std::shared_ptr<sf::Texture> texture, const sf::IntRect &textureRect, const sf::VertexArray &vertices) :
 		m_texture(texture),
 		m_textureRect(textureRect),
 		m_vertices(vertices)

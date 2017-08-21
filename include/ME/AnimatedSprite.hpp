@@ -3,6 +3,7 @@
 
 #include "Graphic.hpp"
 #include "SpriteAnimationData.hpp"
+#include <memory>
 
 namespace me
 {
@@ -41,14 +42,13 @@ namespace me
 
 		void setAnimation(const SpriteAnimationData &anim);
 
-
 		///Constructor that generates an animation from a horizontal strip spritesheet
-		AnimatedSprite(const sf::Texture *texture, const sf::Vector2i &startPosition, const sf::Vector2i &size,
+		AnimatedSprite(std::shared_ptr<sf::Texture> texture, const sf::Vector2i &startPosition, const sf::Vector2i &size,
 			unsigned int numFrames, sf::Time frameDuration, bool playOnCreate = true);
 		///Constructor that takes both a pre-created animation and a size (use in case animation has varying frame sizes)
-		AnimatedSprite(const sf::Texture *texture, const SpriteAnimationData &anim, const sf::Vector2i &size, bool playOnCreate = true);
+		AnimatedSprite(std::shared_ptr<sf::Texture> texture, const SpriteAnimationData &anim, const sf::Vector2i &size, bool playOnCreate = true);
 		///Constructor that takes a pre-created animation (assumes size based on first frame)
-		AnimatedSprite(const sf::Texture *texture, const SpriteAnimationData &anim, bool playOnCreate = true);
+		AnimatedSprite(std::shared_ptr<sf::Texture> texture, const SpriteAnimationData &anim, bool playOnCreate = true);
 		///Copy constructor
 		AnimatedSprite(const AnimatedSprite &copy);
 		~AnimatedSprite();

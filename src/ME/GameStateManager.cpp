@@ -6,9 +6,14 @@ namespace me
 	void GameStateManager::addState(const std::string &key, GameState *state)
 	{
 		m_states[key] = std::shared_ptr<GameState>(state);
-		state->registerManager(this);
+		state->registerStateManager(this);
 
 		if (!m_currentState) transitionTo(key); //automatically transition into the first state created
+	}
+
+	std::shared_ptr<GameState> GameStateManager::getState(const std::string &key) const
+	{
+		return m_states.at(key);
 	}
 
 	void GameStateManager::transitionTo(const std::string &key)

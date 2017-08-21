@@ -86,7 +86,7 @@ namespace me
 	}
 
 
-	AnimatedSprite::AnimatedSprite(const sf::Texture *texture, const sf::Vector2i &startPosition, const sf::Vector2i &size,
+	AnimatedSprite::AnimatedSprite(std::shared_ptr<sf::Texture> texture, const sf::Vector2i &startPosition, const sf::Vector2i &size,
 		unsigned int numFrames, sf::Time frameDuration, bool playOnCreate) :
 		m_size(size),
 		m_currentFrame(0),
@@ -99,7 +99,7 @@ namespace me
 		initVertices();
 	}
 
-	AnimatedSprite::AnimatedSprite(const sf::Texture *texture, const SpriteAnimationData &anim, const sf::Vector2i &size, bool playOnCreate) :
+	AnimatedSprite::AnimatedSprite(std::shared_ptr<sf::Texture> texture, const SpriteAnimationData &anim, const sf::Vector2i &size, bool playOnCreate) :
 		m_size(size),
 		m_anim(anim),
 		m_isPlaying(playOnCreate)
@@ -108,7 +108,7 @@ namespace me
 		initVertices();
 	}
 
-	AnimatedSprite::AnimatedSprite(const sf::Texture *texture, const SpriteAnimationData &anim, bool playOnCreate) :
+	AnimatedSprite::AnimatedSprite(std::shared_ptr<sf::Texture> texture, const SpriteAnimationData &anim, bool playOnCreate) :
 		m_isPlaying(playOnCreate)
 	{
 		//default size to size of first frame of animation

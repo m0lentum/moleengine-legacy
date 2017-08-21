@@ -14,7 +14,7 @@ namespace me
 	private:
 		/// States mapped to strings
 		std::unordered_map<std::string, std::shared_ptr<GameState>> m_states;
-		/// Pointer to current state so we don't have to look it up in the map every frame
+		/// Pointer to currently active state so we don't have to look it up in the map every frame
 		GameState *m_currentState;
 		/// Pointer to the game which owns this object
 		Game *m_game;
@@ -22,6 +22,7 @@ namespace me
 	public:
 		/// Add a new state to the map
 		void addState(const std::string &key, GameState *state);
+		std::shared_ptr<GameState> getState(const std::string &key) const;
 		/// Switch to a different state
 		void transitionTo(const std::string &key);
 

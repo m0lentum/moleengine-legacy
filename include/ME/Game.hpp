@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "GameStateManager.hpp"
+#include "AssetManager.hpp"
 
 namespace me
 {
@@ -23,7 +24,7 @@ namespace me
 		sf::Time m_fixedUpdateInterval; //TODO: have a separate settings class for this
 
 		GameStateManager m_stateManager;
-
+		AssetManager m_assetManager;
 
 		void createWindow(unsigned int width, unsigned int height);
 

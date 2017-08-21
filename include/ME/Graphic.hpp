@@ -2,6 +2,7 @@
 #define GRAPHIC_HPP
 
 #include <SFML/Graphics.hpp>
+#include <memory>
 
 namespace me
 {
@@ -9,7 +10,7 @@ namespace me
 	class Graphic : public sf::Drawable, public sf::Transformable
 	{
 	protected:
-		const sf::Texture*	m_texture;		//texture to fill the shape with, can be null
+		std::shared_ptr<sf::Texture> m_texture;		//texture to fill the shape with, can be null
 		sf::IntRect			m_textureRect;	//area of texture to draw
 		sf::VertexArray		m_vertices;		//vertices to draw
 		sf::FloatRect		m_bounds;		//bounding box containing the vertices
@@ -20,7 +21,7 @@ namespace me
 
 		Graphic();
 		/// Completely custom graphic
-		Graphic(const sf::Texture *texture, const sf::IntRect &textureRect, const sf::VertexArray &vertices);
+		Graphic(std::shared_ptr<sf::Texture> texture, const sf::IntRect &textureRect, const sf::VertexArray &vertices);
 		/// Copy constructor
 		Graphic(const Graphic &copy);
 		virtual ~Graphic();

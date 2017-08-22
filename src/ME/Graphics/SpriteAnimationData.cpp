@@ -1,4 +1,4 @@
-#include <SpriteAnimationData.hpp>
+#include <Graphics/SpriteAnimationData.hpp>
 
 namespace me
 {

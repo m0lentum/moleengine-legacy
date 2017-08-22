@@ -3,7 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <memory>
-#include "Graphic.hpp"
+#include "Graphics/Graphic.hpp"
 
 namespace me
 {

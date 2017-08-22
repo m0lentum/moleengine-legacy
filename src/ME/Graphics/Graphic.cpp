@@ -1,4 +1,4 @@
-#include <Graphic.hpp>
+#include <Graphics/Graphic.hpp>
 #include <iostream>
 
 namespace me

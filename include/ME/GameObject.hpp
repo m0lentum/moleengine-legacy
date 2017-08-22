@@ -16,12 +16,12 @@ namespace me
 		virtual void continuousUpdate(const sf::Time &timeElapsed);
 		virtual void fixedUpdate();
 
-		void setGraphic(Graphic *graphic);
+		void setGraphic(std::shared_ptr<Graphic> graphic);
 
 		GameObject();
-		GameObject(Graphic *graphic);
+		GameObject(std::shared_ptr<Graphic> graphic);
 		GameObject(const GameObject &copy);
-		~GameObject();
+		virtual ~GameObject();
 
 	private:
 		virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;

@@ -21,16 +21,16 @@ namespace me
 		}
 	}
 
-	void GameObject::setGraphic(Graphic *graphic)
+	void GameObject::setGraphic(std::shared_ptr<Graphic> graphic)
 	{
-		m_graphic.reset(graphic);
+		m_graphic = graphic;
 	}
 
 	GameObject::GameObject()
 	{
 	}
 
-	GameObject::GameObject(Graphic *graphic) :
+	GameObject::GameObject(std::shared_ptr<Graphic> graphic) :
 		m_graphic(graphic)
 	{
 	}

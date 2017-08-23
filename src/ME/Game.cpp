@@ -47,7 +47,6 @@ namespace me
 
 	void Game::begin()
 	{
-		m_stateManager.registerGame(this);
 		gameLoop();
 	}
 

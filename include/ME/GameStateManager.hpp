@@ -8,34 +8,26 @@
 
 namespace me
 {
-	class Game;
-
+	/// Keeps track of the currently active game state.
+	/// Primarily used to direct update loop calls to the right state.
 	class GameStateManager : public IComponent
 	{
 	private:
-		/// States mapped to strings
-		std::unordered_map<std::string, std::shared_ptr<IGameState>> m_states;
-		/// Pointer to currently active state so we don't have to look it up in the map every frame
+		/// Pointer to currently active state
 		IGameState *m_currentState;
-		/// Pointer to the game which owns this object
-		Game *m_game;
+		/// Pointer to previously active state
+		IGameState *m_prevState;
 
 	public:
-		/// Add a new state to the map
-		void addState(const std::string &key, IGameState *state);
-		std::shared_ptr<IGameState> getState(const std::string &key) const;
 		/// Switch to a different state
-		void transitionTo(const std::string &key);
-		
+		void transitionTo(IGameState *state);
+		/// Switch back to the previously active state
+		void backToPrevious();
 
 		// IComponent update loops
 		virtual void continuousUpdate(const sf::Time &timeElapsed);
 		virtual void fixedUpdate();
 		virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
-
-
-		inline void registerGame(Game *const game) { m_game = game; }
-		inline Game* getGame() const { return m_game; }
 
 		
 		GameStateManager();

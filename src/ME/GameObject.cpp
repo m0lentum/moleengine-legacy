@@ -17,7 +17,7 @@ namespace me
 		if (m_graphic)
 		{
 			states.transform *= getTransform();
-			target.draw(*m_graphic, states);
+			m_graphic->draw(target, states);
 		}
 	}
 

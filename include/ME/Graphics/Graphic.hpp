@@ -7,7 +7,7 @@
 namespace me
 {
 	/// Custom implementation of sf::Shape to allow more flexibility + animation
-	class Graphic : public sf::Drawable, public sf::Transformable
+	class Graphic : public sf::Transformable
 	{
 	protected:
 		std::shared_ptr<sf::Texture> m_texture;		//texture to fill the shape with, can be null
@@ -18,6 +18,8 @@ namespace me
 	public:
 		/// This should be called every frame if there's an animation to update
 		virtual void continuousUpdate(const sf::Time &timeElapsed);
+		/// Draw the graphic in the specified target
+		virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
 		Graphic();
 		/// Completely custom graphic
@@ -34,8 +36,6 @@ namespace me
 		void fillWithColor(const sf::Color& color);
 
 	private:
-		virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
-
 		/// Update texture coordinates to keep the texture from deforming
 		void updateTexCoords();
 	};

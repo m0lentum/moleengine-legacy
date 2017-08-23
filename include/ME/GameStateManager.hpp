@@ -3,33 +3,35 @@
 
 #include <unordered_map>
 #include <memory>
-#include "GameState.hpp"
+#include "IGameState.hpp"
+#include "IComponent.hpp"
 
 namespace me
 {
 	class Game;
 
-	class GameStateManager
+	class GameStateManager : public IComponent
 	{
 	private:
 		/// States mapped to strings
-		std::unordered_map<std::string, std::shared_ptr<GameState>> m_states;
+		std::unordered_map<std::string, std::shared_ptr<IGameState>> m_states;
 		/// Pointer to currently active state so we don't have to look it up in the map every frame
-		GameState *m_currentState;
+		IGameState *m_currentState;
 		/// Pointer to the game which owns this object
 		Game *m_game;
 
 	public:
 		/// Add a new state to the map
-		void addState(const std::string &key, GameState *state);
-		std::shared_ptr<GameState> getState(const std::string &key) const;
+		void addState(const std::string &key, IGameState *state);
+		std::shared_ptr<IGameState> getState(const std::string &key) const;
 		/// Switch to a different state
 		void transitionTo(const std::string &key);
+		
 
-
-		void continuousUpdate(const sf::Time &timeElapsed);
-		void fixedUpdate();
-		void draw(sf::RenderTarget &target, sf::RenderStates states) const;
+		// IComponent update loops
+		virtual void continuousUpdate(const sf::Time &timeElapsed);
+		virtual void fixedUpdate();
+		virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
 
 		inline void registerGame(Game *const game) { m_game = game; }

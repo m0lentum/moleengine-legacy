@@ -18,7 +18,7 @@ namespace me
 	void Space::draw(sf::RenderTarget &target, sf::RenderStates states) const
 	{
 		for (const auto &obj : m_objects)
-			target.draw(*obj, states);
+			obj->draw(target, states);
 	}
 
 	void Space::addObject(GameObject *object)

@@ -1,4 +1,5 @@
 #include <Game.hpp>
+#include "Input/Keyboard.hpp"
 //#include <iostream>
 
 namespace me
@@ -33,6 +34,8 @@ namespace me
 			{
 				m_timeSinceFixedUpdate -= m_fixedUpdateInterval;
 				fixedUpdate();
+
+				Keyboard::updateTracked();
 			}
 
 			draw(); //TODO move draw and continuousUpdate loops to separate thread

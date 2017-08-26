@@ -2,6 +2,8 @@
 
 namespace me
 {
+	const float VectorMath::PI = 3.1415927f;
+
 	float VectorMath::getLength(const sf::Vector2f &vector)
 	{
 		return std::sqrtf(vector.x * vector.x + vector.y * vector.y);

@@ -4,13 +4,14 @@
 #include <SFML/System/Vector2.hpp>
 #include <cmath>
 
-static const float PI = 3.1415927f;
-
 namespace me
 {
 	/// Collection of math functions for handling two-dimensional float vectors.
 	class VectorMath
 	{
+	private:
+		static const float PI;
+
 	public:
 		static float getLength(const sf::Vector2f &vector);
 		/// Returns a vector with the same direction as this one but a length of 1.

@@ -1,4 +1,6 @@
 #include <GameObject.hpp>
+#include <Space.hpp>
+#include <iostream>
 
 namespace me
 {
@@ -21,21 +23,39 @@ namespace me
 		}
 	}
 
+	void GameObject::registerSpace(Space *space)
+	{
+		m_space = space;
+	}
+
+	void GameObject::destroy()
+	{
+		if (m_space)
+			m_space->removeObject(this);
+		else
+			std::cerr << "Cannot destroy an object that is not in a space" << std::endl;
+	}
+
 	void GameObject::setGraphic(std::shared_ptr<Graphic> graphic)
 	{
 		m_graphic = graphic;
 	}
 
-	GameObject::GameObject()
+
+
+	GameObject::GameObject() :
+		m_space(NULL)
 	{
 	}
 
 	GameObject::GameObject(std::shared_ptr<Graphic> graphic) :
+		m_space(NULL),
 		m_graphic(graphic)
 	{
 	}
 
 	GameObject::GameObject(const GameObject &copy) :
+		m_space(NULL),
 		m_graphic(new Graphic(*copy.m_graphic))
 	{
 	}

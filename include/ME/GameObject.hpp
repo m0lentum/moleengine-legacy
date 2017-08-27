@@ -18,8 +18,6 @@ namespace me
 
 		std::shared_ptr<Graphic> m_graphic;
 
-		bool m_markedToDestroy;
-
 	public:
 		// IComponent update loops
 		virtual void continuousUpdate(const sf::Time &timeElapsed);
@@ -31,8 +29,6 @@ namespace me
 		/// Mark this object for destruction.
 		/// It will be removed from all spaces on the next fixedUpdate cycle.
 		void destroy();
-		/// Whether the object should be destroyed
-		bool markedToDestroy();
 
 		void setGraphic(std::shared_ptr<Graphic> graphic);
 

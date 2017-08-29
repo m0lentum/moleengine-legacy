@@ -1,4 +1,6 @@
 #include <Physics/PhysicsObject.hpp>
+#include <iostream>
+#include <Space.hpp>
 
 namespace me
 {
@@ -7,6 +9,13 @@ namespace me
 		m_props.velocity += (force / m_props.mass); // TODO: account for offset from center
 	}
 
+	void PhysicsObject::destroy()
+	{
+		if (m_space)
+			m_space->removeObject(this);
+		else
+			std::cerr << "Warning: tried to destroy a physics object that is not in a space" << std::endl;
+	}
 
 
 	PhysicsObject::PhysicsObject() :

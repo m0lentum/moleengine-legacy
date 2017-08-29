@@ -30,8 +30,13 @@ namespace me
 
 		/// Apply a force to this object, meaning mass and (TODO) point of impact will be considered.
 		void applyForce(const sf::Vector2f &force);
-		/// Simply sets the velocity to the given value without regard to physical properties.
+		/// Add a vector to the velocity of the object without regard to physical properties (used for gravity).
+		inline void accelerate(const sf::Vector2f &acc) { m_props.velocity += acc; }
+		/// Set the velocity to the given value without regard to physical properties.
 		inline void setVelocity(const sf::Vector2f &vel) { m_props.velocity = vel; }
+
+		// This needs to be re-implemented here in order for Space::removeObject to remove the object from the right container
+		virtual void destroy();
 
 		/// Sets props to default values and leaves the graphic null.
 		PhysicsObject();

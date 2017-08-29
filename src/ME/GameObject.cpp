@@ -33,7 +33,7 @@ namespace me
 		if (m_space)
 			m_space->removeObject(this);
 		else
-			std::cerr << "Cannot destroy an object that is not in a space" << std::endl;
+			std::cerr << "Warning: tried to destroy an object that is not in a space" << std::endl;
 	}
 
 	void GameObject::setGraphic(std::shared_ptr<Graphic> graphic)

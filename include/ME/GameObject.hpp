@@ -12,7 +12,7 @@ namespace me
 
 	class GameObject : public sf::Transformable, public IComponent
 	{
-	private:
+	protected:
 		/// The Space this object is in, if any.
 		Space *m_space;
 
@@ -27,8 +27,8 @@ namespace me
 		/// Store a pointer to the space containing this object
 		void registerSpace(Space *space);
 		/// Mark this object for destruction.
-		/// It will be removed from all spaces on the next fixedUpdate cycle.
-		void destroy();
+		/// It will be removed from the space it's in on the next fixedUpdate cycle.
+		virtual void destroy();
 
 		void setGraphic(std::shared_ptr<Graphic> graphic);
 

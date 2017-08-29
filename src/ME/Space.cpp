@@ -22,17 +22,6 @@ namespace me
 		doDraw<PhysicsObject>(m_physicsObjects, target, states);
 	}
 
-	void Space::addObject(std::shared_ptr<GameObject> object)
-	{
-		m_objects.emplace(object.get(), object);
-		object->registerSpace(this);
-	}
-
-	void Space::addPhysicsObject(std::shared_ptr<PhysicsObject> object)
-	{
-		m_physicsObjects.emplace(object.get(), object);
-		object->registerSpace(this);
-	}
 
 	void Space::removeObject(GameObject * object)
 	{

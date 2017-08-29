@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <memory>
 #include <queue>
+#include <type_traits>
 #include "GameObject.hpp"
 #include "Physics/PhysicsObject.hpp"
 #include <SFML/Graphics/RenderTarget.hpp>
@@ -34,10 +35,6 @@ namespace me
 		/// draw all contained objects
 		virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
 
-		void addObject(std::shared_ptr<GameObject> object);
-		void addPhysicsObject(std::shared_ptr<PhysicsObject> object);
-		void removeObject(GameObject * object);
-		void removeObject(PhysicsObject * object);
 
 		// TODO: tagging system to filter objects
 
@@ -45,11 +42,30 @@ namespace me
 		Space(const Space &copy);
 		~Space();
 
+		// messy code, but this allows using the same method name to add both PhysicsObjects and GameObjects, 
+		// and thus eliminates the possibility of adding an object to the wrong container by accident.
 
+		/// add a GameObject
+		template<typename T, typename std::enable_if<std::is_base_of<GameObject, T>::value && !std::is_base_of<PhysicsObject, T>::value>::type* = nullptr> 
+		void addObject(std::shared_ptr<T> object)
+		{
+			m_objects.emplace(object.get(), object);
+			object->registerSpace(this);
+		}
+		/// add a PhysicsObject
+		template<typename T, typename std::enable_if<std::is_base_of<PhysicsObject, T>::value>::type* = nullptr>
+		void addObject(std::shared_ptr<T> object)
+		{
+			m_physicsObjects.emplace(object.get(), object);
+			object->registerSpace(this);
+		}
 
+		void removeObject(GameObject * object);
+		void removeObject(PhysicsObject * object);
+		
 	private:
-		// Helper functions to avoid copy-pasting code in the actual update loops.
-		// These are not really important for anyone reading the code so I'm too lazy to put these in an .inl file.
+		// Helper functions to avoid copy-pasting code.
+		// These won't be used outside the class so I'm too lazy to put them in an .inl file.
 
 		template<class T>
 		void doContinuousUpdate(std::unordered_map<T*, std::shared_ptr<T>> &objects, sf::Time timeElapsed)

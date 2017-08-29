@@ -18,32 +18,43 @@ namespace me
 	}
 
 
-	PhysicsObject::PhysicsObject() :
-		GameObject()
-	{
-	}
 
-	PhysicsObject::PhysicsObject(const Props &props) :
+	PhysicsObject::PhysicsObject(ICollider *collider) :
 		GameObject(),
-		m_props(props)
+		m_collider(collider)
 	{
+		m_collider->setParent(this);
 	}
 
-	PhysicsObject::PhysicsObject(std::shared_ptr<Graphic> graphic) :
-		GameObject(graphic)
+	PhysicsObject::PhysicsObject(const Props &props, ICollider *collider) :
+		GameObject(),
+		m_props(props),
+		m_collider(collider)
 	{
+		m_collider->setParent(this);
 	}
 
-	PhysicsObject::PhysicsObject(const Props &props, std::shared_ptr<Graphic> graphic) :
+	PhysicsObject::PhysicsObject(ICollider *collider, const std::shared_ptr<Graphic> graphic) :
 		GameObject(graphic),
-		m_props(props)
+		m_collider(collider)
 	{
+		m_collider->setParent(this);
+	}
+
+	PhysicsObject::PhysicsObject(const Props &props, ICollider *collider, std::shared_ptr<Graphic> graphic) :
+		GameObject(graphic),
+		m_props(props),
+		m_collider(collider)
+	{
+		m_collider->setParent(this);
 	}
 
 	PhysicsObject::PhysicsObject(const PhysicsObject &copy) :
 		GameObject(copy),
-		m_props(copy.m_props)
+		m_props(copy.m_props),
+		m_collider(copy.m_collider->clone())
 	{
+		m_collider->setParent(this);
 	}
 
 	PhysicsObject::~PhysicsObject()

@@ -3,6 +3,8 @@
 
 #include "../GameObject.hpp"
 #include <SFML/System/Vector2.hpp>
+#include "ICollider.hpp"
+#include <memory>
 
 namespace me
 {
@@ -24,9 +26,11 @@ namespace me
 		};
 	protected:
 		Props m_props;
+		std::unique_ptr<ICollider> m_collider;
 
 	public:
-		inline const Props* getProps() const { return &m_props; }
+		inline const Props& getProps() const { return m_props; }
+		inline const ICollider& getCollider() const { return *m_collider; }
 
 		/// Apply a force to this object, meaning mass and (TODO) point of impact will be considered.
 		void applyForce(const sf::Vector2f &force);
@@ -39,13 +43,13 @@ namespace me
 		virtual void destroy();
 
 		/// Sets props to default values and leaves the graphic null.
-		PhysicsObject();
+		PhysicsObject(ICollider *collider);
 		/// Sets props to given values and leaves the graphic null.
-		PhysicsObject(const Props &props);
+		PhysicsObject(const Props &props, ICollider *collider);
 		/// Sets props to default values and sets the graphic.
-		PhysicsObject(std::shared_ptr<Graphic> graphic);
+		PhysicsObject(ICollider *collider, const std::shared_ptr<Graphic> graphic);
 		/// Sets props to given values and sets the graphic.
-		PhysicsObject(const Props &props, std::shared_ptr<Graphic> graphic);
+		PhysicsObject(const Props &props, ICollider *collider, std::shared_ptr<Graphic> graphic);
 		/// Copy constructor.
 		PhysicsObject(const PhysicsObject &copy);
 		virtual ~PhysicsObject();

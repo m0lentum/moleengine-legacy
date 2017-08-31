@@ -38,6 +38,8 @@ namespace me
 		inline void accelerate(const sf::Vector2f &acc) { m_props.velocity += acc; }
 		/// Set the velocity to the given value without regard to physical properties.
 		inline void setVelocity(const sf::Vector2f &vel) { m_props.velocity = vel; }
+		/// Generate a graphic for the object from the shape of its collider.
+		void setGraphicFromCollider(const sf::Color &color = sf::Color::White);
 
 		// This needs to be re-implemented here in order for Space::removeObject to remove the object from the right container
 		virtual void destroy();

@@ -9,6 +9,12 @@ namespace me
 		m_props.velocity += (force / m_props.mass); // TODO: account for offset from center
 	}
 
+	void PhysicsObject::setGraphicFromCollider(const sf::Color &color)
+	{
+		if (m_collider)
+			setGraphic(m_collider->generateGraphic(color));
+	}
+
 	void PhysicsObject::destroy()
 	{
 		if (m_space)

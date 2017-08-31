@@ -37,6 +37,10 @@ namespace me
 		other.checkCollision(*this, info);
 	}
 	
+	std::shared_ptr<Graphic> ColliderCircle::generateGraphic(const sf::Color &color) const
+	{
+		return Graphic::makeCircle(m_radius, 25, color);
+	}
 
 
 	ICollider* ColliderCircle::clone() const

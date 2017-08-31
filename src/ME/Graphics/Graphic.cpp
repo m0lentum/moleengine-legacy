@@ -1,5 +1,6 @@
 #include <Graphics/Graphic.hpp>
 #include <iostream>
+#include <cmath>
 
 namespace me
 {
@@ -14,6 +15,30 @@ namespace me
 		{
 			m_vertices[i].color = color;
 		}
+	}
+
+	void Graphic::setTexture(std::shared_ptr<sf::Texture> texture, bool resetRect)
+	{
+		if (texture)
+		{
+			// Recompute the texture area if requested, or if there was no texture & rect before. Copied from sf::Shape.
+			if (resetRect || (!m_texture && (m_textureRect == sf::IntRect())))
+				setTextureRect(sf::IntRect(0, 0, texture->getSize().x, texture->getSize().y));
+		}
+
+		m_texture = texture;
+	}
+
+	void Graphic::setTextureRect(const sf::IntRect &rect)
+	{
+		m_textureRect = rect;
+		updateTexCoords();
+	}
+
+	void Graphic::setVertices(const sf::VertexArray &verts)
+	{
+		m_vertices = verts;
+		updateVertices();
 	}
 
 	void Graphic::updateVertices()
@@ -55,6 +80,14 @@ namespace me
 	{
 	}
 
+	Graphic::Graphic(const sf::VertexArray &vertices) :
+		m_texture(NULL),
+		m_textureRect(),
+		m_vertices(vertices)
+	{
+		updateVertices();
+	}
+
 	Graphic::Graphic(std::shared_ptr<sf::Texture> texture, const sf::IntRect &textureRect, const sf::VertexArray &vertices) :
 		m_texture(texture),
 		m_textureRect(textureRect),
@@ -73,5 +106,25 @@ namespace me
 
 	Graphic::~Graphic()
 	{
+	}
+
+
+	std::shared_ptr<Graphic> Graphic::makeCircle(float radius, unsigned int pointCount, const sf::Color &color)
+	{
+		sf::VertexArray verts(sf::PrimitiveType::TriangleFan, pointCount);
+
+		const float angleIncrement = 6.2831853f / pointCount;
+
+		float angle;
+		for (unsigned int i = 0; i < pointCount; i++)
+		{
+			angle = i * angleIncrement;
+			verts[i].position.x = std::cos(angle) * radius;
+			verts[i].position.y = std::sin(angle) * radius;
+			
+			verts[i].color = color;
+		}
+
+		return std::make_shared<Graphic>(verts);
 	}
 }

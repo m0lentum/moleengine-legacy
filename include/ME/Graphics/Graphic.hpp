@@ -6,7 +6,8 @@
 
 namespace me
 {
-	/// Custom implementation of sf::Shape to allow more flexibility + animation
+	/// Custom implementation of sf::Shape to allow more flexibility + animation.
+	/// A lot of this is basically copy-pasted from sf::Shape.
 	class Graphic : public sf::Transformable
 	{
 	protected:
@@ -21,19 +22,29 @@ namespace me
 		/// Draw the graphic in the specified target
 		virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
+		/// Set every vertex to the specified color
+		void fillWithColor(const sf::Color& color);
+
+		void setTexture(std::shared_ptr<sf::Texture> texture, bool resetRect = true);
+		void setTextureRect(const sf::IntRect &rect);
+		void setVertices(const sf::VertexArray &verts);
+
+
 		Graphic();
+		/// Graphic without a texture
+		Graphic(const sf::VertexArray &vertices);
 		/// Completely custom graphic
 		Graphic(std::shared_ptr<sf::Texture> texture, const sf::IntRect &textureRect, const sf::VertexArray &vertices);
 		/// Copy constructor
 		Graphic(const Graphic &copy);
 		virtual ~Graphic();
 
+		/// Create a circle with the origin at the center.
+		static std::shared_ptr<Graphic> makeCircle(float radius, unsigned int pointCount, const sf::Color &color = sf::Color::White);
+
 	protected:
 		/// This should be called every time a point's position changes
 		void updateVertices();
-
-		/// Set every vertex to the specified color
-		void fillWithColor(const sf::Color& color);
 
 	private:
 		/// Update texture coordinates to keep the texture from deforming

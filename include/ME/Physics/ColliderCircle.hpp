@@ -20,7 +20,8 @@ namespace me
 		virtual void checkCollision(const ColliderCircle &other, CollisionInfo &info) const;
 		virtual void checkCollision(const ColliderRect &other, CollisionInfo &info) const;
 		virtual void checkCollision(const ColliderPolygon &other, CollisionInfo &info) const;
-		
+
+		virtual std::shared_ptr<Graphic> generateGraphic(const sf::Color &color = sf::Color::White) const;
 		
 		virtual ICollider* clone() const;
 

@@ -1,5 +1,6 @@
 #include <Space.hpp>
-//#include <iostream>
+#include <Physics/CollisionChecker.hpp>
+#include <iostream>
 
 namespace me
 {
@@ -13,13 +14,43 @@ namespace me
 	{
 		doFixedUpdate<GameObject>(m_objects, m_oToDestroy);
 		doFixedUpdate<PhysicsObject>(m_physicsObjects, m_pToDestroy);
-		// TODO: physics calculations
+		
+		handleCollisions();
 	}
 	
 	void Space::draw(sf::RenderTarget &target, sf::RenderStates states) const
 	{
 		doDraw<GameObject>(m_objects, target, states);
 		doDraw<PhysicsObject>(m_physicsObjects, target, states);
+	}
+
+	void Space::handleCollisions()
+	{
+		// TODO: add optimization through spatial partitioning
+
+		for (auto i = m_physicsObjects.begin(); i != m_physicsObjects.end(); i++)
+		{
+			auto j = i;
+			j++;
+			for (; j != m_physicsObjects.end(); j++)
+			{
+				CollisionInfo info;
+				info.obj1 = i->first;
+				info.obj2 = j->first;
+				CollisionChecker::checkCollision(i->second->getCollider(), j->second->getCollider(), info);
+
+				if (info.areColliding)
+				{
+					// TODO: onCollision events for objects
+					resolveCollision(info);
+				}
+			}
+		}
+	}
+
+	void Space::resolveCollision(const CollisionInfo &info)
+	{
+		info.obj1->move(info.penetration);
 	}
 
 

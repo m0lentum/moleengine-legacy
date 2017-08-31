@@ -29,12 +29,19 @@ namespace me
 
 	public:
 		/// continuousUpdate all contained objects
-		virtual void continuousUpdate(sf::Time timeElapsed);
+		void continuousUpdate(sf::Time timeElapsed);
 		/// fixedUpdate all contained objects
-		virtual void fixedUpdate();
+		void fixedUpdate();
 		/// draw all contained objects
-		virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
+		void draw(sf::RenderTarget &target, sf::RenderStates states) const;
 
+	private:
+		/// Check for collisions and resolve them
+		void handleCollisions();
+		/// Resolves penetration and applies appropriate forces to the objects.
+		void resolveCollision(const CollisionInfo &info);
+
+	public:
 
 		// TODO: tagging system to filter objects
 

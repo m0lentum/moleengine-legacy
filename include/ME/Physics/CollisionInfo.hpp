@@ -11,13 +11,16 @@ namespace me
 	/// Struct containing information about a collision.
 	struct CollisionInfo
 	{
-		const PhysicsObject *obj1;
-		const PhysicsObject *obj2;
+		PhysicsObject *obj1;
+		PhysicsObject *obj2;
 
 		bool areColliding = false;
 
-		/// The point in global space where the force of the collision will be applied to objects.
-		sf::Vector2f point;
+		/// The point on object 1 (in local space) where the collision force will be applied
+		sf::Vector2f point1;
+		/// Same as point1 but for object 2
+		sf::Vector2f point2;
+		/// The direction and depth of penetration if the objects are colliding (direction towards obj1).
 		sf::Vector2f penetration;
 	};
 }

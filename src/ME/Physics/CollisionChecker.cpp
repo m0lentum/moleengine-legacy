@@ -1,5 +1,7 @@
 #include <Physics/CollisionChecker.hpp>
-#include <iostream>
+#include <Physics/ColliderCircle.hpp>
+#include <Physics/VectorMath.hpp>
+//#include <iostream>
 
 namespace me
 {
@@ -11,9 +13,17 @@ namespace me
 	//===================  CIRCLE and X  ===================
 	void CollisionChecker::circleCircle(const ColliderCircle &obj1, const ColliderCircle &obj2, CollisionInfo &info)
 	{
-		// this is just for testing to make sure the right function gets called
-		std::cout << "Checking circle-circle collision!" << std::endl;
-		info.point = sf::Vector2f(10, 10);
+		sf::Vector2f separation = obj2.getPosition() - obj1.getPosition();
+		sf::Vector2f axis = VectorMath::normalize(separation);
+
+		float penDepth = obj1.getRadius() + obj2.getRadius() - VectorMath::getLength(separation);
+		if (penDepth > 0) // A collision occurred
+		{
+			info.areColliding = true;
+			info.penetration = axis * -penDepth;
+			info.point1 = axis * obj1.getRadius();
+			info.point2 = axis * -obj2.getRadius();
+		}
 	}
 
 	void CollisionChecker::circleRect(const ColliderCircle &obj1, const ColliderRect &obj2, CollisionInfo &info)

@@ -6,7 +6,7 @@ namespace me
 
 	float VectorMath::getLength(const sf::Vector2f &vector)
 	{
-		return std::sqrtf(vector.x * vector.x + vector.y * vector.y);
+		return std::sqrt(vector.x * vector.x + vector.y * vector.y);
 	}
 
 	sf::Vector2f VectorMath::normalize(const sf::Vector2f &vector)

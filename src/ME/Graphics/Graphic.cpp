@@ -127,4 +127,21 @@ namespace me
 
 		return std::make_shared<Graphic>(verts);
 	}
+
+  std::shared_ptr<Graphic> Graphic::makeRect(float width, float height, const sf::Color &color)
+	{
+		sf::VertexArray verts(sf::PrimitiveType::TriangleFan, 4);
+
+		float hw = width / 2;
+		float hh = height / 2;
+
+		verts[0].position = sf::Vector2f(-hw, -hh);
+		verts[1].position = sf::Vector2f(-hw, hh);
+		verts[2].position = sf::Vector2f(hw, hh);
+		verts[3].position = sf::Vector2f(hw, -hh);
+
+		std::shared_ptr<Graphic> graphic = std::make_shared<Graphic>(verts);
+		graphic->fillWithColor(color);
+		return graphic;
+	}
 }

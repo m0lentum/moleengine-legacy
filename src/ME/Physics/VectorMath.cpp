@@ -28,7 +28,8 @@ namespace me
 
 	sf::Vector2f VectorMath::projectToVector(const sf::Vector2f &vector, const sf::Vector2f &target)
 	{
-		return projectToAxis(vector, normalize(target));
+		// (v dot t / t.length^2) * v
+		return projectToAxis(vector, target) / (target.x * target.x + target.y * target.y);
 	}
 
 	sf::Vector2f VectorMath::rotateRad(const sf::Vector2f &vector, float radians)

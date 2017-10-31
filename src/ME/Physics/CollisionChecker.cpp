@@ -2,8 +2,7 @@
 #include <Physics/ColliderCircle.hpp>
 #include <Physics/ColliderRect.hpp>
 #include <Physics/VectorMath.hpp>
-#include <iostream>
-#include <Input/Keyboard.hpp>
+//#include <iostream>
 
 namespace me
 {
@@ -85,11 +84,6 @@ namespace me
 					axisOwner = i;
 					axisIndex = j;
 					negateAxis = axisDistance > 0; // Penetration should always be towards object 1
-				}
-
-				if (Keyboard::isKeyJustPressed(Keyboard::M)) {
-					std::cout << axisDistance << ", " << axisWidthSum << ", " << depth << std::endl;
-					std::cout << penDepth << ", " << negateAxis << std::endl << std::endl;
 				}
 			}
 		}

@@ -1,17 +1,20 @@
-#ifndef COLLIDER_CIRCLE_HPP
-#define COLLIDER_CIRCLE_HPP
+#ifndef COLLIDER_RECT_HPP
+#define COLLIDER_RECT_HPP
 
 #include "ICollider.hpp"
 
 namespace me
 {
-	class ColliderCircle : public ICollider
+	class ColliderRect : public ICollider
 	{
 	private:
-		const float m_radius;
+		float m_halfWidth;
+		float m_halfHeight;
 
 	public:
-		const float getRadius() const;
+		inline const float getHalfWidth() const { return m_halfWidth; }
+		inline const float getHalfHeight() const { return m_halfHeight; }
+		const sf::Vector2f getWidthAxis() const;
 
 		const sf::Vector2f& getPosition() const;
 
@@ -22,13 +25,14 @@ namespace me
 		virtual void checkCollision(const ColliderPolygon &other, CollisionInfo &info) const;
 
 		virtual std::shared_ptr<Graphic> generateGraphic(const sf::Color &color = sf::Color::White) const;
-		
+
 		virtual ICollider* clone() const;
 
-		ColliderCircle(float radius);
-		ColliderCircle(const ColliderCircle &copy);
-		virtual ~ColliderCircle() {}
+		ColliderRect(float width, float height);
+		ColliderRect(const ColliderRect &copy);
+		virtual ~ColliderRect() {}
 	};
 }
 
-#endif // COLLIDER_CIRCLE_HPP
+
+#endif // COLLIDER_RECT_HPP

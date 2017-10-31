@@ -4,16 +4,16 @@
 
 namespace me
 {
-	const sf::Vector2f& ColliderCircle::getPosition() const
-	{
-		return m_parent->getPosition();
-	}
-
 	const float ColliderCircle::getRadius() const
 	{
 		// The collider has to be a perfect circle for calculations to work,
 		// so only consider one dimension of the containing object's scale and assume the other is the same
 		return m_parent->getScale().x * m_radius;
+	}
+
+	const sf::Vector2f& ColliderCircle::getPosition() const
+	{
+		return m_parent->getPosition();
 	}
 
 
@@ -24,12 +24,12 @@ namespace me
 
 	void ColliderCircle::checkCollision(const ColliderRect &other, CollisionInfo &info) const
 	{
-
+		CollisionChecker::rectCircle(other, *this, info);
 	}
 
 	void ColliderCircle::checkCollision(const ColliderPolygon &other, CollisionInfo &info) const
 	{
-
+		CollisionChecker::polyCircle(other, *this, info);
 	}
 
 	void ColliderCircle::findTypeAndCheckCollision(const ICollider &other, CollisionInfo &info) const

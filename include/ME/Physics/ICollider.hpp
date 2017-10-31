@@ -5,6 +5,7 @@
 #include "CollisionInfo.hpp"
 #include <memory>
 #include <SFML/Graphics/Color.hpp>
+#include <SFML/System/Vector2.hpp>
 
 namespace me
 {

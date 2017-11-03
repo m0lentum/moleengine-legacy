@@ -18,10 +18,9 @@ Planned features:
 * Keyframe-based animation of various object properties
 
 ## Dependencies
-SFML (https://www.sfml-dev.org/) \
-C++11 and the C++ standard library
+SFML (https://www.sfml-dev.org/)
 
-## Building the project
+## Installation
 Note: You probably shouldn't yet. Here are the instructions nonetheless.
 
 **Windows (VS2017 method)**

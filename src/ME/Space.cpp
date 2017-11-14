@@ -86,11 +86,13 @@ namespace me
 	void Space::addObject(GameObject * object)
 	{
 		m_objects.emplace(object);
+		object->registerSpace(this);
 	}
 
 	void Space::addObject(PhysicsObject * object)
 	{
 		m_physicsObjects.emplace(object);
+		object->registerSpace(this);
 	}
 
 

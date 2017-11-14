@@ -37,7 +37,7 @@ namespace me
 		other.checkCollision(*this, info);
 	}
 
-	std::shared_ptr<Graphic> ColliderRect::generateGraphic(const sf::Color &color) const
+	Graphic* ColliderRect::generateGraphic(const sf::Color &color) const
 	{
 		return Graphic::makeRect(m_halfWidth * 2, m_halfHeight * 2, color);
 	}

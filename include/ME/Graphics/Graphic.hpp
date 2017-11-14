@@ -34,17 +34,17 @@ namespace me
 		/// Graphic without a texture
 		Graphic(const sf::VertexArray &vertices);
 		/// Completely custom graphic
-	  Graphic(std::shared_ptr<sf::Texture> texture, const sf::IntRect &textureRect, const sf::VertexArray &vertices);
+		Graphic(std::shared_ptr<sf::Texture> texture, const sf::IntRect &textureRect, const sf::VertexArray &vertices);
 		/// Copy constructor
 		Graphic(const Graphic &copy);
 		virtual ~Graphic();
 
 		/// Create a circle with the origin at the center.
-		static std::shared_ptr<Graphic> makeCircle(float radius, unsigned int pointCount, const sf::Color &color = sf::Color::White);
+		static Graphic* makeCircle(float radius, unsigned int pointCount, const sf::Color &color = sf::Color::White);
 
-	  static std::shared_ptr<Graphic> makeRect(float width, float height, const sf::Color &color = sf::Color::White);
-	  
-	  
+		static Graphic* makeRect(float width, float height, const sf::Color &color = sf::Color::White);
+
+
 	protected:
 		/// This should be called every time a point's position changes
 		void updateVertices();

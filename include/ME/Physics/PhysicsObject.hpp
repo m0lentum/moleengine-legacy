@@ -49,9 +49,9 @@ namespace me
 		/// Sets props to given values and leaves the graphic null.
 		PhysicsObject(const Props &props, ICollider *collider);
 		/// Sets props to default values and sets the graphic.
-		PhysicsObject(ICollider *collider, const std::shared_ptr<Graphic> graphic);
+		PhysicsObject(ICollider *collider, Graphic *graphic);
 		/// Sets props to given values and sets the graphic.
-		PhysicsObject(const Props &props, ICollider *collider, std::shared_ptr<Graphic> graphic);
+		PhysicsObject(const Props &props, ICollider *collider, Graphic *graphic);
 		/// Copy constructor.
 		PhysicsObject(const PhysicsObject &copy);
 		virtual ~PhysicsObject();

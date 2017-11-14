@@ -36,9 +36,9 @@ namespace me
 			std::cerr << "Warning: tried to destroy an object that is not in a space" << std::endl;
 	}
 
-	void GameObject::setGraphic(std::shared_ptr<Graphic> graphic)
+	void GameObject::setGraphic(Graphic *graphic)
 	{
-		m_graphic = graphic;
+		m_graphic.reset(graphic);
 	}
 
 
@@ -48,7 +48,7 @@ namespace me
 	{
 	}
 
-	GameObject::GameObject(std::shared_ptr<Graphic> graphic) :
+	GameObject::GameObject(Graphic *graphic) :
 		m_space(NULL),
 		m_graphic(graphic)
 	{

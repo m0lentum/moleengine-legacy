@@ -109,7 +109,7 @@ namespace me
 	}
 
 
-	std::shared_ptr<Graphic> Graphic::makeCircle(float radius, unsigned int pointCount, const sf::Color &color)
+	Graphic* Graphic::makeCircle(float radius, unsigned int pointCount, const sf::Color &color)
 	{
 		sf::VertexArray verts(sf::PrimitiveType::TriangleFan, pointCount);
 
@@ -125,10 +125,10 @@ namespace me
 			verts[i].color = color;
 		}
 
-		return std::make_shared<Graphic>(verts);
+		return new Graphic(verts);
 	}
 
-  std::shared_ptr<Graphic> Graphic::makeRect(float width, float height, const sf::Color &color)
+	Graphic* Graphic::makeRect(float width, float height, const sf::Color &color)
 	{
 		sf::VertexArray verts(sf::PrimitiveType::TriangleFan, 4);
 
@@ -140,7 +140,7 @@ namespace me
 		verts[2].position = sf::Vector2f(hw, hh);
 		verts[3].position = sf::Vector2f(hw, -hh);
 
-		std::shared_ptr<Graphic> graphic = std::make_shared<Graphic>(verts);
+		Graphic* graphic = new Graphic(verts);
 		graphic->fillWithColor(color);
 		return graphic;
 	}

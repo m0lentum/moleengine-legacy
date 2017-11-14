@@ -38,7 +38,7 @@ namespace me
 		virtual void checkCollision(const ColliderPolygon &other, CollisionInfo &info) const = 0;
 		
 		/// Generate a Graphic from the shape of the collider.
-		virtual std::shared_ptr<Graphic> generateGraphic(const sf::Color &color = sf::Color::White) const = 0;
+		virtual Graphic* generateGraphic(const sf::Color &color = sf::Color::White) const = 0;
 
 		/// Virtual clone method to allow copying from a base class pointer
 		virtual ICollider* clone() const = 0;

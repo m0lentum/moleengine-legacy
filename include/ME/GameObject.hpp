@@ -16,7 +16,7 @@ namespace me
 		/// The Space this object is in, if any.
 		Space *m_space;
 
-		std::shared_ptr<Graphic> m_graphic;
+		std::unique_ptr<Graphic> m_graphic;
 
 	public:
 		// IComponent update loops
@@ -30,11 +30,11 @@ namespace me
 		/// It will be removed from the space it's in on the next fixedUpdate cycle.
 		virtual void destroy();
 
-		void setGraphic(std::shared_ptr<Graphic> graphic);
+		void setGraphic(Graphic *graphic);
 
 		GameObject();
 		/// Set the graphic upon initialization
-		GameObject(std::shared_ptr<Graphic> graphic);
+		GameObject(Graphic *graphic);
 		GameObject(const GameObject &copy);
 
 		virtual ~GameObject();

@@ -40,14 +40,14 @@ namespace me
 		m_collider->setParent(this);
 	}
 
-	PhysicsObject::PhysicsObject(ICollider *collider, const std::shared_ptr<Graphic> graphic) :
+	PhysicsObject::PhysicsObject(ICollider *collider, Graphic *graphic) :
 		GameObject(graphic),
 		m_collider(collider)
 	{
 		m_collider->setParent(this);
 	}
 
-	PhysicsObject::PhysicsObject(const Props &props, ICollider *collider, std::shared_ptr<Graphic> graphic) :
+	PhysicsObject::PhysicsObject(const Props &props, ICollider *collider, Graphic *graphic) :
 		GameObject(graphic),
 		m_props(props),
 		m_collider(collider)

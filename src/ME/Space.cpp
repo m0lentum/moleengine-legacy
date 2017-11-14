@@ -1,28 +1,54 @@
 #include <Space.hpp>
 #include <Physics/CollisionChecker.hpp>
-#include <iostream>
+//#include <iostream>
 
 namespace me
 {
 	void Space::continuousUpdate(sf::Time timeElapsed)
 	{
-		doContinuousUpdate<GameObject>(m_objects, timeElapsed);
-		doContinuousUpdate<PhysicsObject>(m_physicsObjects, timeElapsed);
+		for (const auto &obj : m_objects) obj->continuousUpdate(timeElapsed);
+		for (const auto &pObj : m_physicsObjects) pObj->continuousUpdate(timeElapsed);
 	}
 	
+
 	void Space::fixedUpdate()
 	{
-		doFixedUpdate<GameObject>(m_objects, m_oToDestroy);
-		doFixedUpdate<PhysicsObject>(m_physicsObjects, m_pToDestroy);
-		
+		// Remove all objects marked for destruction
+		while (!m_oToDestroy.empty())
+		{
+			GameObject *obj = m_oToDestroy.front();
+			m_objects.erase(obj);
+			m_oToDestroy.pop();
+
+			delete obj;
+		}
+		// Update the rest of the objects
+		for (const auto &obj : m_objects)
+			obj->fixedUpdate();
+
+
+		// Same for physics objects
+		while (!m_pToDestroy.empty())
+		{
+			PhysicsObject *obj = m_pToDestroy.front();
+			m_physicsObjects.erase(obj);
+			m_pToDestroy.pop();
+
+			delete obj;
+		}
+		for (const auto &obj : m_physicsObjects)
+			obj->fixedUpdate();
+
 		handleCollisions();
 	}
 	
+
 	void Space::draw(sf::RenderTarget &target, sf::RenderStates states) const
 	{
-		doDraw<GameObject>(m_objects, target, states);
-		doDraw<PhysicsObject>(m_physicsObjects, target, states);
+		for (const auto &obj : m_objects) obj->draw(target, states);
+		for (const auto &pObj : m_physicsObjects) pObj->draw(target, states);
 	}
+
 
 	void Space::handleCollisions()
 	{
@@ -35,9 +61,9 @@ namespace me
 			for (; j != m_physicsObjects.end(); j++)
 			{
 				CollisionInfo info;
-				info.obj1 = i->first;
-				info.obj2 = j->first;
-				CollisionChecker::checkCollision(i->second->getCollider(), j->second->getCollider(), info);
+				info.obj1 = *i;
+				info.obj2 = *j;
+				CollisionChecker::checkCollision((*i)->getCollider(), (*j)->getCollider(), info);
 
 				if (info.areColliding)
 				{
@@ -48,9 +74,23 @@ namespace me
 		}
 	}
 
+
 	void Space::resolveCollision(const CollisionInfo &info)
 	{
 		info.obj1->move(info.penetration);
+		// TODO: physics
+	}
+
+
+
+	void Space::addObject(GameObject * object)
+	{
+		m_objects.emplace(object);
+	}
+
+	void Space::addObject(PhysicsObject * object)
+	{
+		m_physicsObjects.emplace(object);
 	}
 
 

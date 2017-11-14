@@ -1,10 +1,8 @@
 #ifndef SPACE_HPP
 #define SPACE_HPP
 
-#include <unordered_map>
-#include <memory>
+#include <unordered_set>
 #include <queue>
-#include <type_traits>
 #include "GameObject.hpp"
 #include "Physics/PhysicsObject.hpp"
 #include <SFML/Graphics/RenderTarget.hpp>
@@ -16,12 +14,10 @@ namespace me
 	class Space
 	{
 	private:
-		/// Store all objects in a map with a pointer to themselves as key.
-		/// This allows a simple way for the object to delete itself,
-		/// while still using shared_ptr for memory management.
-		std::unordered_map<GameObject*, std::shared_ptr<GameObject>> m_objects;
+		/// A set of all non-physics objects. These objects are owned by the Space and should not have references stored elsewhere.
+		std::unordered_set<GameObject*> m_objects;
 		/// Store physics objects in a separate container so we can access their special properties
-		std::unordered_map<PhysicsObject*, std::shared_ptr<PhysicsObject>> m_physicsObjects;
+		std::unordered_set<PhysicsObject*> m_physicsObjects;
 		/// Store the objects we need to destroy in a queue for 
 		/// deletion at the start of the next update loop
 		std::queue<GameObject*> m_oToDestroy;
@@ -43,63 +39,17 @@ namespace me
 
 	public:
 
+		void addObject(GameObject * object);
+		void addObject(PhysicsObject * object);
+
+		void removeObject(GameObject * object);
+		void removeObject(PhysicsObject * object);
+
 		// TODO: tagging system to filter objects
 
 		Space();
 		Space(const Space &copy);
 		~Space();
-
-		// messy code, but this allows using the same method name to add both PhysicsObjects and GameObjects, 
-		// and thus eliminates the possibility of adding an object to the wrong container by accident.
-
-		/// add a GameObject
-		template<typename T, typename std::enable_if<std::is_base_of<GameObject, T>::value && !std::is_base_of<PhysicsObject, T>::value>::type* = nullptr> 
-		void addObject(std::shared_ptr<T> object)
-		{
-			m_objects.emplace(object.get(), object);
-			object->registerSpace(this);
-		}
-		/// add a PhysicsObject
-		template<typename T, typename std::enable_if<std::is_base_of<PhysicsObject, T>::value>::type* = nullptr>
-		void addObject(std::shared_ptr<T> object)
-		{
-			m_physicsObjects.emplace(object.get(), object);
-			object->registerSpace(this);
-		}
-
-		void removeObject(GameObject * object);
-		void removeObject(PhysicsObject * object);
-		
-	private:
-		// Helper functions to avoid copy-pasting code.
-		// These won't be used outside the class so I'm too lazy to put them in an .inl file.
-
-		template<class T>
-		void doContinuousUpdate(std::unordered_map<T*, std::shared_ptr<T>> &objects, sf::Time timeElapsed)
-		{
-			for (const auto &obj : objects) obj.second->continuousUpdate(timeElapsed);
-		}
-
-		template<class T>
-		void doFixedUpdate(std::unordered_map<T*, std::shared_ptr<T>> &objects, std::queue<T*> &toDestroy)
-		{
-			// Remove all objects marked for destruction
-			while (!toDestroy.empty())
-			{
-				objects.erase(toDestroy.front());
-				toDestroy.pop();
-			}
-			// Update the rest of the objects
-			for (const auto &obj : objects)
-				obj.second->fixedUpdate();
-		}
-
-		template<class T>
-		void doDraw(const std::unordered_map<T*, std::shared_ptr<T>> &objects, sf::RenderTarget &target, sf::RenderStates states) const
-		{
-			for (const auto &obj : objects)
-				obj.second->draw(target, states);
-		}
 	};
 }
 

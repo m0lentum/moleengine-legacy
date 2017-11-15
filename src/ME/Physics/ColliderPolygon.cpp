@@ -47,10 +47,6 @@ namespace me
 	ColliderPolygon::ColliderPolygon(std::initializer_list<sf::Vector2f> points) :
 		m_points(points)
 	{
-		for (const auto &point : m_points) {
-			std::cout << point.x << ", " << point.y << ";";
-		}
-		std::cout << std::endl;
 	}
 
 	ColliderPolygon::ColliderPolygon(std::initializer_list<float> coords)
@@ -64,11 +60,6 @@ namespace me
 		for (auto i = coords.begin(); i != end; i += 2) {
 			m_points.push_back(sf::Vector2f(*i, *(i + 1)));
 		}
-
-		for (const auto &point : m_points) {
-			std::cout << point.x << ", " << point.y << ";";
-		}
-		std::cout << std::endl;
 	}
 
 	ColliderPolygon::ColliderPolygon(const ColliderPolygon &copy)

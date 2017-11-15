@@ -13,10 +13,12 @@ namespace me
 	private:
 		
 		std::vector<sf::Vector2f> m_edges;
+		std::vector<sf::Vector2f> m_axes;
 
 	public:
 
-		const std::vector<sf::Vector2f>& getPoints() const;
+		const std::vector<sf::Vector2f> getEdges() const;
+		const std::vector<sf::Vector2f> getAxes() const;
 
 		const sf::Vector2f& getPosition() const;
 
@@ -42,6 +44,9 @@ namespace me
 		static std::vector<sf::Vector2f> pointsToEdges(const std::vector<sf::Vector2f> &points);
 		/// PointsToEdges in reverse
 		static std::vector<sf::Vector2f> edgesToPoints(const std::vector<sf::Vector2f> &edges);
+
+		/// Calculate axes from edges
+		void calculateAxes();
 
 	public:
 

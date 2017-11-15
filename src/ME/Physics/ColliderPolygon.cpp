@@ -7,9 +7,31 @@
 
 namespace me
 {
-	const std::vector<sf::Vector2f>& ColliderPolygon::getPoints() const
+	const std::vector<sf::Vector2f> ColliderPolygon::getEdges() const
 	{
-		return m_edges;
+		std::vector<sf::Vector2f> vecs(m_edges);
+		sf::Transform transform = m_parent->getTransform();
+		sf::Vector2f position = getPosition();
+
+		for (auto &vec : vecs)
+		{
+			vec = (transform * vec) - position; // rotated and scaled but not translated
+		}
+
+		return vecs;
+	}
+
+	const std::vector<sf::Vector2f> ColliderPolygon::getAxes() const
+	{
+		std::vector<sf::Vector2f> vecs(m_axes);
+		float angle = m_parent->getRotation();
+
+		for (auto &vec : vecs)
+		{
+			vec = VectorMath::rotateDeg(vec, angle); // Rotated only - keep these unit length
+		}
+
+		return vecs;
 	}
 
 	const sf::Vector2f& ColliderPolygon::getPosition() const
@@ -35,7 +57,7 @@ namespace me
 	void ColliderPolygon::center()
 	{
 		float area = getArea();
-		
+
 		// Calculate the centroid relative to the first point of the polygon
 		sf::Vector2f weightedSumOfC, curr, next;
 		for (std::vector<sf::Vector2f>::size_type i = 1; i < m_edges.size() - 1; i++)
@@ -105,7 +127,7 @@ namespace me
 	std::vector<sf::Vector2f> ColliderPolygon::edgesToPoints(const std::vector<sf::Vector2f> &edges)
 	{
 		std::vector<sf::Vector2f> points;
-		
+
 		points.push_back(edges[0]);
 		sf::Vector2f sum = edges[0];
 		for (std::vector<sf::Vector2f>::size_type i = 1; i < edges.size(); i++)
@@ -118,11 +140,30 @@ namespace me
 	}
 
 
+	void ColliderPolygon::calculateAxes()
+	{
+		// Determine which direction the edges are going so we know which way is out. 1 = clockwise, -1 = counter-clockwise
+		float direction = VectorMath::dot(VectorMath::leftNormal(m_edges[2]), m_edges[1]) > 0 ? 1 : -1;
+
+		sf::Vector2f sum; // The last edge is not stored so we calculate it
+		for (std::vector<sf::Vector2f>::size_type i = 1; i < m_edges.size(); i++)
+		{
+			m_axes.push_back(VectorMath::normalize(VectorMath::leftNormal(m_edges[i]) * direction));
+
+			sum -= m_edges[i]; // negative sum ends up being the vector from the last point to the first
+		}
+		
+		// Last edge
+		m_axes.push_back(VectorMath::normalize(VectorMath::leftNormal(sum) * direction));
+	}
+
 
 	ColliderPolygon::ColliderPolygon(std::initializer_list<sf::Vector2f> points, bool autoCenter) :
 		m_edges(pointsToEdges(points))
 	{
 		if (autoCenter) center();
+
+		calculateAxes();
 	}
 
 	ColliderPolygon::ColliderPolygon(std::initializer_list<float> coords, bool autoCenter)
@@ -142,9 +183,13 @@ namespace me
 		m_edges = pointsToEdges(points);
 
 		if (autoCenter) center();
+
+		calculateAxes();
 	}
 
-	ColliderPolygon::ColliderPolygon(const ColliderPolygon &copy)
+	ColliderPolygon::ColliderPolygon(const ColliderPolygon &copy) :
+		m_edges(copy.m_edges),
+		m_axes(copy.m_axes)
 	{
 	}
 }

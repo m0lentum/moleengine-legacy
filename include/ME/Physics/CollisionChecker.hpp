@@ -28,6 +28,10 @@ namespace me
 		static void polyCircle(const ColliderPolygon &obj1, const ColliderCircle &obj2, CollisionInfo &info);
 		static void polyRect(const ColliderPolygon &obj1, const ColliderRect &obj2, CollisionInfo &info);
 		static void polyPoly(const ColliderPolygon &obj1, const ColliderPolygon &obj2, CollisionInfo &info);
+
+	private:
+		/// Distance from the origin of a polygon to the farthest point when projected to an axis.
+		static float polyWidthOnAxis(const std::vector<sf::Vector2f> &obj1, const sf::Vector2f &axis);
 	};
 }
 

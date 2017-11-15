@@ -1,6 +1,7 @@
 #include <Physics/CollisionChecker.hpp>
 #include <Physics/ColliderCircle.hpp>
 #include <Physics/ColliderRect.hpp>
+#include <Physics/ColliderPolygon.hpp>
 #include <Physics/VectorMath.hpp>
 //#include <iostream>
 
@@ -115,6 +116,59 @@ namespace me
 
 	void CollisionChecker::polyPoly(const ColliderPolygon &obj1, const ColliderPolygon &obj2, CollisionInfo &info)
 	{
+		sf::Vector2f distance = obj2.getPosition() - obj1.getPosition();
 
+		std::vector<sf::Vector2f> edges1 = obj1.getEdges();
+		std::vector<sf::Vector2f> edges2 = obj2.getEdges();
+
+		std::vector<sf::Vector2f> axes = obj1.getAxes();
+		std::vector<sf::Vector2f> otherAxes = obj2.getAxes();
+		axes.insert(axes.end(), otherAxes.begin(), otherAxes.end()); // Put all axes into one vector for easy iteration
+
+
+		float penDepth = 100000;
+		sf::Vector2f penAxis;
+		for (auto &axis : axes)
+		{
+			float distOnAxis = VectorMath::dot(axis, distance);
+			if (distOnAxis < 0)
+			{
+				axis = -axis; // revert the axis if it faces the wrong way
+				distOnAxis = -distOnAxis;
+			}
+
+			float w1 = polyWidthOnAxis(edges1, axis);
+			float w2 = polyWidthOnAxis(edges2, -axis);
+
+			float depth = w1 + w2 - distOnAxis;
+			if (depth < 0) // no collision on this axis => SAT: no collision at all
+			{
+				return;
+			}
+			else if (depth < penDepth)
+			{
+				penAxis = axis;
+				penDepth = depth;
+			}
+		}
+
+		info.areColliding = true;
+		info.penetration = -penDepth * penAxis;
+
+		// TODO: calculate point(s) of impact
+	}
+
+	float CollisionChecker::polyWidthOnAxis(const std::vector<sf::Vector2f> &edges, const sf::Vector2f &axis)
+	{
+		float max = 0;
+		float curr = 0;
+		
+		for (std::vector<sf::Vector2f>::size_type i = 0; i < edges.size(); i++)
+		{
+			curr += VectorMath::dot(edges[i], axis);
+			if (curr > max) max = curr;
+		}
+
+		return max;
 	}
 }

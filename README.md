@@ -44,14 +44,23 @@ Note: You probably shouldn't yet. Here are the instructions nonetheless.
 5. Run CMake -> install -> CMakeLists.txt.
 6. The library should now be in your install directory, ready to be linked to your projects.
 
-**Note:** this library is statically linked, but the SFML .dlls are required by projects using it.
+**Note:** this library is statically linked, but the SFML .dlls are required by projects using it. I will look into
+different linking options in the future.
 
 **Linux**
 
-(coming soon)
+1. Install CMake (https://cmake.org/).
+2. Install SFML.
+3. Clone this repository.
+4. Create a build directory anywhere outside of the repository.
+5. Navigate to the directory and run\
+```cmake -DCMAKE_INSTALL_PREFIX="/path/to/install/location" -DCMAKE_BUILD_TYPE="[Debug/Release]" /path/to/engine/root```\
+Additionally, if SFML is not in your system path, set `-DSFML_ROOT="/path/to/sfml"`
+6. Run `make install`
+7. The library should now be in your install directory, ready to be linked to your projects.
 
 ## Usage
-Basic tutorials coming soonish, probably.\
+Basic tutorials will be added once the project is in a usable state.\
 For now you can refer to [my very messy test game](https://github.com/MoleTrooper/MoleEngineTestGame) for hints.
 
 ## Contact

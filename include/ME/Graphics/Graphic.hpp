@@ -41,9 +41,10 @@ namespace me
 
 		/// Create a circle with the origin at the center.
 		static Graphic* makeCircle(float radius, unsigned int pointCount, const sf::Color &color = sf::Color::White);
-
+		/// Create a rectangle with the specified height and width.
 		static Graphic* makeRect(float width, float height, const sf::Color &color = sf::Color::White);
-
+		/// Create a polygon with the given points.
+		static Graphic* makePolygon(const std::vector<sf::Vector2f> &points, const sf::Color &color = sf::Color::White);
 
 	protected:
 		/// This should be called every time a point's position changes

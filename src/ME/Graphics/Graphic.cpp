@@ -144,4 +144,18 @@ namespace me
 		graphic->fillWithColor(color);
 		return graphic;
 	}
+
+	Graphic* Graphic::makePolygon(const std::vector<sf::Vector2f> &points, const sf::Color &color)
+	{
+		sf::VertexArray verts(sf::PrimitiveType::TriangleFan, points.size());
+
+		for (std::vector<sf::Vector2f>::size_type i = 0; i < points.size(); i++)
+		{
+			verts[i].position = points[i];
+		}
+
+		Graphic* graphic = new Graphic(verts);
+		graphic->fillWithColor(color);
+		return graphic;
+	}
 }

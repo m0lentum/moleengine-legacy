@@ -7,6 +7,8 @@
 
 namespace me
 {
+	float CollisionChecker::EPSILON = 0.001f;
+
 	void CollisionChecker::checkCollision(const ICollider &obj1, const ICollider &obj2, CollisionInfo &info)
 	{
 		obj1.findTypeAndCheckCollision(obj2, info);
@@ -36,6 +38,7 @@ namespace me
 	void CollisionChecker::circlePoly(const ColliderCircle &circle, const ColliderPolygon &poly, CollisionInfo &info)
 	{
 		polyCircle(poly, circle, info);
+		info.penetration = -info.penetration;
 	}
 
 
@@ -99,7 +102,8 @@ namespace me
 
 	void CollisionChecker::rectPoly(const ColliderRect &rect, const ColliderPolygon &poly, CollisionInfo &info)
 	{
-
+		polyRect(poly, rect, info);
+		info.penetration = -info.penetration;
 	}
 
 
@@ -143,11 +147,51 @@ namespace me
 		}
 
 		info.areColliding = true;
-		info.penetration = penAxis * penDepth;
+		info.penetration = -penAxis * penDepth;
 	}
 
 	void CollisionChecker::polyRect(const ColliderPolygon &poly, const ColliderRect &rect, CollisionInfo &info)
 	{
+		sf::Vector2f distance = rect.getPosition() - poly.getPosition();
+
+		std::vector<sf::Vector2f> edges = poly.getEdges();
+		std::vector<sf::Vector2f> axes = poly.getAxes();
+
+		sf::Vector2f rectWAxis = rect.getWidthAxis();
+		sf::Vector2f rectHAxis = VectorMath::leftNormal(rectWAxis);
+		axes.push_back(rectWAxis);
+		axes.push_back(rectHAxis);
+
+		sf::Vector2f rectDimensions[2] = { rectWAxis * rect.getHalfWidth(), rectHAxis * rect.getHalfHeight() };
+
+		float penDepth = 100000;
+		sf::Vector2f penAxis;
+		for (auto &axis : axes)
+		{
+			float distOnAxis = VectorMath::dot(axis, distance);
+			if (distOnAxis < 0)
+			{
+				axis = -axis; // revert the axis if it faces the wrong way
+				distOnAxis = -distOnAxis;
+			}
+
+			PolyAxisInfo w1 = polyWidthOnAxis(edges, axis);
+			PolyAxisInfo w2 = rectWidthOnAxis(rectDimensions, axis);
+
+			float depth = w1.width + w2.width - distOnAxis;
+			if (depth < 0) // no collision on this axis => SAT: no collision at all
+			{
+				return;
+			}
+			else if (depth < penDepth)
+			{
+				penAxis = axis;
+				penDepth = depth;
+			}
+		}
+
+		info.areColliding = true;
+		info.penetration = -penDepth * penAxis;
 
 	}
 
@@ -206,12 +250,12 @@ namespace me
 			curr += edges[i];
 			float projLength = VectorMath::dot(curr, axis);
 			
-			if (std::abs(projLength - info.width) < 0.001f) { // This edge is perpendicular to the axis, make both ends of the edge the farthest points
+			if (std::abs(projLength - info.width) < EPSILON) { // This edge is perpendicular to the axis, make both ends of the edge the farthest points
 				info.width = projLength;
 				info.hasPoint2 = true;
 				info.point1 = curr - edges[i];
 				info.point2 = curr;
-			} 
+			}
 			else if (projLength > info.width)
 			{
 				info.width = projLength;
@@ -222,4 +266,40 @@ namespace me
 
 		return info;
 	}
+
+	CollisionChecker::PolyAxisInfo CollisionChecker::rectWidthOnAxis(const sf::Vector2f dimensions[2], const sf::Vector2f &axis)
+	{
+		PolyAxisInfo info;
+
+		float wLength = VectorMath::dot(dimensions[0], axis);
+		float hLength = VectorMath::dot(dimensions[1], axis);
+
+		info.width = std::abs(wLength) + std::abs(hLength);
+
+		// Find the farthest point(s) along this axis
+		float wDir = wLength > 0 ? 1 : -1;
+		float hDir = hLength > 0 ? 1 : -1;
+
+		if (std::abs(wLength) < EPSILON)
+		{
+			info.hasPoint2 = true;
+			sf::Vector2f middle = dimensions[0] * wDir;
+			info.point1 = middle + dimensions[1];
+			info.point2 = middle - dimensions[1];
+		}
+		else if (std::abs(hLength) < EPSILON)
+		{
+			info.hasPoint2 = true;
+			sf::Vector2f middle = dimensions[1] * hDir;
+			info.point1 = middle + dimensions[0];
+			info.point2 = middle - dimensions[0];
+		}
+		else
+		{
+			info.point1 = wDir * dimensions[0] + hDir * dimensions[1];
+		}
+
+		return info;
+	}
+
 }

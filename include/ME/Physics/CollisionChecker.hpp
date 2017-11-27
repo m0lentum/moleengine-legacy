@@ -37,8 +37,12 @@ namespace me
 			sf::Vector2f point2; // Other farthest point if two are an equal distance away
 		};
 
+		static float EPSILON; // Threshold to determine whether two distances are the same
+
 		/// Distance from the origin of a polygon to the farthest point when projected to an axis.
 		static PolyAxisInfo polyWidthOnAxis(const std::vector<sf::Vector2f> &edges, const sf::Vector2f &axis);
+		/// Same for a rectangle
+		static PolyAxisInfo rectWidthOnAxis(const sf::Vector2f dimensions[2], const sf::Vector2f &axis);
 	};
 }
 

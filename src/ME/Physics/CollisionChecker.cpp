@@ -13,49 +13,49 @@ namespace me
 	}
 
 	//===================  CIRCLE and X  ===================
-	void CollisionChecker::circleCircle(const ColliderCircle &obj1, const ColliderCircle &obj2, CollisionInfo &info)
+	void CollisionChecker::circleCircle(const ColliderCircle &circle1, const ColliderCircle &circle2, CollisionInfo &info)
 	{
-		sf::Vector2f distance = obj2.getPosition() - obj1.getPosition();
+		sf::Vector2f distance = circle2.getPosition() - circle1.getPosition();
 		sf::Vector2f axis = VectorMath::normalize(distance);
 
-		float penDepth = obj1.getRadius() + obj2.getRadius() - VectorMath::getLength(distance);
+		float penDepth = circle1.getRadius() + circle2.getRadius() - VectorMath::getLength(distance);
 		if (penDepth > 0) // A collision occurred
 		{
 			info.areColliding = true;
 			info.penetration = axis * -penDepth;
-			info.point1 = axis * obj1.getRadius();
-			info.point2 = axis * -obj2.getRadius();
+			info.point1 = axis * circle1.getRadius();
+			info.point2 = axis * -circle2.getRadius();
 		}
 	}
 
-	void CollisionChecker::circleRect(const ColliderCircle &obj1, const ColliderRect &obj2, CollisionInfo &info)
+	void CollisionChecker::circleRect(const ColliderCircle &circle, const ColliderRect &rect, CollisionInfo &info)
 	{
 
 	}
 
-	void CollisionChecker::circlePoly(const ColliderCircle &obj1, const ColliderPolygon &obj2, CollisionInfo &info)
+	void CollisionChecker::circlePoly(const ColliderCircle &circle, const ColliderPolygon &poly, CollisionInfo &info)
 	{
 
 	}
 
 
 	//===================  RECT and X  ===================
-	void CollisionChecker::rectCircle(const ColliderRect &obj1, const ColliderCircle &obj2, CollisionInfo &info)
+	void CollisionChecker::rectCircle(const ColliderRect &rect, const ColliderCircle &circle, CollisionInfo &info)
 	{
 
 	}
 
-	void CollisionChecker::rectRect(const ColliderRect &obj1, const ColliderRect &obj2, CollisionInfo &info)
+	void CollisionChecker::rectRect(const ColliderRect &rect1, const ColliderRect &rect2, CollisionInfo &info)
 	{
-		sf::Vector2f distance = obj2.getPosition() - obj1.getPosition();
+		sf::Vector2f distance = rect2.getPosition() - rect1.getPosition();
 
-		float dimensions[2][2] = { { obj1.getHalfWidth(), obj1.getHalfHeight() },
-			{ obj2.getHalfWidth(), obj2.getHalfHeight() } };
+		float dimensions[2][2] = { { rect1.getHalfWidth(), rect1.getHalfHeight() },
+			{ rect2.getHalfWidth(), rect2.getHalfHeight() } };
 
 		sf::Vector2f axes[2][2];
-		axes[0][0] = obj1.getWidthAxis(); // axes[0] == first object's axes, axes[1] == second object's
+		axes[0][0] = rect1.getWidthAxis(); // axes[0] == first rectect's axes, axes[1] == second rectect's
 		axes[0][1] = VectorMath::leftNormal(axes[0][0]);
-		axes[1][0] = obj2.getWidthAxis();
+		axes[1][0] = rect2.getWidthAxis();
 		axes[1][1] = VectorMath::leftNormal(axes[1][0]);
 
 
@@ -64,14 +64,14 @@ namespace me
 		int axisIndex = 0;
 		bool negateAxis = false;
 
-		for (int i = 0; i < 2; i++) // i == which object we're looking at
+		for (int i = 0; i < 2; i++) // i == which rectect we're looking at
 		{
 			int other = (i + 1) % 2;
-			for (int j = 0; j < 2; j++) // j == which axis of the object we're looking at
+			for (int j = 0; j < 2; j++) // j == which axis of the rectect we're looking at
 			{
 				float axisDistance = VectorMath::dot(axes[i][j], distance);
 				float axisWidthSum = dimensions[i][j]
-					+ std::abs(VectorMath::dot(axes[other][0], axes[i][j])) * dimensions[other][0] // project width axis of other object
+					+ std::abs(VectorMath::dot(axes[other][0], axes[i][j])) * dimensions[other][0] // project width axis of other rectect
 					+ std::abs(VectorMath::dot(axes[other][1], axes[i][j])) * dimensions[other][1];
 				
 				float depth = axisWidthSum - std::abs(axisDistance);
@@ -84,7 +84,7 @@ namespace me
 					penDepth = depth;
 					axisOwner = i;
 					axisIndex = j;
-					negateAxis = axisDistance > 0; // Penetration should always be towards object 1
+					negateAxis = axisDistance > 0; // Penetration should always be towards rectect 1
 				}
 			}
 		}
@@ -97,32 +97,32 @@ namespace me
 		// TODO: calculate points of impact
 	}
 
-	void CollisionChecker::rectPoly(const ColliderRect &obj1, const ColliderPolygon &obj2, CollisionInfo &info)
+	void CollisionChecker::rectPoly(const ColliderRect &rect, const ColliderPolygon &poly, CollisionInfo &info)
 	{
 
 	}
 
 
 	//===================  POLY and X  ===================
-	void CollisionChecker::polyCircle(const ColliderPolygon &obj1, const ColliderCircle &obj2, CollisionInfo &info)
+	void CollisionChecker::polyCircle(const ColliderPolygon &poly, const ColliderCircle &circle, CollisionInfo &info)
+	{
+		
+	}
+
+	void CollisionChecker::polyRect(const ColliderPolygon &poly, const ColliderRect &rect, CollisionInfo &info)
 	{
 
 	}
 
-	void CollisionChecker::polyRect(const ColliderPolygon &obj1, const ColliderRect &obj2, CollisionInfo &info)
+	void CollisionChecker::polyPoly(const ColliderPolygon &poly1, const ColliderPolygon &poly2, CollisionInfo &info)
 	{
+		sf::Vector2f distance = poly2.getPosition() - poly1.getPosition();
 
-	}
+		std::vector<sf::Vector2f> edges1 = poly1.getEdges();
+		std::vector<sf::Vector2f> edges2 = poly2.getEdges();
 
-	void CollisionChecker::polyPoly(const ColliderPolygon &obj1, const ColliderPolygon &obj2, CollisionInfo &info)
-	{
-		sf::Vector2f distance = obj2.getPosition() - obj1.getPosition();
-
-		std::vector<sf::Vector2f> edges1 = obj1.getEdges();
-		std::vector<sf::Vector2f> edges2 = obj2.getEdges();
-
-		std::vector<sf::Vector2f> axes = obj1.getAxes();
-		std::vector<sf::Vector2f> otherAxes = obj2.getAxes();
+		std::vector<sf::Vector2f> axes = poly1.getAxes();
+		std::vector<sf::Vector2f> otherAxes = poly2.getAxes();
 		axes.insert(axes.end(), otherAxes.begin(), otherAxes.end()); // Put all axes into one vector for easy iteration
 
 

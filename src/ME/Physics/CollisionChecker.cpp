@@ -3,7 +3,7 @@
 #include <Physics/ColliderRect.hpp>
 #include <Physics/ColliderPolygon.hpp>
 #include <Physics/VectorMath.hpp>
-//#include <iostream>
+#include <iostream>
 
 namespace me
 {
@@ -35,14 +35,14 @@ namespace me
 
 	void CollisionChecker::circlePoly(const ColliderCircle &circle, const ColliderPolygon &poly, CollisionInfo &info)
 	{
-
+		polyCircle(poly, circle, info);
 	}
 
 
 	//===================  RECT and X  ===================
 	void CollisionChecker::rectCircle(const ColliderRect &rect, const ColliderCircle &circle, CollisionInfo &info)
 	{
-
+		
 	}
 
 	void CollisionChecker::rectRect(const ColliderRect &rect1, const ColliderRect &rect2, CollisionInfo &info)
@@ -106,7 +106,44 @@ namespace me
 	//===================  POLY and X  ===================
 	void CollisionChecker::polyCircle(const ColliderPolygon &poly, const ColliderCircle &circle, CollisionInfo &info)
 	{
+		sf::Vector2f distance = circle.getPosition() - poly.getPosition();
 		
+		std::vector<sf::Vector2f> edges = poly.getEdges();
+		std::vector<sf::Vector2f> axes = poly.getAxes();
+		float radius = circle.getRadius();
+
+		// With the circle we also need to check the axis between its center and the closest point to it
+		sf::Vector2f closestPoint = poly.getPosition() + polyWidthOnAxis(edges, distance).point1;
+		sf::Vector2f toCircle = circle.getPosition() - closestPoint;
+		axes.push_back(VectorMath::normalize(toCircle));
+
+		float penDepth = 100000;
+		sf::Vector2f penAxis;
+		for (auto &axis : axes)
+		{
+			float distOnAxis = VectorMath::dot(axis, distance);
+			if (distOnAxis < 0)
+			{
+				axis = -axis; // revert the axis if it faces the wrong way
+				distOnAxis = -distOnAxis;
+			}
+
+			PolyAxisInfo polyW = polyWidthOnAxis(edges, axis);
+
+			float depth = polyW.width + radius - distOnAxis;
+			if (depth < 0) // no collision on this axis => SAT: no collision at all
+			{
+				return;
+			}
+			else if (depth < penDepth)
+			{
+				penAxis = axis;
+				penDepth = depth;
+			}
+		}
+
+		info.areColliding = true;
+		info.penetration = penAxis * penDepth;
 	}
 
 	void CollisionChecker::polyRect(const ColliderPolygon &poly, const ColliderRect &rect, CollisionInfo &info)
@@ -137,10 +174,10 @@ namespace me
 				distOnAxis = -distOnAxis;
 			}
 
-			float w1 = polyWidthOnAxis(edges1, axis);
-			float w2 = polyWidthOnAxis(edges2, -axis);
+			PolyAxisInfo w1 = polyWidthOnAxis(edges1, axis);
+			PolyAxisInfo w2 = polyWidthOnAxis(edges2, -axis);
 
-			float depth = w1 + w2 - distOnAxis;
+			float depth = w1.width + w2.width - distOnAxis;
 			if (depth < 0) // no collision on this axis => SAT: no collision at all
 			{
 				return;
@@ -158,17 +195,31 @@ namespace me
 		// TODO: calculate point(s) of impact
 	}
 
-	float CollisionChecker::polyWidthOnAxis(const std::vector<sf::Vector2f> &edges, const sf::Vector2f &axis)
+	CollisionChecker::PolyAxisInfo CollisionChecker::polyWidthOnAxis(const std::vector<sf::Vector2f> &edges, const sf::Vector2f &axis)
 	{
-		float max = 0;
-		float curr = 0;
+		PolyAxisInfo info;
+
+		sf::Vector2f curr;
 		
 		for (std::vector<sf::Vector2f>::size_type i = 0; i < edges.size(); i++)
 		{
-			curr += VectorMath::dot(edges[i], axis);
-			if (curr > max) max = curr;
+			curr += edges[i];
+			float projLength = VectorMath::dot(curr, axis);
+			
+			if (std::abs(projLength - info.width) < 0.001f) { // This edge is perpendicular to the axis, make both ends of the edge the farthest points
+				info.width = projLength;
+				info.hasPoint2 = true;
+				info.point1 = curr - edges[i];
+				info.point2 = curr;
+			} 
+			else if (projLength > info.width)
+			{
+				info.width = projLength;
+				info.hasPoint2 = false;
+				info.point1 = curr;
+			}
 		}
 
-		return max;
+		return info;
 	}
 }

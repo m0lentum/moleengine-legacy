@@ -30,8 +30,15 @@ namespace me
 		static void polyPoly(const ColliderPolygon &poly1, const ColliderPolygon &poly2, CollisionInfo &info);
 
 	private:
+		struct PolyAxisInfo {
+			float width = 0; // Width when projected to the given axis
+			sf::Vector2f point1; // Farthest point along the axis
+			bool hasPoint2 = false;
+			sf::Vector2f point2; // Other farthest point if two are an equal distance away
+		};
+
 		/// Distance from the origin of a polygon to the farthest point when projected to an axis.
-		static float polyWidthOnAxis(const std::vector<sf::Vector2f> &edges, const sf::Vector2f &axis);
+		static PolyAxisInfo polyWidthOnAxis(const std::vector<sf::Vector2f> &edges, const sf::Vector2f &axis);
 	};
 }
 

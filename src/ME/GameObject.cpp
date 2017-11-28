@@ -14,7 +14,7 @@ namespace me
 	void GameObject::destroy()
 	{
 		if (m_space)
-			m_space->removeObject(this);
+			m_space->removeObject(m_id);
 		else
 			std::cerr << "Warning: tried to destroy an object that is not in a space" << std::endl;
 	}
@@ -24,6 +24,8 @@ namespace me
 	{
 		m_components.emplace(component->getType(), std::unique_ptr<IComponent>(component));
 		component->registerParent(this);
+
+		if (m_space) m_space->addComponent(component);
 	}
 
 	void GameObject::removeComponent(const std::string &type)

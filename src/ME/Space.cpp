@@ -6,50 +6,35 @@ namespace me
 {
 	void Space::continuousUpdate(sf::Time timeElapsed)
 	{
-		for (const auto &obj : m_objects) obj->continuousUpdate(timeElapsed);
-		for (const auto &pObj : m_physicsObjects) pObj->continuousUpdate(timeElapsed);
+		
 	}
 	
 
 	void Space::fixedUpdate()
 	{
 		// Remove all objects marked for destruction
-		while (!m_oToDestroy.empty())
+		while (!m_toDestroy.empty())
 		{
-			GameObject *obj = m_oToDestroy.front();
-			m_objects.erase(obj);
-			m_oToDestroy.pop();
+			std::string id = m_toDestroy.front();
+			// Remove reference to object from all controllers controlling it
+			for (auto &item : m_objects[id]->getAllComponents())
+			{
+				// CONSIDERATION: do we want to assume all components have controllers in this Space?
+				m_controllers[item.first]->removeComponent(id);
+			}
 
-			delete obj;
+			m_objects.erase(id);
+			m_toDestroy.pop();
 		}
-		// Update the rest of the objects
-		for (const auto &obj : m_objects)
-			obj->fixedUpdate();
-
-
-		// Same for physics objects
-		while (!m_pToDestroy.empty())
-		{
-			PhysicsObject *obj = m_pToDestroy.front();
-			m_physicsObjects.erase(obj);
-			m_pToDestroy.pop();
-
-			delete obj;
-		}
-		for (const auto &obj : m_physicsObjects)
-			obj->fixedUpdate();
-
-		handleCollisions();
 	}
 	
 
 	void Space::draw(sf::RenderTarget &target, sf::RenderStates states) const
 	{
-		for (const auto &obj : m_objects) obj->draw(target, states);
-		for (const auto &pObj : m_physicsObjects) pObj->draw(target, states);
+
 	}
 
-
+	/* TODO: move this stuff into a Controller
 	void Space::handleCollisions()
 	{
 		// TODO: add optimization through spatial partitioning
@@ -77,36 +62,35 @@ namespace me
 
 	void Space::resolveCollision(const CollisionInfo &info)
 	{
-		info.obj1->move(info.penetration);
+		//info.obj1->move(info.penetration);
 		// TODO: physics
 	}
+	*/
 
 
 
 	void Space::addObject(GameObject * object)
 	{
-		m_objects.emplace(object);
+		m_objects.emplace(object->getID(), std::unique_ptr<GameObject>(object));
 		object->registerSpace(this);
+
+		// TODO: add components to controllers
 	}
 
-	void Space::addObject(PhysicsObject * object)
+	void Space::removeObject(const std::string &id)
 	{
-		m_physicsObjects.emplace(object);
-		object->registerSpace(this);
+		m_toDestroy.push(id);
 	}
-
-
-	void Space::removeObject(GameObject * object)
+	
+	void Space::addController(IController *controller)
 	{
-		m_oToDestroy.push(object);
+		m_controllers.emplace(controller->getType(), std::unique_ptr<IController>(controller));
 	}
 
-	void Space::removeObject(PhysicsObject * object)
+	void Space::removeController(const std::string &id)
 	{
-		m_pToDestroy.push(object);
+		m_controllers.erase(id);
 	}
-
-
 
 	Space::Space()
 	{

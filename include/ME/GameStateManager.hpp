@@ -4,13 +4,12 @@
 #include <unordered_map>
 #include <memory>
 #include "IGameState.hpp"
-#include "IComponent.hpp"
 
 namespace me
 {
 	/// Keeps track of the currently active game state.
 	/// Primarily used to direct update loop calls to the right state.
-	class GameStateManager : public IComponent
+	class GameStateManager 
 	{
 	private:
 		/// Pointer to currently active state
@@ -24,10 +23,10 @@ namespace me
 		/// Switch back to the previously active state
 		void backToPrevious();
 
-		// IComponent update loops
-		virtual void continuousUpdate(const sf::Time &timeElapsed);
-		virtual void fixedUpdate();
-		virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
+		// update loops
+		void continuousUpdate(const sf::Time &timeElapsed);
+		void fixedUpdate();
+		void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
 		
 		GameStateManager();

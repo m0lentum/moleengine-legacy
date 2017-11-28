@@ -316,8 +316,8 @@ namespace me
 		info.width = std::abs(wLength) + std::abs(hLength);
 
 		// Find the farthest point(s) along this axis
-		float wDir = wLength > 0 ? 1 : -1;
-		float hDir = hLength > 0 ? 1 : -1;
+		float wDir = wLength > 0 ? 1.0f : -1.0f;
+		float hDir = hLength > 0 ? 1.0f : -1.0f;
 
 		if (std::abs(wLength) < EPSILON)
 		{

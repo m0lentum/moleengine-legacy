@@ -4,13 +4,12 @@
 #include <SFML/Graphics.hpp>
 #include <memory>
 #include "Graphics/Graphic.hpp"
-#include "IComponent.hpp"
 
 namespace me
 {
 	class Space;
 
-	class GameObject : public sf::Transformable, public IComponent
+	class GameObject : public sf::Transformable
 	{
 	protected:
 		/// The Space this object is in, if any.
@@ -19,7 +18,7 @@ namespace me
 		std::unique_ptr<Graphic> m_graphic;
 
 	public:
-		// IComponent update loops
+		// update loops
 		virtual void continuousUpdate(const sf::Time &timeElapsed);
 		virtual void fixedUpdate();
 		virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;

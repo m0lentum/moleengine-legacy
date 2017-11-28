@@ -143,7 +143,7 @@ namespace me
 	void ColliderPolygon::calculateAxes()
 	{
 		// Determine which direction the edges are going so we know which way is out. 1 = clockwise, -1 = counter-clockwise
-		float direction = VectorMath::dot(VectorMath::leftNormal(m_edges[2]), m_edges[1]) > 0 ? 1 : -1;
+		float direction = VectorMath::dot(VectorMath::leftNormal(m_edges[2]), m_edges[1]) > 0 ? 1.0f : -1.0f;
 
 		sf::Vector2f sum; // The last edge is not stored so we calculate it
 		for (std::vector<sf::Vector2f>::size_type i = 1; i < m_edges.size(); i++)

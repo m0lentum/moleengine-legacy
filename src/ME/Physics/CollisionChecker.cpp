@@ -32,7 +32,8 @@ namespace me
 
 	void CollisionChecker::circleRect(const ColliderCircle &circle, const ColliderRect &rect, CollisionInfo &info)
 	{
-
+		rectCircle(rect, circle, info);
+		info.penetration = -info.penetration;
 	}
 
 	void CollisionChecker::circlePoly(const ColliderCircle &circle, const ColliderPolygon &poly, CollisionInfo &info)
@@ -45,7 +46,45 @@ namespace me
 	//===================  RECT and X  ===================
 	void CollisionChecker::rectCircle(const ColliderRect &rect, const ColliderCircle &circle, CollisionInfo &info)
 	{
-		
+		const sf::Vector2f distance = circle.getPosition() - rect.getPosition();
+
+		sf::Vector2f rectWAxis = rect.getWidthAxis();
+		sf::Vector2f rectHAxis = VectorMath::leftNormal(rectWAxis);
+
+		sf::Vector2f rectDimensions[2] = { rectWAxis * rect.getHalfWidth(), rectHAxis * rect.getHalfHeight() };
+		float radius = circle.getRadius();
+
+		sf::Vector2f closestPoint = rect.getPosition() + rectWidthOnAxis(rectDimensions, distance).point1;
+		sf::Vector2f toCircleAxis = VectorMath::normalize(circle.getPosition() - closestPoint);
+
+		sf::Vector2f axes[3] = { rectWAxis, rectHAxis, toCircleAxis };
+		float penDepth = 100000;
+		sf::Vector2f penAxis;
+		for (auto &axis : axes)
+		{
+			float distOnAxis = VectorMath::dot(axis, distance);
+			if (distOnAxis < 0)
+			{
+				axis = -axis; // revert the axis if it faces the wrong way
+				distOnAxis = -distOnAxis;
+			}
+
+			PolyAxisInfo rectW = rectWidthOnAxis(rectDimensions, axis);
+
+			float depth = rectW.width + radius - distOnAxis;
+			if (depth < 0) // no collision on this axis => SAT: no collision at all
+			{
+				return;
+			}
+			else if (depth < penDepth)
+			{
+				penAxis = axis;
+				penDepth = depth;
+			}
+		}
+
+		info.areColliding = true;
+		info.penetration = -penDepth * penAxis;
 	}
 
 	void CollisionChecker::rectRect(const ColliderRect &rect1, const ColliderRect &rect2, CollisionInfo &info)
@@ -67,7 +106,7 @@ namespace me
 		int axisIndex = 0;
 		bool negateAxis = false;
 
-		for (int i = 0; i < 2; i++) // i == which rectect we're looking at
+		for (int i = 0; i < 2; i++) // i == which rect we're looking at
 		{
 			int other = (i + 1) % 2;
 			for (int j = 0; j < 2; j++) // j == which axis of the rectect we're looking at

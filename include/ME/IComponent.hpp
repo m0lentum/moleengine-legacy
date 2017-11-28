@@ -23,6 +23,8 @@ namespace me
 		virtual std::string getType() = 0;
 
 
+		virtual IComponent * clone() = 0;
+
 		virtual ~IComponent() {}
 	};
 }

@@ -4,24 +4,7 @@
 
 namespace me
 {
-	void GameObject::continuousUpdate(const sf::Time &timeElapsed)
-	{
-		if (m_graphic) m_graphic->continuousUpdate(timeElapsed);
-	}
-
-	void GameObject::fixedUpdate()
-	{
-		//A generic GameObject does nothing on fixed update
-	}
-
-	void GameObject::draw(sf::RenderTarget &target, sf::RenderStates states) const
-	{
-		if (m_graphic)
-		{
-			states.transform *= getTransform();
-			m_graphic->draw(target, states);
-		}
-	}
+	unsigned int GameObject::numExisting = 0;
 
 	void GameObject::registerSpace(Space *space)
 	{
@@ -36,28 +19,74 @@ namespace me
 			std::cerr << "Warning: tried to destroy an object that is not in a space" << std::endl;
 	}
 
-	void GameObject::setGraphic(Graphic *graphic)
+
+	void GameObject::addComponent(IComponent *component)
 	{
-		m_graphic.reset(graphic);
+		m_components.emplace(component->getType(), std::unique_ptr<IComponent>(component));
+		component->registerParent(this);
+	}
+
+	void GameObject::removeComponent(const std::string &type)
+	{
+		m_components.erase(type);
+	}
+
+	IComponent * GameObject::getComponent(const std::string &type) const
+	{
+		return m_components.at(type).get();
+	}
+
+	const std::unordered_map<std::string, std::unique_ptr<IComponent> > & GameObject::getAllComponents() const
+	{
+		return m_components;
 	}
 
 
 
 	GameObject::GameObject() :
-		m_space(NULL)
+		m_space(NULL),
+		m_id(std::to_string(numExisting++))
 	{
 	}
 
-	GameObject::GameObject(Graphic *graphic) :
+	GameObject::GameObject(const std::string &id) :
 		m_space(NULL),
-		m_graphic(graphic)
+		m_id(id)
 	{
+		numExisting++;
+	}
+
+	GameObject::GameObject(std::initializer_list<IComponent*> components) :
+		m_space(NULL),
+		m_id(std::to_string(numExisting++))
+	{
+		for (auto i = components.begin(); i != components.end(); i++)
+		{
+			addComponent(*i);
+		}
+	}
+
+	GameObject::GameObject(const std::string &id, std::initializer_list<IComponent*> components) :
+		m_space(NULL),
+		m_id(id)
+	{
+		for (auto i = components.begin(); i != components.end(); i++)
+		{
+			addComponent(*i);
+		}
+
+		numExisting++;
 	}
 
 	GameObject::GameObject(const GameObject &copy) :
 		m_space(NULL),
-		m_graphic(new Graphic(*copy.m_graphic))
+		m_id(std::to_string(numExisting++))
 	{
+		// Deep copy m_components
+		for (auto &comp : copy.m_components)
+		{
+			m_components.emplace(comp.first, comp.second->clone());
+		}
 	}
 
 	GameObject::~GameObject()

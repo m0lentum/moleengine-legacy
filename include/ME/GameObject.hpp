@@ -2,9 +2,10 @@
 #define GAME_OBJECT_HPP
 
 #include <SFML/Graphics.hpp>
-#include <memory>
 #include "IComponent.hpp"
-#include "Graphics/Graphic.hpp"
+#include <initializer_list>
+#include <unordered_map>
+#include <memory>
 
 namespace me
 {
@@ -12,17 +13,18 @@ namespace me
 
 	class GameObject : public sf::Transformable
 	{
-	protected:
+	private:
 		/// The Space this object is in, if any.
 		Space *m_space;
 
-		std::unique_ptr<Graphic> m_graphic;
+		std::unordered_map<std::string, std::unique_ptr<IComponent> > m_components;
+
+		/// A unique identification string.
+		const std::string m_id;
+		/// Tracks how many game objects have been created. Used for generating a unique ID.
+		static unsigned int numExisting;
 
 	public:
-		// update loops
-		virtual void continuousUpdate(const sf::Time &timeElapsed);
-		virtual void fixedUpdate();
-		virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
 		/// Store a pointer to the space containing this object
 		void registerSpace(Space *space);
@@ -30,11 +32,19 @@ namespace me
 		/// It will be removed from the space it's in on the next fixedUpdate cycle.
 		virtual void destroy();
 
-		void setGraphic(Graphic *graphic);
+		void addComponent(IComponent *component);
+		void removeComponent(const std::string &type);
+		IComponent * getComponent(const std::string &type) const;
+		const std::unordered_map<std::string, std::unique_ptr<IComponent> > & getAllComponents() const;
 
+		inline const std::string & getID() const { return m_id; }
+
+		
 		GameObject();
-		/// Set the graphic upon initialization
-		GameObject(Graphic *graphic);
+		/// Set a custom id (avoid using integers as this can break uniqueness)
+		GameObject(const std::string &id);
+		GameObject(std::initializer_list<IComponent*> components);
+		GameObject(const std::string &id, std::initializer_list<IComponent*> components);
 		GameObject(const GameObject &copy);
 
 		virtual ~GameObject();

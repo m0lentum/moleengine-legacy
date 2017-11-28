@@ -3,6 +3,7 @@
 
 #include <unordered_set>
 #include <queue>
+#include "IController.hpp"
 #include "GameObject.hpp"
 #include "Physics/PhysicsObject.hpp"
 #include <SFML/Graphics/RenderTarget.hpp>

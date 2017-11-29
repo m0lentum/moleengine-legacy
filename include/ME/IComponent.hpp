@@ -2,6 +2,7 @@
 #define ICOMPONENT_HPP
 
 #include <string>
+#include "GameObject.hpp"
 
 namespace me
 {
@@ -22,10 +23,10 @@ namespace me
 		inline std::string getID() const { return m_parent->getID(); }
 
 		/// Each Component has a type that is used to identify the Controller it is related to.
-		virtual std::string getType() = 0;
+		virtual std::string getType() const = 0;
 
 
-		virtual IComponent * clone() = 0;
+		virtual IComponent * clone() const = 0;
 
 		virtual ~IComponent() {}
 	};

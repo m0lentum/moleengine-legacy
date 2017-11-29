@@ -19,8 +19,10 @@ namespace me
 			// Remove reference to object from all controllers controlling it
 			for (auto &item : m_objects[id]->getAllComponents())
 			{
-				// CONSIDERATION: do we want to assume all components have controllers in this Space?
-				m_controllers[item.first]->removeComponent(id);
+				if (m_controllers.count(item.first) > 0)
+				{
+					m_controllers[item.first]->removeComponent(id);
+				}
 			}
 
 			m_objects.erase(id);
@@ -92,13 +94,22 @@ namespace me
 		m_controllers.erase(id);
 	}
 
+	void Space::addComponent(IComponent *component)
+	{
+		std::string type = component->getType();
+		if (m_controllers.count(type) > 0)
+		{
+			m_controllers[type]->registerComponent(component);
+		}
+	}
+
 	Space::Space()
 	{
 	}
 
-	Space::Space(const Space &copy) :
-		m_objects(copy.m_objects)
+	Space::Space(const Space &copy)
 	{
+		// TODO: deep copy the whole dang thing
 	}
 
 	Space::~Space()

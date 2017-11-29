@@ -4,10 +4,11 @@
 
 namespace me
 {
-	void Graphic::continuousUpdate(const sf::Time &timeElapsed)
+	std::string Graphic::getType() const
 	{
-		//Do nothing if there's no animation
+		return "graphic";
 	}
+	
 
 	void Graphic::fillWithColor(const sf::Color& color)
 	{
@@ -63,12 +64,18 @@ namespace me
 
 	void Graphic::draw(sf::RenderTarget& target, sf::RenderStates states) const
 	{
-		states.transform *= getTransform();
+		states.transform *= m_parent->getTransform();
 		states.texture = m_texture.get();
 
 		target.draw(m_vertices, states);
 
 		//TODO add outline
+	}
+
+
+	IComponent * Graphic::clone() const
+	{
+		return new Graphic(*this);
 	}
 
 

@@ -1,6 +1,7 @@
 #include <Physics/ColliderCircle.hpp>
 #include <Physics/PhysicsObject.hpp>
 #include <Physics/CollisionChecker.hpp>
+#include <Graphics/Graphic.hpp>
 
 namespace me
 {

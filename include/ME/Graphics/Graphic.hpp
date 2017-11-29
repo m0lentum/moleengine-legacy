@@ -3,12 +3,13 @@
 
 #include <SFML/Graphics.hpp>
 #include <memory>
+#include "../IComponent.hpp"
 
 namespace me
 {
 	/// Custom implementation of sf::Shape to allow more flexibility + animation.
 	/// A lot of this is basically copy-pasted from sf::Shape.
-	class Graphic : public sf::Transformable
+	class Graphic : public IComponent
 	{
 	protected:
 		std::shared_ptr<sf::Texture> m_texture;		//texture to fill the shape with, can be null
@@ -17,8 +18,6 @@ namespace me
 		sf::FloatRect		m_bounds;		//bounding box containing the vertices
 
 	public:
-		/// This should be called every frame if there's an animation to update
-		virtual void continuousUpdate(const sf::Time &timeElapsed);
 		/// Draw the graphic in the specified target
 		virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
@@ -28,6 +27,10 @@ namespace me
 		void setTexture(std::shared_ptr<sf::Texture> texture, bool resetRect = true);
 		void setTextureRect(const sf::IntRect &rect);
 		void setVertices(const sf::VertexArray &verts);
+
+		// Inherited Component methods
+		virtual std::string getType() const;
+		virtual IComponent * clone() const;
 
 
 		Graphic();

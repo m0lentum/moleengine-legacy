@@ -5,7 +5,7 @@
 #include <queue>
 #include "IController.hpp"
 #include "GameObject.hpp"
-#include "IController.hpp"
+#include "IComponent.hpp"
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/RenderStates.hpp>
 

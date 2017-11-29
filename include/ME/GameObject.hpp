@@ -2,7 +2,6 @@
 #define GAME_OBJECT_HPP
 
 #include <SFML/Graphics.hpp>
-#include "IComponent.hpp"
 #include <initializer_list>
 #include <unordered_map>
 #include <memory>
@@ -10,6 +9,7 @@
 namespace me
 {
 	class Space;
+	class IComponent;
 
 	class GameObject : public sf::Transformable
 	{

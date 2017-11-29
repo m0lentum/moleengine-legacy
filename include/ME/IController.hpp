@@ -9,6 +9,7 @@
 namespace me
 {
 	class Space;
+	class IComponent;
 
 	/// Controllers work within Spaces and control a specific Component.
 	class IController

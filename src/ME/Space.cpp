@@ -6,7 +6,10 @@ namespace me
 {
 	void Space::continuousUpdate(sf::Time timeElapsed)
 	{
-		
+		for (auto &cont : m_controllers)
+		{
+			cont.second->continuousUpdate(timeElapsed);
+		}
 	}
 	
 
@@ -28,12 +31,20 @@ namespace me
 			m_objects.erase(id);
 			m_toDestroy.pop();
 		}
+
+		for (auto &cont : m_controllers)
+		{
+			cont.second->fixedUpdate();
+		}
 	}
 	
 
 	void Space::draw(sf::RenderTarget &target, sf::RenderStates states) const
 	{
-
+		for (auto &cont : m_controllers)
+		{
+			cont.second->draw(target, states);
+		}
 	}
 
 	/* TODO: move this stuff into a Controller
@@ -76,7 +87,13 @@ namespace me
 		m_objects.emplace(object->getID(), std::unique_ptr<GameObject>(object));
 		object->registerSpace(this);
 
-		// TODO: add components to controllers
+		for (auto &comp : object->getAllComponents())
+		{
+			if (m_controllers.count(comp.first) > 0)
+			{
+				m_controllers[comp.first]->registerComponent(comp.second.get());
+			}
+		}
 	}
 
 	void Space::removeObject(const unsigned int id)

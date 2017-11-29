@@ -4,7 +4,8 @@
 #include <SFML/System/Time.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/RenderStates.hpp>
-#include <string>
+#include <unordered_map>
+#include <memory>
 
 namespace me
 {
@@ -16,7 +17,8 @@ namespace me
 	{
 	protected:
 
-		Space *m_space;
+		Space *m_parentSpace;
+		std::unordered_map<unsigned int, IComponent* > m_components;
 
 	public:
 
@@ -28,13 +30,12 @@ namespace me
 		/// The type of the Controller corresponds to the type of Components it controls.
 		virtual std::string getType() = 0;
 
-		/// The process of storing and removing Components must be individually implemented by each Controller
-		/// due to type casts needed to access the Component's special features
-		virtual void registerComponent(IComponent *component) = 0;
-		virtual void removeComponent(unsigned int id) = 0;
+
+		virtual void registerComponent(IComponent *component);
+		virtual void removeComponent(unsigned int id);
 
 
-		inline void registerSpace(Space *space) { m_space = space; }
+		void registerSpace(Space *space);
 
 		virtual ~IController() {}
 	};

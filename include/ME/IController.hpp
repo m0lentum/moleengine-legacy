@@ -31,7 +31,7 @@ namespace me
 		/// The process of storing and removing Components must be individually implemented by each Controller
 		/// due to type casts needed to access the Component's special features
 		virtual void registerComponent(IComponent *component) = 0;
-		virtual void removeComponent(std::string id) = 0;
+		virtual void removeComponent(unsigned int id) = 0;
 
 
 		inline void registerSpace(Space *space) { m_space = space; }

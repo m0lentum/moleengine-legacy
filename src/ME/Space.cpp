@@ -15,7 +15,7 @@ namespace me
 		// Remove all objects marked for destruction
 		while (!m_toDestroy.empty())
 		{
-			std::string id = m_toDestroy.front();
+			unsigned int id = m_toDestroy.front();
 			// Remove reference to object from all controllers controlling it
 			for (auto &item : m_objects[id]->getAllComponents())
 			{
@@ -79,7 +79,7 @@ namespace me
 		// TODO: add components to controllers
 	}
 
-	void Space::removeObject(const std::string &id)
+	void Space::removeObject(const unsigned int id)
 	{
 		m_toDestroy.push(id);
 	}

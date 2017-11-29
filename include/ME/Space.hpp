@@ -18,10 +18,10 @@ namespace me
 	{
 	private:
 		/// A set of all non-physics objects. These objects are owned by the Space and should not have references stored elsewhere.
-		std::unordered_map<std::string, std::unique_ptr<GameObject> > m_objects;
+		std::unordered_map<unsigned int, std::unique_ptr<GameObject> > m_objects;
 		/// Store the ids of the objects we need to destroy in a queue for 
 		/// deletion at the start of the next update loop
-		std::queue<std::string> m_toDestroy;
+		std::queue<unsigned int> m_toDestroy;
 		/// Controllers that manage the Components present in GameObjects
 		std::unordered_map<std::string, std::unique_ptr<IController> > m_controllers;
 
@@ -36,7 +36,7 @@ namespace me
 
 
 		void addObject(GameObject *object);
-		void removeObject(const std::string &id);
+		void removeObject(const unsigned int id);
 		/// Called by GameObject if a component gets added to it while it's already in a Space
 		void addComponent(IComponent *component);
 

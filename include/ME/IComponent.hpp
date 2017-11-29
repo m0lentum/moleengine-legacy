@@ -20,7 +20,7 @@ namespace me
 
 		inline void registerParent(GameObject *parent) { m_parent = parent; }
 		// The ID of the GameObject containing this Component
-		inline std::string getID() const { return m_parent->getID(); }
+		inline const unsigned int getID() const { return m_parent->getID(); }
 
 		/// Each Component has a type that is used to identify the Controller it is related to.
 		virtual std::string getType() const = 0;

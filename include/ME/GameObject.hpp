@@ -19,8 +19,8 @@ namespace me
 
 		std::unordered_map<std::string, std::unique_ptr<IComponent> > m_components;
 
-		/// A unique identification string.
-		const std::string m_id;
+		/// A unique identification number.
+		const unsigned int m_id;
 		/// Tracks how many game objects have been created. Used for generating a unique ID.
 		static unsigned int numExisting;
 
@@ -37,14 +37,11 @@ namespace me
 		IComponent * getComponent(const std::string &type) const;
 		const std::unordered_map<std::string, std::unique_ptr<IComponent> > & getAllComponents() const;
 
-		inline const std::string & getID() const { return m_id; }
+		inline const unsigned int getID() const { return m_id; }
 
 		
 		GameObject();
-		/// Set a custom id (avoid using integers as this can break uniqueness)
-		GameObject(const std::string &id);
 		GameObject(std::initializer_list<IComponent*> components);
-		GameObject(const std::string &id, std::initializer_list<IComponent*> components);
 		GameObject(const GameObject &copy);
 
 		virtual ~GameObject();

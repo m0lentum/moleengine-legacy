@@ -47,42 +47,23 @@ namespace me
 
 	GameObject::GameObject() :
 		m_space(NULL),
-		m_id(std::to_string(numExisting++))
+		m_id(numExisting++)
 	{
-	}
-
-	GameObject::GameObject(const std::string &id) :
-		m_space(NULL),
-		m_id(id)
-	{
-		numExisting++;
 	}
 
 	GameObject::GameObject(std::initializer_list<IComponent*> components) :
 		m_space(NULL),
-		m_id(std::to_string(numExisting++))
+		m_id(numExisting++)
 	{
 		for (auto i = components.begin(); i != components.end(); i++)
 		{
 			addComponent(*i);
 		}
-	}
-
-	GameObject::GameObject(const std::string &id, std::initializer_list<IComponent*> components) :
-		m_space(NULL),
-		m_id(id)
-	{
-		for (auto i = components.begin(); i != components.end(); i++)
-		{
-			addComponent(*i);
-		}
-
-		numExisting++;
 	}
 
 	GameObject::GameObject(const GameObject &copy) :
 		m_space(NULL),
-		m_id(std::to_string(numExisting++))
+		m_id(numExisting++)
 	{
 		// Deep copy m_components
 		for (auto &comp : copy.m_components)

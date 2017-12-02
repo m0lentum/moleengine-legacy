@@ -11,6 +11,7 @@ Currently implemented features:
 * Sprite-sheet animation
 
 Planned features:
+* Component-based game object architecture (https://en.wikipedia.org/wiki/Entity%E2%80%93component%E2%80%93system)
 * Optimization of collision detection via spatial partitioning
 * Physics simulation for rigid bodies
 * Level data format
@@ -54,7 +55,7 @@ different linking options in the future.
 3. Clone this repository.
 4. Create a build directory anywhere outside of the repository.
 5. Navigate to the directory and run\
-```cmake -DCMAKE_INSTALL_PREFIX="/path/to/install/location" -DCMAKE_BUILD_TYPE="[Debug/Release]" /path/to/engine/root```\
+```cmake -DCMAKE_INSTALL_PREFIX="/path/to/install/location" -DCMAKE_BUILD_TYPE=("Debug" or "Release") /path/to/engine/root```\
 Additionally, if SFML is not in your system path, set `-DSFML_ROOT="/path/to/sfml"`
 6. Run `make install`
 7. The library should now be in your install directory, ready to be linked to your projects.

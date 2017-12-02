@@ -4,12 +4,6 @@
 
 namespace me
 {
-	std::string Graphic::getType() const
-	{
-		return "graphic";
-	}
-	
-
 	void Graphic::fillWithColor(const sf::Color& color)
 	{
 		for (std::size_t i = 0; i < m_vertices.getVertexCount(); i++)
@@ -47,7 +41,6 @@ namespace me
 		m_bounds = m_vertices.getBounds();
 
 		updateTexCoords();
-		//TODO also update outline
 	}
 
 	void Graphic::updateTexCoords()
@@ -73,7 +66,7 @@ namespace me
 	}
 
 
-	IComponent * Graphic::clone() const
+	IBehavior * Graphic::clone() const
 	{
 		return new Graphic(*this);
 	}

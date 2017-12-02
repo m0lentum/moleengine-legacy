@@ -1,4 +1,5 @@
 #include <GameObject.hpp>
+#include <IBehavior.hpp>
 #include <Space.hpp>
 #include <iostream>
 
@@ -20,29 +21,38 @@ namespace me
 	}
 
 
-	void GameObject::addComponent(IComponent *component)
+	
+	void GameObject::addBehavior(IBehavior *behavior)
 	{
-		m_components.emplace(component->getType(), std::unique_ptr<IComponent>(component));
-		component->registerParent(this);
-
-		if (m_space) m_space->addComponent(component);
+		m_behaviors.push_back(std::unique_ptr<IBehavior>(behavior));
+		behavior->registerParent(this);
 	}
 
-	void GameObject::removeComponent(const std::string &type)
+
+
+	void GameObject::continuousUpdate(sf::Time timeElapsed)
 	{
-		m_components.erase(type);
+		for (auto &beh : m_behaviors)
+		{
+			beh->continuousUpdate(timeElapsed);
+		}
 	}
 
-	IComponent * GameObject::getComponent(const std::string &type) const
+	void GameObject::fixedUpdate()
 	{
-		return m_components.at(type).get();
+		for (auto &beh : m_behaviors)
+		{
+			beh->fixedUpdate();
+		}
 	}
 
-	const std::unordered_map<std::string, std::unique_ptr<IComponent> > & GameObject::getAllComponents() const
+	void GameObject::draw(sf::RenderTarget &target, sf::RenderStates states) const
 	{
-		return m_components;
+		for (auto &beh : m_behaviors)
+		{
+			beh->draw(target, states);
+		}
 	}
-
 
 
 	GameObject::GameObject() :
@@ -51,13 +61,13 @@ namespace me
 	{
 	}
 
-	GameObject::GameObject(std::initializer_list<IComponent*> components) :
+	GameObject::GameObject(std::initializer_list<IBehavior*> behaviors) :
 		m_space(NULL),
 		m_id(numExisting++)
 	{
-		for (auto i = components.begin(); i != components.end(); i++)
+		for (auto i = behaviors.begin(); i != behaviors.end(); i++)
 		{
-			addComponent(*i);
+			addBehavior(*i);
 		}
 	}
 
@@ -65,10 +75,10 @@ namespace me
 		m_space(NULL),
 		m_id(numExisting++)
 	{
-		// Deep copy m_components
-		for (auto &comp : copy.m_components)
+		// Deep copy m_behaviors
+		for (auto &beh : copy.m_behaviors)
 		{
-			m_components.emplace(comp.first, comp.second->clone());
+			addBehavior(beh->clone());
 		}
 	}
 

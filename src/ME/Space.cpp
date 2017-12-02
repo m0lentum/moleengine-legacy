@@ -10,6 +10,11 @@ namespace me
 		{
 			cont.second->continuousUpdate(timeElapsed);
 		}
+
+		for (auto &obj : m_objects)
+		{
+			obj.second->continuousUpdate(timeElapsed);
+		}
 	}
 	
 
@@ -20,13 +25,13 @@ namespace me
 		{
 			unsigned int id = m_toDestroy.front();
 			// Remove reference to object from all controllers controlling it
-			for (auto &item : m_objects[id]->getAllComponents())
+			/*for (auto &item : m_objects[id]->getAllComponents())
 			{
 				if (m_controllers.count(item.first) > 0)
 				{
 					m_controllers[item.first]->removeComponent(id);
 				}
-			}
+			}*/
 
 			m_objects.erase(id);
 			m_toDestroy.pop();
@@ -36,6 +41,11 @@ namespace me
 		{
 			cont.second->fixedUpdate();
 		}
+
+		for (auto &obj : m_objects)
+		{
+			obj.second->fixedUpdate();
+		}
 	}
 	
 
@@ -44,6 +54,11 @@ namespace me
 		for (auto &cont : m_controllers)
 		{
 			cont.second->draw(target, states);
+		}
+
+		for (auto &obj : m_objects)
+		{
+			obj.second->draw(target, states);
 		}
 	}
 
@@ -87,13 +102,13 @@ namespace me
 		m_objects.emplace(object->getID(), std::unique_ptr<GameObject>(object));
 		object->registerSpace(this);
 
-		for (auto &comp : object->getAllComponents())
+		/*for (auto &comp : object->getAllComponents())
 		{
 			if (m_controllers.count(comp.first) > 0)
 			{
 				m_controllers[comp.first]->registerComponent(comp.second.get());
 			}
-		}
+		}*/
 	}
 
 	void Space::removeObject(const unsigned int id)

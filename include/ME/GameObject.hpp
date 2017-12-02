@@ -1,15 +1,18 @@
 #ifndef GAME_OBJECT_HPP
 #define GAME_OBJECT_HPP
 
-#include <SFML/Graphics.hpp>
+#include <SFML/Graphics/RenderTarget.hpp>
+#include <SFML/Graphics/RenderStates.hpp>
+#include <SFML/System/Time.hpp>
+#include <SFML/Graphics/Transformable.hpp>
 #include <initializer_list>
-#include <unordered_map>
+#include <vector>
 #include <memory>
 
 namespace me
 {
 	class Space;
-	class IComponent;
+	class IBehavior;
 
 	class GameObject : public sf::Transformable
 	{
@@ -17,7 +20,7 @@ namespace me
 		/// The Space this object is in, if any.
 		Space *m_space;
 
-		std::unordered_map<std::string, std::unique_ptr<IComponent> > m_components;
+		std::vector<std::unique_ptr<IBehavior> > m_behaviors;
 
 		/// A unique identification number.
 		const unsigned int m_id;
@@ -32,16 +35,20 @@ namespace me
 		/// It will be removed from the space it's in on the next fixedUpdate cycle.
 		virtual void destroy();
 
-		void addComponent(IComponent *component);
-		void removeComponent(const std::string &type);
-		IComponent * getComponent(const std::string &type) const;
-		const std::unordered_map<std::string, std::unique_ptr<IComponent> > & getAllComponents() const;
+		void addBehavior(IBehavior *behavior);
 
 		inline const unsigned int getID() const { return m_id; }
 
+		/// continuousUpdate all behaviors
+		void continuousUpdate(sf::Time timeElapsed);
+		/// fixedUpdate all behaviors
+		void fixedUpdate();
+		/// draw all behaviors
+		void draw(sf::RenderTarget &target, sf::RenderStates states) const;
+
 		
 		GameObject();
-		GameObject(std::initializer_list<IComponent*> components);
+		GameObject(std::initializer_list<IBehavior*> behaviors);
 		GameObject(const GameObject &copy);
 
 		virtual ~GameObject();

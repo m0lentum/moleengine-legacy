@@ -57,18 +57,11 @@ namespace me
 
 	void Graphic::draw(sf::RenderTarget& target, sf::RenderStates states) const
 	{
-		states.transform *= m_parent->getTransform();
 		states.texture = m_texture.get();
 
 		target.draw(m_vertices, states);
 
 		//TODO add outline
-	}
-
-
-	IBehavior * Graphic::clone() const
-	{
-		return new Graphic(*this);
 	}
 
 

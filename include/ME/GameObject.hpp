@@ -6,53 +6,89 @@
 #include <SFML/System/Time.hpp>
 #include <SFML/Graphics/Transformable.hpp>
 #include <initializer_list>
-#include <vector>
 #include <memory>
+#include <unordered_map>
+#include <typeindex>
+#include "ComponentSystem.hpp"
 
 namespace me
 {
 	class Space;
-	class IBehavior;
 
 	class GameObject : public sf::Transformable
 	{
 	private:
-		/// The Space this object is in, if any.
+		/// The Space this object is in.
 		Space *m_space;
-
-		std::vector<std::unique_ptr<IBehavior> > m_behaviors;
 
 		/// A unique identification number.
 		const unsigned int m_id;
 		/// Tracks how many game objects have been created. Used for generating a unique ID.
 		static unsigned int numExisting;
 
+		std::unordered_map<std::type_index, std::unique_ptr<Internal::ComponentContainerBase> > m_components;
+
 	public:
 
-		/// Store a pointer to the space containing this object
-		void registerSpace(Space *space);
 		/// Mark this object for destruction.
 		/// It will be removed from the space it's in on the next fixedUpdate cycle.
-		virtual void destroy();
-
-		void addBehavior(IBehavior *behavior);
+		void destroy();
 
 		inline const unsigned int getID() const { return m_id; }
 
-		/// continuousUpdate all behaviors
-		void continuousUpdate(sf::Time timeElapsed);
-		/// fixedUpdate all behaviors
-		void fixedUpdate();
-		/// draw all behaviors
-		void draw(sf::RenderTarget &target, sf::RenderStates states) const;
+
+		/// Add a Component. It can be of any data type.
+		template <typename T>
+		ComponentHandle<T> addComponent(T* m_component);
+
+		template <typename T>
+		void removeComponent();
+
+		template <typename T>
+		ComponentHandle<T> getComponent();
 
 		
-		GameObject();
-		GameObject(std::initializer_list<IBehavior*> behaviors);
-		GameObject(const GameObject &copy);
+		GameObject(Space *space);
 
-		virtual ~GameObject();
+		~GameObject();
 	};
+
+
+
+
+	template <typename T>
+	ComponentHandle<T> GameObject::addComponent(T* m_component)
+	{
+		std::type_index index(typeid(T)); // Get index from type
+
+		m_components.emplace(index, std::make_unique<Internal::ComponentContainer<T> >(m_component)); // put in the map
+
+		return ComponentHandle<T>(m_component);
+	}
+
+	template <typename T>
+	void GameObject::removeComponent()
+	{
+		std::type_index index(typeid(T));
+
+		m_components.erase(index);
+	}
+
+	template <typename T>
+	ComponentHandle<T> GameObject::getComponent()
+	{
+		std::type_index index(typeid(T));
+
+		if (m_components.count(index) > 0)
+		{
+			Internal::ComponentContainer<T>* container = reinterpret_cast<Internal::ComponentContainer<T>*>(m_components.at(index).get());
+			return ComponentHandle<T>(container->getData());
+		}
+		else
+		{
+			return ComponentHandle<T>(); // Return invalid handle if not found
+		}
+	}
 }
 
 #endif //GAME_OBJECT_HPP

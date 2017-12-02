@@ -3,9 +3,7 @@
 
 #include <unordered_map>
 #include <queue>
-#include "IController.hpp"
 #include "GameObject.hpp"
-#include "IComponent.hpp"
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/RenderStates.hpp>
 
@@ -17,13 +15,7 @@ namespace me
 	class Space
 	{
 	private:
-		/// A set of all non-physics objects. These objects are owned by the Space and should not have references stored elsewhere.
-		std::unordered_map<unsigned int, std::unique_ptr<GameObject> > m_objects;
-		/// Store the ids of the objects we need to destroy in a queue for 
-		/// deletion at the start of the next update loop
-		std::queue<unsigned int> m_toDestroy;
-		/// Controllers that manage the Components present in GameObjects
-		std::unordered_map<std::string, std::unique_ptr<IController> > m_controllers;
+
 
 	public:
 		/// continuousUpdate all contained objects
@@ -33,15 +25,6 @@ namespace me
 		/// draw all contained objects
 		void draw(sf::RenderTarget &target, sf::RenderStates states) const;
 
-
-
-		void addObject(GameObject *object);
-		void removeObject(const unsigned int id);
-		/// Called by GameObject if a component gets added to it while it's already in a Space
-		void addComponent(IComponent *component);
-
-		void addController(IController *controller);
-		void removeController(const std::string &type);
 
 
 		Space();

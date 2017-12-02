@@ -3,13 +3,12 @@
 
 #include <SFML/Graphics.hpp>
 #include <memory>
-#include "../IBehavior.hpp"
 
 namespace me
 {
 	/// Custom implementation of sf::Shape to allow more flexibility + animation.
 	/// A lot of this is basically copy-pasted from sf::Shape.
-	class Graphic : public IBehavior
+	class Graphic
 	{
 	protected:
 		std::shared_ptr<sf::Texture> m_texture;		//texture to fill the shape with, can be null
@@ -28,8 +27,6 @@ namespace me
 		void setTextureRect(const sf::IntRect &rect);
 		void setVertices(const sf::VertexArray &verts);
 
-
-		virtual IBehavior * clone() const;
 
 
 		Graphic();

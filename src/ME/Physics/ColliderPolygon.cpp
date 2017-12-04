@@ -101,7 +101,7 @@ namespace me
 
 	Graphic* ColliderPolygon::generateGraphic(const sf::Color &color) const
 	{
-		return Graphic::makePolygon(edgesToPoints(m_edges), color);
+		return new Graphic(Graphic::makePolygon(edgesToPoints(m_edges), color));
 	}
 
 

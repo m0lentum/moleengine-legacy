@@ -36,14 +36,16 @@ namespace me
 		Graphic(std::shared_ptr<sf::Texture> texture, const sf::IntRect &textureRect, const sf::VertexArray &vertices);
 		/// Copy constructor
 		Graphic(const Graphic &copy);
+		/// Move constructor
+		Graphic(Graphic&& move);
 		virtual ~Graphic();
 
 		/// Create a circle with the origin at the center.
-		static Graphic* makeCircle(float radius, unsigned int pointCount, const sf::Color &color = sf::Color::White);
+		static sf::VertexArray makeCircle(float radius, unsigned int pointCount, const sf::Color &color = sf::Color::White);
 		/// Create a rectangle with the specified height and width.
-		static Graphic* makeRect(float width, float height, const sf::Color &color = sf::Color::White);
+		static sf::VertexArray makeRect(float width, float height, const sf::Color &color = sf::Color::White);
 		/// Create a polygon with the given points.
-		static Graphic* makePolygon(const std::vector<sf::Vector2f> &points, const sf::Color &color = sf::Color::White);
+		static sf::VertexArray makePolygon(const std::vector<sf::Vector2f> &points, const sf::Color &color = sf::Color::White);
 
 	protected:
 		/// This should be called every time a point's position changes

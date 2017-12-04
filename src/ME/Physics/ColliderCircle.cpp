@@ -40,7 +40,7 @@ namespace me
 	
 	Graphic* ColliderCircle::generateGraphic(const sf::Color &color) const
 	{
-		return Graphic::makeCircle(m_radius, 25, color);
+		return new Graphic(Graphic::makeCircle(m_radius, 25, color));
 	}
 
 

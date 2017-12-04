@@ -62,6 +62,7 @@ namespace me
 		target.draw(m_vertices, states);
 
 		//TODO add outline
+		std::cout << "asdfa" << std::endl;
 	}
 
 
@@ -97,12 +98,20 @@ namespace me
 	{
 	}
 
+	Graphic::Graphic(Graphic&& move) :
+		m_texture(std::move(move.m_texture)),
+		m_textureRect(std::move(move.m_textureRect)),
+		m_vertices(std::move(move.m_vertices)),
+		m_bounds(std::move(move.m_bounds))
+	{
+	}
+
 	Graphic::~Graphic()
 	{
 	}
 
 
-	Graphic* Graphic::makeCircle(float radius, unsigned int pointCount, const sf::Color &color)
+	sf::VertexArray Graphic::makeCircle(float radius, unsigned int pointCount, const sf::Color &color)
 	{
 		sf::VertexArray verts(sf::PrimitiveType::TriangleFan, pointCount);
 
@@ -118,10 +127,10 @@ namespace me
 			verts[i].color = color;
 		}
 
-		return new Graphic(verts);
+		return verts;
 	}
 
-	Graphic* Graphic::makeRect(float width, float height, const sf::Color &color)
+	sf::VertexArray Graphic::makeRect(float width, float height, const sf::Color &color)
 	{
 		sf::VertexArray verts(sf::PrimitiveType::TriangleFan, 4);
 
@@ -133,12 +142,12 @@ namespace me
 		verts[2].position = sf::Vector2f(hw, hh);
 		verts[3].position = sf::Vector2f(hw, -hh);
 
-		Graphic* graphic = new Graphic(verts);
-		graphic->fillWithColor(color);
-		return graphic;
+		for (unsigned int i = 0; i < verts.getVertexCount(); i++) verts[i].color = color;
+
+		return verts;
 	}
 
-	Graphic* Graphic::makePolygon(const std::vector<sf::Vector2f> &points, const sf::Color &color)
+	sf::VertexArray Graphic::makePolygon(const std::vector<sf::Vector2f> &points, const sf::Color &color)
 	{
 		sf::VertexArray verts(sf::PrimitiveType::TriangleFan, points.size());
 
@@ -147,8 +156,8 @@ namespace me
 			verts[i].position = points[i];
 		}
 
-		Graphic* graphic = new Graphic(verts);
-		graphic->fillWithColor(color);
-		return graphic;
+		for (unsigned int i = 0; i < verts.getVertexCount(); i++) verts[i].color = color;
+
+		return verts;
 	}
 }

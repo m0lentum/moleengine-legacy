@@ -9,7 +9,7 @@
 #include <memory>
 #include <unordered_map>
 #include <typeindex>
-#include "ComponentSystem.hpp"
+#include "ComponentStorageUnit.hpp"
 
 namespace me
 {
@@ -26,7 +26,7 @@ namespace me
 		/// Tracks how many game objects have been created. Used for generating a unique ID.
 		static unsigned int numExisting;
 
-		std::unordered_map<std::type_index, std::unique_ptr<Internal::ComponentContainerBase> > m_components;
+		std::unordered_map<std::type_index, ComponentStorageUnitBase*> m_components;
 
 	public:
 
@@ -38,14 +38,20 @@ namespace me
 
 
 		/// Add a Component. It can be of any data type.
-		template <typename T>
-		ComponentHandle<T> addComponent(T* m_component);
+		template <typename T, typename ...Args>
+		T* addComponent(Args&&... args);
 
 		template <typename T>
 		void removeComponent();
 
 		template <typename T>
-		ComponentHandle<T> getComponent();
+		T* getComponent();
+
+
+		/// Used by ComponentContainer to send 
+		template <typename T>
+		void registerComponent(ComponentStorageUnit<T> *component);
+
 
 		
 		GameObject(Space *space);
@@ -56,38 +62,32 @@ namespace me
 
 
 
-	template <typename T>
-	ComponentHandle<T> GameObject::addComponent(T* m_component)
+	template <typename T, typename ...Args>
+	T* GameObject::addComponent(Args&&... args)
 	{
-		std::type_index index(typeid(T)); // Get index from type
-
-		m_components.emplace(index, std::make_unique<Internal::ComponentContainer<T> >(m_component)); // put in the map
-
-		return ComponentHandle<T>(m_component);
+		// TODO (need Space implementation first)
 	}
 
 	template <typename T>
 	void GameObject::removeComponent()
 	{
 		std::type_index index(typeid(T));
-
-		m_components.erase(index);
+		// TODO
 	}
 
 	template <typename T>
-	ComponentHandle<T> GameObject::getComponent()
+	T* GameObject::getComponent()
 	{
 		std::type_index index(typeid(T));
+		// TODO
+	}
 
-		if (m_components.count(index) > 0)
-		{
-			Internal::ComponentContainer<T>* container = reinterpret_cast<Internal::ComponentContainer<T>*>(m_components.at(index).get());
-			return ComponentHandle<T>(container->getData());
-		}
-		else
-		{
-			return ComponentHandle<T>(); // Return invalid handle if not found
-		}
+	template <typename T>
+	void GameObject::registerComponent(ComponentStorageUnit<T> *component)
+	{
+		std::type_index index(typeid(T)); // Get index from type
+
+		m_components.emplace(index, component); // put in the map
 	}
 }
 

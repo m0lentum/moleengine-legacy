@@ -39,7 +39,7 @@ namespace me
 
 	Graphic* ColliderRect::generateGraphic(const sf::Color &color) const
 	{
-		return Graphic::makeRect(m_halfWidth * 2, m_halfHeight * 2, color);
+		return new Graphic(Graphic::makeRect(m_halfWidth * 2, m_halfHeight * 2, color));
 	}
 
 

@@ -62,7 +62,6 @@ namespace me
 		target.draw(m_vertices, states);
 
 		//TODO add outline
-		std::cout << "asdfa" << std::endl;
 	}
 
 

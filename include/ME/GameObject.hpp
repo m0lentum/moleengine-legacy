@@ -88,7 +88,7 @@ namespace me
 		
 		if (m_components.count(index) > 0)
 		{
-			return reinterpret_cast<ComponentStorageUnit<T>*>(m_components.at(index))->component;
+			return &(reinterpret_cast<ComponentStorageUnit<T>*>(m_components.at(index))->component);
 		}
 
 		return NULL;

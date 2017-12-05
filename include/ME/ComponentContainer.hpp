@@ -7,8 +7,16 @@
 
 namespace me
 {
+	// Base class for containers so we can store references to them
+	class ComponentContainerBase
+	{
+	public:
+		virtual ~ComponentContainerBase() {}
+	};
+
+
 	template <typename T>
-	class ComponentContainer
+	class ComponentContainer : public ComponentContainerBase
 	{
 	private:
 
@@ -19,14 +27,21 @@ namespace me
 		template <typename... Args>
 		T* createComponent(GameObject *parent, Args&&... args)
 		{
-			m_components.push_back(StorageUnit(parent, T(args...)));
-			return &(m_components.back().component);
+			m_components.push_back(ComponentStorageUnit<T>(parent, args...));
+			ComponentStorageUnit<T> &unit = m_components.back();
+			unit.parent->registerComponent<T>(&unit);
+			return &(unit.component);
 		}
+		
+		void cleanup();
 
-		void destroyComponent(GameObject *parent);
+
+
+		inline unsigned int getSize() { return m_components.size(); }
+
 
 		ComponentContainer() {}
-		~ComponentContainer() {}
+		virtual ~ComponentContainer() {}
 	};
 }
 

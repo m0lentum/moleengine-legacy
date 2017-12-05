@@ -9,13 +9,27 @@ namespace me
 	struct ComponentStorageUnitBase
 	{
 		GameObject *parent;
-		bool alive = true;
+		bool isAlive;
+
+		ComponentStorageUnitBase(GameObject *parent) :
+			parent(parent),
+			isAlive(true)
+		{
+		}
+			
 	};
 
 	template <typename T>
 	struct ComponentStorageUnit : ComponentStorageUnitBase
 	{
 		T component;
+
+		template <typename... Args>
+		ComponentStorageUnit(GameObject *parent, Args&&... args) :
+			ComponentStorageUnitBase(parent),
+			component(args...)
+		{
+		}
 	};
 }
 

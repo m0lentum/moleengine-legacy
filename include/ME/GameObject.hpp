@@ -41,6 +41,8 @@ namespace me
 		template <typename T, typename ...Args>
 		T* addComponent(Args&&... args);
 
+		/// Mark a Component as dead. This does not actually delete it (that is done in
+		/// ComponentContainer::cleanup() after marking), but stops it from being updated.
 		template <typename T>
 		void removeComponent();
 
@@ -48,7 +50,7 @@ namespace me
 		T* getComponent();
 
 
-		/// Used by ComponentContainer to send 
+		/// Used by ComponentContainer to send info back to the object
 		template <typename T>
 		void registerComponent(ComponentStorageUnit<T> *component);
 
@@ -65,29 +67,44 @@ namespace me
 	template <typename T, typename ...Args>
 	T* GameObject::addComponent(Args&&... args)
 	{
-		// TODO (need Space implementation first)
+		return m_space->createComponent<T>(this, args...);
 	}
 
 	template <typename T>
 	void GameObject::removeComponent()
 	{
 		std::type_index index(typeid(T));
-		// TODO
+		
+		if (m_components.count(index) > 0)
+		{
+			m_components.at(index)->isAlive = false;
+		}
 	}
 
 	template <typename T>
 	T* GameObject::getComponent()
 	{
 		std::type_index index(typeid(T));
-		// TODO
+		
+		if (m_components.count(index) > 0)
+		{
+			return reinterpret_cast<ComponentStorageUnit<T>*>(m_components.at(index))->component;
+		}
+
+		return NULL;
 	}
 
 	template <typename T>
 	void GameObject::registerComponent(ComponentStorageUnit<T> *component)
 	{
-		std::type_index index(typeid(T)); // Get index from type
+		std::type_index index(typeid(T));
 
-		m_components.emplace(index, component); // put in the map
+		if (m_components.count(index) > 0) // destroy previous component of same type if one existed
+		{
+			m_components.at(index)->isAlive = false;
+		}
+
+		m_components[index] = component;
 	}
 }
 

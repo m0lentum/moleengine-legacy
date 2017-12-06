@@ -103,7 +103,6 @@ namespace me
 		if (m_components.count(index) > 0) // destroy previous m_component of same type if one existed
 		{
 			m_components.at(index)->m_isAlive = false;
-			std::cout << "ass" << std::endl;
 		}
 
 		m_components[index] = m_component;

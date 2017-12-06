@@ -110,6 +110,20 @@ namespace me
 	}
 
 
+	Graphic& Graphic::operator=(Graphic&& other)
+	{
+		if (this != &other)
+		{
+			m_texture = std::move(other.m_texture);
+			m_textureRect = std::move(other.m_textureRect);
+			m_vertices = std::move(other.m_vertices);
+			m_bounds = std::move(other.m_bounds);
+		}
+
+		return *this;
+	}
+
+
 	sf::VertexArray Graphic::makeCircle(float radius, unsigned int pointCount, const sf::Color &color)
 	{
 		sf::VertexArray verts(sf::PrimitiveType::TriangleFan, pointCount);

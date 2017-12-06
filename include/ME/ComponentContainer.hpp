@@ -48,7 +48,7 @@ namespace me
 		void cleanup()
 		{
 			m_components.erase(std::remove_if(m_components.begin(), m_components.end(),
-				[](ComponentStorageUnit<T> unit) { return !unit.isAlive(); }),
+				[](ComponentStorageUnit<T> &unit) { return !unit.isAlive(); }),
 				m_components.end());
 		}
 

@@ -1,6 +1,8 @@
 #ifndef COMPONENT_STORAGE_UNIT_HPP
 #define COMPONENT_STORAGE_UNIT_HPP
 
+#include <utility>
+
 namespace me
 {
 	class GameObject;
@@ -23,6 +25,14 @@ namespace me
 		ComponentStorageUnitBase(GameObject *m_parent) :
 			m_parent(m_parent),
 			m_isAlive(true)
+		{
+		}
+
+		ComponentStorageUnitBase(ComponentStorageUnitBase &copy) = delete;
+
+		ComponentStorageUnitBase(ComponentStorageUnitBase&& move) :
+			m_parent(move.m_parent),
+			m_isAlive(move.m_isAlive)
 		{
 		}
 
@@ -49,6 +59,25 @@ namespace me
 		{
 		}
 
+		ComponentStorageUnit(ComponentStorageUnit<T> &copy) = delete;
+
+		ComponentStorageUnit(ComponentStorageUnit<T>&& move) :
+			ComponentStorageUnitBase(std::forward<ComponentStorageUnit<T> >(move)),
+			m_component(std::move(move.m_component))
+		{
+		}
+
+		ComponentStorageUnit<T>& operator=(ComponentStorageUnit<T>&& other)
+		{
+			if (this != &other)
+			{
+				m_component = std::move(other.m_component);
+				m_parent = other.m_parent;
+				m_isAlive = other.m_isAlive;
+			}
+
+			return *this;
+		}
 
 		virtual ~ComponentStorageUnit() {}
 	};

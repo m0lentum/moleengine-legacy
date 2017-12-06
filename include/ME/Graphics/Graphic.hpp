@@ -40,6 +40,11 @@ namespace me
 		Graphic(Graphic&& move);
 		virtual ~Graphic();
 
+		/// Move assignment operator
+		Graphic& operator=(Graphic&& other);
+
+
+
 		/// Create a circle with the origin at the center.
 		static sf::VertexArray makeCircle(float radius, unsigned int pointCount, const sf::Color &color = sf::Color::White);
 		/// Create a rectangle with the specified height and width.

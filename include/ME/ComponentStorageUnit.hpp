@@ -50,7 +50,6 @@ namespace me
 
 		inline T* getComponent() { return &m_component; }
 
-		inline void remove() { m_parent->removeComponent<T>(); }
 
 		template <typename... Args>
 		ComponentStorageUnit(GameObject *m_parent, Args&&... args) :

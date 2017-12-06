@@ -9,13 +9,12 @@
 #include <memory>
 #include <unordered_map>
 #include <typeindex>
+#include "Space.hpp"
 #include "ComponentStorageUnit.hpp"
 #include <iostream>
 
 namespace me
 {
-	class Space;
-
 	class GameObject : public sf::Transformable
 	{
 	private:

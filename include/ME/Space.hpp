@@ -4,7 +4,6 @@
 #include <vector>
 #include <memory>
 #include <unordered_map>
-#include "GameObject.hpp"
 #include "IController.hpp"
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/RenderStates.hpp>
@@ -14,6 +13,8 @@
 
 namespace me
 {
+	class GameObject;
+
 	/// A container class for GameObjects. Used to group objects and share them between game states.
 	class Space
 	{

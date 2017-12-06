@@ -1,5 +1,6 @@
 #include <Space.hpp>
 #include <Physics/CollisionChecker.hpp>
+#include <GameObject.hpp>
 //#include <iostream>
 
 namespace me

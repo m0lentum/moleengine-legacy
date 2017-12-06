@@ -2,8 +2,8 @@
 #define COMPONENT_CONTAINER_HPP
 
 #include <vector>
+#include "ComponentStorageUnit.hpp" 
 #include "GameObject.hpp"
-#include "ComponentStorageUnit.hpp"
 #include <functional>
 #include <iostream>
 #include <algorithm>
@@ -28,13 +28,13 @@ namespace me
 	public:
 
 		template <typename... Args>
-		T* createComponent(GameObject *m_parent, Args&&... args)
+		T* createComponent(GameObject *parent, Args&&... args)
 		{
 			if (m_components.size() < m_components.max_size())
 			{
-				m_components.push_back(ComponentStorageUnit<T>(m_parent, args...));
+				m_components.push_back(ComponentStorageUnit<T>(parent, args...));
 				ComponentStorageUnit<T> &unit = m_components.back();
-				unit.getParent()->registerComponent<T>(&unit);
+				parent->registerComponent<T>(&unit);
 				return unit.getComponent();
 			}
 			else
@@ -50,6 +50,8 @@ namespace me
 			m_components.erase(std::remove_if(m_components.begin(), m_components.end(),
 				[](ComponentStorageUnit<T> &unit) { return !unit.isAlive(); }),
 				m_components.end());
+
+			// IMPORTANT: this currently breaks pointers! Fix this!
 		}
 
 		/// Execute a function on every (alive) Component in the Container

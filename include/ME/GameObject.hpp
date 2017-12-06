@@ -10,6 +10,7 @@
 #include <unordered_map>
 #include <typeindex>
 #include "ComponentStorageUnit.hpp"
+#include <iostream>
 
 namespace me
 {
@@ -52,7 +53,7 @@ namespace me
 
 		/// Used by ComponentContainer to send info back to the object
 		template <typename T>
-		void registerComponent(ComponentStorageUnit<T> *component);
+		void registerComponent(ComponentStorageUnit<T> *m_component);
 
 
 		
@@ -77,7 +78,7 @@ namespace me
 		
 		if (m_components.count(index) > 0)
 		{
-			m_components.at(index)->isAlive = false;
+			m_components.at(index)->m_isAlive = false;
 		}
 	}
 
@@ -88,23 +89,24 @@ namespace me
 		
 		if (m_components.count(index) > 0)
 		{
-			return &(reinterpret_cast<ComponentStorageUnit<T>*>(m_components.at(index))->component);
+			return &(reinterpret_cast<ComponentStorageUnit<T>*>(m_components.at(index))->m_component);
 		}
 
 		return NULL;
 	}
 
 	template <typename T>
-	void GameObject::registerComponent(ComponentStorageUnit<T> *component)
+	void GameObject::registerComponent(ComponentStorageUnit<T> *m_component)
 	{
 		std::type_index index(typeid(T));
 
-		if (m_components.count(index) > 0) // destroy previous component of same type if one existed
+		if (m_components.count(index) > 0) // destroy previous m_component of same type if one existed
 		{
-			m_components.at(index)->isAlive = false;
+			m_components.at(index)->m_isAlive = false;
+			std::cout << "ass" << std::endl;
 		}
 
-		m_components[index] = component;
+		m_components[index] = m_component;
 	}
 }
 

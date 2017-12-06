@@ -36,18 +36,23 @@ namespace me
 
 	GameObject * Space::createObject()
 	{
-		m_objects.push_back(GameObject(this));
-		return &(m_objects.back());
+		if (m_objects.size() < m_objects.capacity())
+		{
+			m_objects.push_back(GameObject(this));
+			return &(m_objects.back());
+		}
+		else
+		{
+			std::cerr << "Error: Space is full" << std::endl;
+			return NULL;
+		}
 	}
 
 
-	Space::Space()
+	Space::Space(std::size_t maxObjects) :
+		m_maxObjects(maxObjects)
 	{
-	}
-
-	Space::Space(const Space &copy)
-	{
-		// TODO: deep copy the whole dang thing
+		m_objects.reserve(maxObjects); // Reserve room for all objects now so reallocations won't happen later
 	}
 
 	Space::~Space()

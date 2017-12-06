@@ -4,6 +4,9 @@
 #include <vector>
 #include "GameObject.hpp"
 #include "ComponentStorageUnit.hpp"
+#include <functional>
+#include <iostream>
+#include <algorithm>
 
 namespace me
 {
@@ -25,23 +28,47 @@ namespace me
 	public:
 
 		template <typename... Args>
-		T* createComponent(GameObject *parent, Args&&... args)
+		T* createComponent(GameObject *m_parent, Args&&... args)
 		{
-			m_components.push_back(ComponentStorageUnit<T>(parent, args...));
-			ComponentStorageUnit<T> &unit = m_components.back();
-			unit.parent->registerComponent<T>(&unit);
-			return &(unit.component);
+			if (m_components.size() < m_components.max_size())
+			{
+				m_components.push_back(ComponentStorageUnit<T>(m_parent, args...));
+				ComponentStorageUnit<T> &unit = m_components.back();
+				unit.getParent()->registerComponent<T>(&unit);
+				return unit.getComponent();
+			}
+			else
+			{
+				std::cout << "Error: ComponentContainer is full" << std::endl;
+				return NULL;
+			}
 		}
 		
-		void cleanup();
+		/// Remove all components that have been marked dead
+		void cleanup()
+		{
+			m_components.erase(std::remove_if(m_components.begin(), m_components.end(),
+				[](ComponentStorageUnit<T> unit) { return !unit.isAlive(); }),
+				m_components.end());
+		}
 
-
+		/// Execute a function on every (alive) Component in the Container
+		void each(std::function<void(ComponentStorageUnit<T>&)> function)
+		{
+			for (auto &unit : m_components)
+			{
+				if (!unit.isAlive())
+				{
+					function(unit);
+				}
+			}
+		}
 
 		inline unsigned int getSize() { return m_components.size(); }
 
 
-		ComponentContainer() {}
-		virtual ~ComponentContainer() {}
+		ComponentContainer(std::size_t maxSize) { m_components.reserve(maxSize); }
+		~ComponentContainer() {}
 	};
 }
 

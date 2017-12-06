@@ -6,30 +6,51 @@ namespace me
 	class GameObject;
 
 	// base class for pointer storage in GameObjects
-	struct ComponentStorageUnitBase
+	class ComponentStorageUnitBase
 	{
-		GameObject *parent;
-		bool isAlive;
+	protected:
+		// allow objects to manipulate stuff directly, others can only read
+		friend class GameObject;
 
-		ComponentStorageUnitBase(GameObject *parent) :
-			parent(parent),
-			isAlive(true)
+		GameObject *m_parent;
+		bool m_isAlive;
+
+	public:
+
+		inline bool isAlive() const { return m_isAlive; }
+		inline GameObject * getParent() const { return m_parent; }
+
+		ComponentStorageUnitBase(GameObject *m_parent) :
+			m_parent(m_parent),
+			m_isAlive(true)
 		{
 		}
-			
+
+		virtual ~ComponentStorageUnitBase() {}
 	};
 
 	template <typename T>
-	struct ComponentStorageUnit : ComponentStorageUnitBase
+	class ComponentStorageUnit : public ComponentStorageUnitBase
 	{
-		T component;
+	private:
+
+		T m_component;
+
+	public:
+
+		inline T* getComponent() { return &m_component; }
+
+		inline void remove() { m_parent->removeComponent<T>(); }
 
 		template <typename... Args>
-		ComponentStorageUnit(GameObject *parent, Args&&... args) :
-			ComponentStorageUnitBase(parent),
-			component(args...)
+		ComponentStorageUnit(GameObject *m_parent, Args&&... args) :
+			ComponentStorageUnitBase(m_parent),
+			m_component(args...)
 		{
 		}
+
+
+		virtual ~ComponentStorageUnit() {}
 	};
 }
 

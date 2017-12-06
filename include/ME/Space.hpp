@@ -19,6 +19,8 @@ namespace me
 	{
 	private:
 
+		std::size_t m_maxObjects;
+
 		std::vector<std::unique_ptr<IController> > m_controllers;
 		std::unordered_map<std::type_index, std::unique_ptr<ComponentContainerBase> > m_containers;
 		std::vector<GameObject> m_objects;
@@ -38,15 +40,19 @@ namespace me
 		T* createComponent(GameObject *parent, Args&&... args);
 
 
-		Space();
-		Space(const Space &copy);
+		Space(std::size_t maxObjects = 200);
 		~Space();
 
 	private:
 
 		template <typename T>
 		void createContainer();
+
 	public:
+
+		template <typename T>
+		void createContainer(std::size_t maxSize);
+
 		template <typename T>
 		ComponentContainer<T>* getContainer();
 	};
@@ -77,8 +83,14 @@ namespace me
 	template <typename T>
 	void Space::createContainer()
 	{
+		createContainer<T>(m_maxObjects);
+	}
+
+	template <typename T>
+	void Space::createContainer(std::size_t maxSize)
+	{
 		std::type_index index(typeid(T));
-		m_containers[index] = std::make_unique<ComponentContainer<T> >();
+		m_containers[index] = std::make_unique<ComponentContainer<T> >(maxSize);
 	}
 }
 

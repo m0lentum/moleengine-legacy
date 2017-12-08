@@ -2,14 +2,15 @@
 #define COMPONENT_CONTAINER_HPP
 
 #include <vector>
-#include "ComponentStorageUnit.hpp" 
-#include "GameObject.hpp"
+#include "ComponentStorageUnit.hpp"
 #include <functional>
 #include <iostream>
 #include <algorithm>
 
 namespace me
 {
+	class GameObject;
+
 	// Base class for containers so we can store references to them
 	class ComponentContainerBase
 	{
@@ -24,34 +25,39 @@ namespace me
 	private:
 
 		std::vector<ComponentStorageUnit<T> > m_components;
+		std::size_t m_currentIndex;
 
 	public:
 
 		template <typename... Args>
-		T* createComponent(GameObject *parent, Args&&... args)
+		ComponentStorageUnit<T>* createComponent(GameObject *parent, Args&&... args)
 		{
 			if (m_components.size() < m_components.max_size())
 			{
 				m_components.push_back(ComponentStorageUnit<T>(parent, args...));
-				ComponentStorageUnit<T> &unit = m_components.back();
-				parent->registerComponent<T>(&unit);
-				return unit.getComponent();
+				return &(m_components.back());
 			}
 			else
 			{
-				std::cout << "Error: ComponentContainer is full" << std::endl;
-				return NULL;
-			}
-		}
-		
-		/// Remove all components that have been marked dead
-		void cleanup()
-		{
-			m_components.erase(std::remove_if(m_components.begin(), m_components.end(),
-				[](ComponentStorageUnit<T> &unit) { return !unit.isAlive(); }),
-				m_components.end());
+				// we've filled up the vector, find a dead component and replace it
 
-			// IMPORTANT: this currently breaks pointers! Fix this!
+				std::size_t nextIndex = m_currentIndex;
+				while (m_components[nextIndex].isAlive())
+				{
+					nextIndex++;
+					if (nextIndex >= m_components.max_size()) nextIndex = 0;
+					if (nextIndex == m_currentIndex)
+					{
+						std::cout << "Error: ComponentContainer is full" << std::endl;
+						return NULL;
+					}
+				}
+
+				m_components[nextIndex] = ComponentStorageUnit<T>(parent, args...);
+				m_currentIndex = nextIndex;
+
+				return &(m_components[nextIndex]);
+			}
 		}
 
 		/// Execute a function on every (alive) Component in the Container
@@ -66,11 +72,16 @@ namespace me
 			}
 		}
 
-		inline unsigned int getSize() { return m_components.size(); }
 
+		ComponentContainer(std::size_t maxSize) :
+			m_currentIndex(0)
+		{
+			m_components.reserve(maxSize);
+		}
 
-		ComponentContainer(std::size_t maxSize) { m_components.reserve(maxSize); }
-		~ComponentContainer() {}
+		~ComponentContainer()
+		{
+		}
 	};
 }
 

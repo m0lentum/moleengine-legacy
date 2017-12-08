@@ -11,7 +11,7 @@ namespace me
 	class ComponentStorageUnitBase
 	{
 	protected:
-		// allow objects to manipulate stuff directly, others can only read
+		// you can only kill a Component through its parent object
 		friend class GameObject;
 
 		GameObject *m_parent;

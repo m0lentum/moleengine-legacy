@@ -67,7 +67,9 @@ namespace me
 	template <typename T, typename ...Args>
 	T* GameObject::addComponent(Args&&... args)
 	{
-		return m_space->createComponent<T>(this, args...);
+		ComponentStorageUnit<T>* container = m_space->createComponent<T>(this, args...);
+		registerComponent<T>(container);
+		return container->getComponent();
 	}
 
 	template <typename T>
@@ -78,6 +80,7 @@ namespace me
 		if (m_components.count(index) > 0)
 		{
 			m_components.at(index)->m_isAlive = false;
+			m_components.erase(index);
 		}
 	}
 
@@ -88,7 +91,7 @@ namespace me
 		
 		if (m_components.count(index) > 0)
 		{
-			return &(reinterpret_cast<ComponentStorageUnit<T>*>(m_components.at(index))->m_component);
+			return reinterpret_cast<ComponentStorageUnit<T>*>(m_components.at(index))->getComponent();
 		}
 
 		return NULL;

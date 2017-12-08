@@ -117,6 +117,7 @@ namespace me
 	}
 
 	AnimatedSprite::AnimatedSprite(const AnimatedSprite &copy) :
+		Graphic(copy),
 		m_size(copy.m_size),
 		m_currentFrame(copy.m_currentFrame),
 		m_currentTime(copy.m_currentTime),
@@ -124,9 +125,33 @@ namespace me
 		m_isPlaying(copy.m_isPlaying),
 		m_anim(copy.m_anim)
 	{
-		m_texture = copy.m_texture;
-		m_textureRect = sf::IntRect(copy.m_textureRect);
-		m_vertices = sf::VertexArray(copy.m_vertices);
+	}
+
+	AnimatedSprite::AnimatedSprite(AnimatedSprite&& move) :
+		Graphic(move),
+		m_size(std::move(move.m_size)),
+		m_currentFrame(std::move(move.m_currentFrame)),
+		m_currentTime(std::move(move.m_currentTime)),
+		m_numLoops(std::move(move.m_numLoops)),
+		m_isPlaying(std::move(move.m_isPlaying)),
+		m_anim(std::move(move.m_anim))
+	{
+	}
+
+	AnimatedSprite& AnimatedSprite::operator=(AnimatedSprite&& other)
+	{
+		if (&other != this)
+		{
+			Graphic::operator=(std::move(other));
+			m_size = std::move(other.m_size);
+			m_currentFrame = std::move(other.m_currentFrame);
+			m_currentTime = std::move(other.m_currentTime);
+			m_numLoops = std::move(other.m_numLoops);
+			m_isPlaying = std::move(other.m_isPlaying);
+			m_anim = std::move(other.m_anim);
+		}
+
+		return *this;
 	}
 
 	AnimatedSprite::~AnimatedSprite()

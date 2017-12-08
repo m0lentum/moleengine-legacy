@@ -38,10 +38,10 @@ namespace me
 		GameObject * createObject();
 
 		template <typename T, typename... Args>
-		T* createComponent(GameObject *parent, Args&&... args);
+		ComponentStorageUnit<T>* createComponent(GameObject *parent, Args&&... args);
 
 
-		Space(std::size_t maxObjects = 200);
+		Space(std::size_t maxObjects);
 		~Space();
 
 	private:
@@ -62,7 +62,7 @@ namespace me
 
 
 	template <typename T, typename... Args>
-	T* Space::createComponent(GameObject *parent, Args&&... args)
+	ComponentStorageUnit<T>* Space::createComponent(GameObject *parent, Args&&... args)
 	{
 		ComponentContainer<T> *container = getContainer<T>();
 		return container->createComponent(parent, args...);

@@ -49,8 +49,12 @@ namespace me
 		AnimatedSprite(std::shared_ptr<sf::Texture> texture, const SpriteAnimationData &anim, const sf::Vector2i &size, bool playOnCreate = true);
 		///Constructor that takes a pre-created animation (assumes size based on first frame)
 		AnimatedSprite(std::shared_ptr<sf::Texture> texture, const SpriteAnimationData &anim, bool playOnCreate = true);
-		///Copy constructor
+		
 		AnimatedSprite(const AnimatedSprite &copy);
+		AnimatedSprite(AnimatedSprite&& move);
+
+		AnimatedSprite& operator=(AnimatedSprite&& other);
+
 		~AnimatedSprite();
 
 

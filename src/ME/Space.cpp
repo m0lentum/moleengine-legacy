@@ -7,39 +7,33 @@ namespace me
 {
 	void Space::continuousUpdate(sf::Time timeElapsed)
 	{
-		for (auto &cont : m_controllers)
+		for (auto &sys : m_systems)
 		{
-			cont->continuousUpdate(timeElapsed);
+			sys.second->continuousUpdate(timeElapsed);
 		}
 	}
 
 	void Space::fixedUpdate()
 	{
-		for (auto &cont : m_controllers)
+		for (auto &sys : m_systems)
 		{
-			cont->fixedUpdate();
+			sys.second->fixedUpdate();
 		}
 	}
 
 	void Space::draw(sf::RenderTarget &target, sf::RenderStates states) const
 	{
-		for (auto &cont : m_controllers)
+		for (auto &sys : m_systems)
 		{
-			cont->draw(target, states);
+			sys.second->draw(target, states);
 		}
-	}
-
-
-	void Space::addController(IController *controller)
-	{
-		m_controllers.push_back(std::unique_ptr<IController>(controller));
 	}
 
 	GameObject * Space::createObject()
 	{
 		if (m_objects.size() < m_objects.capacity())
 		{
-			m_objects.push_back(GameObject(this));
+			m_objects.emplace_back(this);
 			return &(m_objects.back());
 		}
 		else

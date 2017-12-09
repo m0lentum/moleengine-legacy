@@ -1,14 +1,14 @@
 #ifndef GRAPHIC_CONTROLLER_HPP
 #define GRAPHIC_CONTROLLER_HPP
 
-#include "../IController.hpp"
+#include "../ISystem.hpp"
 #include "Graphic.hpp"
 #include "AnimatedSprite.hpp"
 #include <vector>
 
 namespace me
 {
-	class GraphicController : public IController
+	class Renderer : public ISystem
 	{
 	public:
 
@@ -16,7 +16,7 @@ namespace me
 		virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
 
 
-		virtual ~GraphicController();
+		virtual ~Renderer() {}
 	};
 }
 

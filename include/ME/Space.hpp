@@ -4,7 +4,7 @@
 #include <vector>
 #include <memory>
 #include <unordered_map>
-#include "IController.hpp"
+#include "ISystem.hpp"
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/RenderStates.hpp>
 #include "ComponentContainer.hpp"
@@ -23,7 +23,7 @@ namespace me
 
 		std::size_t m_maxObjects;
 
-		std::vector<std::unique_ptr<IController> > m_controllers;
+		std::unordered_map<std::type_index, std::unique_ptr<ISystem> > m_systems;
 		std::unordered_map<std::type_index, std::unique_ptr<ComponentContainerBase> > m_containers;
 		std::vector<GameObject> m_objects;
 
@@ -36,12 +36,11 @@ namespace me
 		void draw(sf::RenderTarget &target, sf::RenderStates states) const;
 
 
-		void addController(IController *controller);
-
 		GameObject * createObject();
 
 		template <typename T, typename... Args>
 		ComponentStorageUnit<T>* createComponent(GameObject *parent, Args&&... args);
+
 
 		template <typename T>
 		void createContainer();
@@ -58,6 +57,15 @@ namespace me
 		/// Delete all Containers
 		void hardClear();
 
+
+		template <typename T, typename... Args>
+		typename std::enable_if<std::is_base_of<ISystem, T>::value, T*>::type
+		createSystem(Args&&... args);
+
+		template <typename T>
+		T* getSystem();
+
+
 	private:
 
 		template <typename T>
@@ -71,6 +79,8 @@ namespace me
 
 
 
+
+	
 
 	template <typename T, typename... Args>
 	ComponentStorageUnit<T>* Space::createComponent(GameObject *parent, Args&&... args)
@@ -110,6 +120,33 @@ namespace me
 	{
 		ComponentContainer<T>* container = getContainer<T>();
 		if (container) container->each(function);
+	}
+
+
+
+	template <typename T, typename... Args>
+	typename std::enable_if<std::is_base_of<ISystem, T>::value, T*>::type
+		Space::createSystem(Args&&... args)
+	{
+		std::type_index index(typeid(T));
+		m_systems[index] = std::make_unique<T>(args...);
+
+		ISystem *created = m_systems[index].get();
+		created->registerSpace(this);
+
+		return reinterpret_cast<T*>(created);
+	}
+
+	template <typename T>
+	T* Space::getSystem()
+	{
+		std::type_index index(typeid(T));
+		if (m_systems.count(index) > 0)
+		{
+			return m_systems.at(index);
+		}
+
+		return NULL;
 	}
 }
 

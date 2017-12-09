@@ -36,7 +36,7 @@ namespace me
 		{
 			if (m_components.size() < m_components.max_size())
 			{
-				m_components.push_back(ComponentStorageUnit<T>(parent, args...));
+				m_components.emplace_back(parent, args...);
 				return &(m_components.back());
 			}
 			else

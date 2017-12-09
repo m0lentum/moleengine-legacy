@@ -10,6 +10,7 @@
 #include "ComponentContainer.hpp"
 #include "ComponentStorageUnit.hpp"
 #include <typeindex>
+#include <functional>
 
 namespace me
 {
@@ -26,6 +27,8 @@ namespace me
 		std::unordered_map<std::type_index, std::unique_ptr<ComponentContainerBase> > m_containers;
 		std::vector<GameObject> m_objects;
 
+		std::size_t m_currentObjIndex;
+
 	public:
 
 		void continuousUpdate(sf::Time timeElapsed);
@@ -40,22 +43,30 @@ namespace me
 		template <typename T, typename... Args>
 		ComponentStorageUnit<T>* createComponent(GameObject *parent, Args&&... args);
 
-
-		Space(std::size_t maxObjects);
-		~Space();
-
-	private:
-
 		template <typename T>
 		void createContainer();
-
-	public:
 
 		template <typename T>
 		void createContainer(std::size_t maxSize);
 
+		/// Execute a function on every Component of the given type.
+		template <typename T>
+		void each(std::function<void(ComponentStorageUnit<T>&)> function);
+
+		/// Delete all GameObjects and Components but keep Containers
+		void clear();
+		/// Delete all Containers
+		void hardClear();
+
+	private:
+
 		template <typename T>
 		ComponentContainer<T>* getContainer();
+
+	public:
+
+		Space(std::size_t maxObjects);
+		~Space();
 	};
 
 
@@ -92,6 +103,13 @@ namespace me
 	{
 		std::type_index index(typeid(T));
 		m_containers[index] = std::make_unique<ComponentContainer<T> >(maxSize);
+	}
+
+	template <typename T>
+	void Space::each(std::function<void(ComponentStorageUnit<T>&)> function)
+	{
+		ComponentContainer<T>* container = getContainer<T>();
+		if (container) container->each(function);
 	}
 }
 

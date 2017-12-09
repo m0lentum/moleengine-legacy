@@ -15,6 +15,8 @@ namespace me
 	class ComponentContainerBase
 	{
 	public:
+		virtual void clear() = 0;
+
 		virtual ~ComponentContainerBase() {}
 	};
 
@@ -45,7 +47,7 @@ namespace me
 				while (m_components[nextIndex].isAlive())
 				{
 					nextIndex++;
-					if (nextIndex >= m_components.max_size()) nextIndex = 0;
+					if (nextIndex >= m_components.capacity()) nextIndex = 0;
 					if (nextIndex == m_currentIndex)
 					{
 						std::cout << "Error: ComponentContainer is full" << std::endl;
@@ -70,6 +72,12 @@ namespace me
 					function(unit);
 				}
 			}
+		}
+		
+		/// Delete everything in the Container.
+		virtual void clear()
+		{
+			m_components.clear();
 		}
 
 

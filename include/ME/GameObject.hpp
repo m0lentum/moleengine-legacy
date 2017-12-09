@@ -22,17 +22,17 @@ namespace me
 		Space *m_space;
 
 		/// A unique identification number.
-		const unsigned int m_id;
+		unsigned int m_id;
 		/// Tracks how many game objects have been created. Used for generating a unique ID.
 		static unsigned int numExisting;
 
 		std::unordered_map<std::type_index, ComponentStorageUnitBase*> m_components;
+		bool m_isAlive;
 
 	public:
 
-		/// Mark this object for destruction.
-		/// It will be removed from the space it's in on the next fixedUpdate cycle.
 		void destroy();
+		inline bool isAlive() { return m_isAlive; }
 
 		inline const unsigned int getID() const { return m_id; }
 
@@ -57,7 +57,9 @@ namespace me
 
 		
 		GameObject(Space *space);
-
+		GameObject(GameObject &copy) = delete;
+		GameObject(GameObject &&move);
+		GameObject& operator=(GameObject &&other);
 		~GameObject();
 	};
 

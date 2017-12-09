@@ -38,7 +38,7 @@ namespace me
 				Keyboard::updateTracked();
 			}
 
-			draw(); //TODO move draw and continuousUpdate loops to separate thread
+			draw();
 		}
 	}
 
@@ -59,7 +59,8 @@ namespace me
 	}
 
 	Game::Game() :
-		m_isTerminated(false)
+		m_isTerminated(false),
+		m_stateManager(&m_assetManager)
 	{
 	}
 }

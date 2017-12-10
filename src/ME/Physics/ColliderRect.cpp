@@ -6,46 +6,9 @@
 
 namespace me
 {
-	const sf::Vector2f ColliderRect::getWidthAxis() const
+	sf::VertexArray ColliderRect::toVertexArray(const sf::Color &color) const
 	{
-		float rot = VectorMath::degToRad(m_parent->getRotation());
-		return sf::Vector2f(std::cos(rot), std::sin(rot));
-	}
-
-	const sf::Vector2f& ColliderRect::getPosition() const
-	{
-		return m_parent->getPosition();
-	}
-
-	void ColliderRect::checkCollision(const ColliderCircle &other, CollisionInfo &info) const
-	{
-		CollisionChecker::circleRect(other, *this, info);
-	}
-
-	void ColliderRect::checkCollision(const ColliderRect &other, CollisionInfo &info) const
-	{
-		CollisionChecker::rectRect(other, *this, info);
-	}
-
-	void ColliderRect::checkCollision(const ColliderPolygon &other, CollisionInfo &info) const
-	{
-		CollisionChecker::polyRect(other, *this, info);
-	}
-
-	void ColliderRect::findTypeAndCheckCollision(const ICollider &other, CollisionInfo &info) const
-	{
-		other.checkCollision(*this, info);
-	}
-
-	Graphic* ColliderRect::generateGraphic(const sf::Color &color) const
-	{
-		return new Graphic(Graphic::makeRect(m_halfWidth * 2, m_halfHeight * 2, color));
-	}
-
-
-	ICollider* ColliderRect::clone() const
-	{
-		return new ColliderRect(*this);
+		return Graphic::makeRect(m_halfWidth * 2, m_halfHeight * 2, color);
 	}
 
 
@@ -58,6 +21,27 @@ namespace me
 	ColliderRect::ColliderRect(const ColliderRect &copy) :
 		m_halfWidth(copy.m_halfWidth),
 		m_halfHeight(copy.m_halfHeight)
+	{
+	}
+
+	ColliderRect::ColliderRect(ColliderRect&& move) :
+		m_halfWidth(std::move(move.m_halfWidth)),
+		m_halfHeight(std::move(move.m_halfHeight))
+	{
+	}
+
+	ColliderRect& ColliderRect::operator=(ColliderRect&& other)
+	{
+		if (this != &other)
+		{
+			m_halfWidth = std::move(other.m_halfWidth);
+			m_halfHeight = std::move(other.m_halfHeight);
+		}
+
+		return *this;
+	}
+
+	ColliderRect::~ColliderRect()
 	{
 	}
 }

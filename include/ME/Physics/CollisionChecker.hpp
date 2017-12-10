@@ -2,7 +2,6 @@
 #define COLLISION_CHECKER_HPP
 
 #include "CollisionInfo.hpp"
-#include "PhysicsObject.hpp"
 
 namespace me
 {
@@ -13,8 +12,6 @@ namespace me
 	class CollisionChecker
 	{
 	public:
-		/// Checks for collision between obj1 and obj2.
-		static void checkCollision(const ICollider &obj1, const ICollider &obj2, CollisionInfo &info);
 
 		// Collision checks for different pairs of colliders.
 		static void circleCircle(const ColliderCircle &circle1, const ColliderCircle &circle2, CollisionInfo &info);
@@ -30,6 +27,7 @@ namespace me
 		static void polyPoly(const ColliderPolygon &poly1, const ColliderPolygon &poly2, CollisionInfo &info);
 
 	private:
+
 		struct PolyAxisInfo {
 			float width = 0; // Width when projected to the given axis
 			sf::Vector2f point1; // Farthest point along the axis

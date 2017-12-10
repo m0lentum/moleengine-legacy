@@ -7,37 +7,16 @@
 
 namespace me
 {
-	const std::vector<sf::Vector2f> ColliderPolygon::getEdges() const
+	const std::vector<sf::Vector2f>& ColliderPolygon::getEdges() const
 	{
-		std::vector<sf::Vector2f> vecs(m_edges);
-		sf::Transform transform = m_parent->getTransform();
-		sf::Vector2f position = getPosition();
-
-		for (auto &vec : vecs)
-		{
-			vec = (transform * vec) - position; // rotated and scaled but not translated
-		}
-
-		return vecs;
+		return m_edges;
 	}
 
-	const std::vector<sf::Vector2f> ColliderPolygon::getAxes() const
+	const std::vector<sf::Vector2f>& ColliderPolygon::getAxes() const
 	{
-		std::vector<sf::Vector2f> vecs(m_axes);
-		float angle = m_parent->getRotation();
-
-		for (auto &vec : vecs)
-		{
-			vec = VectorMath::rotateDeg(vec, angle); // Rotated only - keep these unit length
-		}
-
-		return vecs;
+		return m_axes;
 	}
 
-	const sf::Vector2f& ColliderPolygon::getPosition() const
-	{
-		return m_parent->getPosition();
-	}
 
 	float ColliderPolygon::getArea()
 	{
@@ -77,38 +56,13 @@ namespace me
 	}
 
 
+	
 
-
-	void ColliderPolygon::checkCollision(const ColliderCircle &other, CollisionInfo &info) const
+	sf::VertexArray ColliderPolygon::toVertexArray(const sf::Color &color) const
 	{
-		CollisionChecker::circlePoly(other, *this, info);
+		return Graphic::makePolygon(edgesToPoints(m_edges), color);
 	}
 
-	void ColliderPolygon::checkCollision(const ColliderRect &other, CollisionInfo &info) const
-	{
-		CollisionChecker::rectPoly(other, *this, info);
-	}
-
-	void ColliderPolygon::checkCollision(const ColliderPolygon &other, CollisionInfo &info) const
-	{
-		CollisionChecker::polyPoly(other, *this, info);
-	}
-
-	void ColliderPolygon::findTypeAndCheckCollision(const ICollider &other, CollisionInfo &info) const
-	{
-		other.checkCollision(*this, info);
-	}
-
-	Graphic* ColliderPolygon::generateGraphic(const sf::Color &color) const
-	{
-		return new Graphic(Graphic::makePolygon(edgesToPoints(m_edges), color));
-	}
-
-
-	ICollider* ColliderPolygon::clone() const
-	{
-		return new ColliderPolygon(*this);
-	}
 
 
 	std::vector<sf::Vector2f> ColliderPolygon::pointsToEdges(const std::vector<sf::Vector2f> &points)

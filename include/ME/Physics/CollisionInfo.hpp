@@ -6,13 +6,13 @@
 
 namespace me
 {
-	class PhysicsObject;
+	class GameObject;
 
 	/// Struct containing information about a collision.
 	struct CollisionInfo
 	{
-		PhysicsObject *obj1;
-		PhysicsObject *obj2;
+		GameObject *obj1;
+		GameObject *obj2;
 
 		bool areColliding = false;
 

@@ -1,14 +1,15 @@
 #ifndef COLLIDER_POLYGON_HPP
 #define COLLIDER_POLYGON_HPP
 
-#include "ICollider.hpp"
 #include <vector>
 #include <initializer_list>
+#include <SFML/Graphics/VertexArray.hpp>
+#include <SFML/Graphics/Color.hpp>
 
 namespace me
 {
 	/// Arbitrary CONVEX polygon collider.
-	class ColliderPolygon : public ICollider
+	class ColliderPolygon
 	{
 	private:
 		
@@ -17,8 +18,8 @@ namespace me
 
 	public:
 
-		const std::vector<sf::Vector2f> getEdges() const;
-		const std::vector<sf::Vector2f> getAxes() const;
+		const std::vector<sf::Vector2f>& getEdges() const;
+		const std::vector<sf::Vector2f>& getAxes() const;
 
 		const sf::Vector2f& getPosition() const;
 
@@ -27,15 +28,7 @@ namespace me
 		/// Move the origin of the polygon to its centroid (center of mass).
 		void center();
 
-		virtual void findTypeAndCheckCollision(const ICollider &other, CollisionInfo &info) const;
-
-		virtual void checkCollision(const ColliderCircle &other, CollisionInfo &info) const;
-		virtual void checkCollision(const ColliderRect &other, CollisionInfo &info) const;
-		virtual void checkCollision(const ColliderPolygon &other, CollisionInfo &info) const;
-
-		virtual Graphic* generateGraphic(const sf::Color &color = sf::Color::White) const;
-
-		virtual ICollider* clone() const;
+		sf::VertexArray toVertexArray(const sf::Color &color = sf::Color::White) const;
 
 	private:
 
@@ -55,7 +48,7 @@ namespace me
 		ColliderPolygon(std::initializer_list<sf::Vector2f> points, bool autoCenter = true);
 		/// Constructor that takes a list of coordinates
 		ColliderPolygon(std::initializer_list<float> coords, bool autoCenter = true);
-		/// Copy constructor
+
 		ColliderPolygon(const ColliderPolygon &copy);
 		virtual ~ColliderPolygon() {}
 	};

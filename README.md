@@ -9,9 +9,9 @@ Currently implemented features:
 * Fixed and uncapped framerate update loops to separate game logic and rendering
 * Some (work-in-progress) collision detection capabilities
 * Sprite-sheet animation
+* Component-based game object architecture (https://en.wikipedia.org/wiki/Entity%E2%80%93component%E2%80%93system)
 
 Planned features:
-* Component-based game object architecture (https://en.wikipedia.org/wiki/Entity%E2%80%93component%E2%80%93system)
 * Optimization of collision detection via spatial partitioning
 * Physics simulation for rigid bodies
 * Level data format

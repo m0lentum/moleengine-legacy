@@ -1,5 +1,5 @@
-#ifndef COMPONENT_STORAGE_UNIT_HPP
-#define COMPONENT_STORAGE_UNIT_HPP
+#ifndef COMPONENT_HPP
+#define COMPONENT_HPP
 
 #include <utility>
 
@@ -8,7 +8,7 @@ namespace me
 	class GameObject;
 
 	// base class for pointer storage in GameObjects
-	class ComponentStorageUnitBase
+	class ComponentBase
 	{
 	protected:
 		// you can only kill a Component through its parent object
@@ -22,25 +22,25 @@ namespace me
 		inline bool isAlive() const { return m_isAlive; }
 		inline GameObject * getParent() const { return m_parent; }
 
-		ComponentStorageUnitBase(GameObject *m_parent) :
+		ComponentBase(GameObject *m_parent) :
 			m_parent(m_parent),
 			m_isAlive(true)
 		{
 		}
 
-		ComponentStorageUnitBase(ComponentStorageUnitBase &copy) = delete;
+		ComponentBase(ComponentBase &copy) = delete;
 
-		ComponentStorageUnitBase(ComponentStorageUnitBase&& move) :
+		ComponentBase(ComponentBase&& move) :
 			m_parent(move.m_parent),
 			m_isAlive(move.m_isAlive)
 		{
 		}
 
-		virtual ~ComponentStorageUnitBase() {}
+		virtual ~ComponentBase() {}
 	};
 
 	template <typename T>
-	class ComponentStorageUnit : public ComponentStorageUnitBase
+	class Component : public ComponentBase
 	{
 	private:
 
@@ -52,21 +52,21 @@ namespace me
 
 
 		template <typename... Args>
-		ComponentStorageUnit(GameObject *m_parent, Args&&... args) :
-			ComponentStorageUnitBase(m_parent),
+		Component(GameObject *m_parent, Args&&... args) :
+			ComponentBase(m_parent),
 			m_component(args...)
 		{
 		}
 
-		ComponentStorageUnit(ComponentStorageUnit<T> &copy) = delete;
+		Component(Component<T> &copy) = delete;
 
-		ComponentStorageUnit(ComponentStorageUnit<T>&& move) :
-			ComponentStorageUnitBase(std::forward<ComponentStorageUnit<T> >(move)),
+		Component(Component<T>&& move) :
+			ComponentBase(std::forward<Component<T> >(move)),
 			m_component(std::move(move.m_component))
 		{
 		}
 
-		ComponentStorageUnit<T>& operator=(ComponentStorageUnit<T>&& other)
+		Component<T>& operator=(Component<T>&& other)
 		{
 			if (this != &other)
 			{
@@ -78,9 +78,9 @@ namespace me
 			return *this;
 		}
 
-		virtual ~ComponentStorageUnit() {}
+		virtual ~Component() {}
 	};
 }
 
 
-#endif // COMPONENT_STORAGE_UNIT_HPP
+#endif // COMPONENT_HPP

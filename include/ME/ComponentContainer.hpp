@@ -2,7 +2,7 @@
 #define COMPONENT_CONTAINER_HPP
 
 #include <vector>
-#include "ComponentStorageUnit.hpp"
+#include "Component.hpp"
 #include <functional>
 #include <iostream>
 #include <algorithm>
@@ -26,13 +26,13 @@ namespace me
 	{
 	private:
 
-		std::vector<ComponentStorageUnit<T> > m_components;
+		std::vector<Component<T> > m_components;
 		std::size_t m_currentIndex;
 
 	public:
 
 		template <typename... Args>
-		ComponentStorageUnit<T>* createComponent(GameObject *parent, Args&&... args)
+		Component<T>* createComponent(GameObject *parent, Args&&... args)
 		{
 			if (m_components.size() < m_components.max_size())
 			{
@@ -55,7 +55,7 @@ namespace me
 					}
 				}
 
-				m_components[nextIndex] = ComponentStorageUnit<T>(parent, args...);
+				m_components[nextIndex] = Component<T>(parent, args...);
 				m_currentIndex = nextIndex;
 
 				return &(m_components[nextIndex]);
@@ -63,7 +63,7 @@ namespace me
 		}
 
 		/// Execute a function on every (alive) Component in the Container
-		void each(std::function<void(ComponentStorageUnit<T>&)> function)
+		void each(std::function<void(Component<T>&)> function)
 		{
 			for (auto &unit : m_components)
 			{

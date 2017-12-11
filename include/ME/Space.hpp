@@ -8,7 +8,7 @@
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/RenderStates.hpp>
 #include "ComponentContainer.hpp"
-#include "ComponentStorageUnit.hpp"
+#include "Component.hpp"
 #include <typeindex>
 #include <functional>
 
@@ -39,7 +39,7 @@ namespace me
 		GameObject * createObject();
 
 		template <typename T, typename... Args>
-		ComponentStorageUnit<T>* createComponent(GameObject *parent, Args&&... args);
+		Component<T>* createComponent(GameObject *parent, Args&&... args);
 
 
 		template <typename T>
@@ -50,7 +50,7 @@ namespace me
 
 		/// Execute a function on every Component of the given type.
 		template <typename T>
-		void each(std::function<void(ComponentStorageUnit<T>&)> function);
+		void each(std::function<void(Component<T>&)> function);
 
 		/// Delete all GameObjects and Components but keep Containers
 		void clear();
@@ -83,7 +83,7 @@ namespace me
 	
 
 	template <typename T, typename... Args>
-	ComponentStorageUnit<T>* Space::createComponent(GameObject *parent, Args&&... args)
+	Component<T>* Space::createComponent(GameObject *parent, Args&&... args)
 	{
 		ComponentContainer<T> *container = getContainer<T>();
 		return container->createComponent(parent, args...);
@@ -116,7 +116,7 @@ namespace me
 	}
 
 	template <typename T>
-	void Space::each(std::function<void(ComponentStorageUnit<T>&)> function)
+	void Space::each(std::function<void(Component<T>&)> function)
 	{
 		ComponentContainer<T>* container = getContainer<T>();
 		if (container) container->each(function);

@@ -1,5 +1,5 @@
 #include <Physics/Physics.hpp>
-#include <ComponentStorageUnit.hpp>
+#include <Component.hpp>
 #include <Space.hpp>
 #include <Physics/RigidBody.hpp>
 #include <vector>
@@ -20,26 +20,26 @@ namespace me
 
 	void Physics::applyMovement()
 	{
-		m_space->each<RigidBody>([&](ComponentStorageUnit<RigidBody>& unit)
+		m_space->each<RigidBody>([&](Component<RigidBody>& comp)
 		{
-			RigidBody *comp = unit.getComponent();
-			GameObject *parent = unit.getParent();
+			RigidBody *rb = comp.getComponent();
+			GameObject *parent = comp.getParent();
 
-			if (!comp->isStatic)
+			if (!rb->isStatic)
 			{
-				if (!comp->doesOverrideGravity())
-					comp->accelerate(m_gravity * comp->gravityMultiplier);
+				if (!rb->doesOverrideGravity())
+					rb->accelerate(m_gravity * rb->gravityMultiplier);
 				else
-					comp->accelerate(comp->getGravityOverride());
+					rb->accelerate(rb->getGravityOverride());
 
-				if (!comp->isKinematic)
+				if (!rb->isKinematic)
 				{
-					comp->velocity -= comp->drag * comp->velocity;
-					comp->angularVelocity -= comp->angularDrag * comp->angularVelocity;
+					rb->velocity -= rb->drag * rb->velocity;
+					rb->angularVelocity -= rb->angularDrag * rb->angularVelocity;
 				}
 				
-				parent->move(comp->velocity);
-				parent->rotate(comp->angularVelocity);
+				parent->move(rb->velocity);
+				parent->rotate(rb->angularVelocity);
 			}
 		});
 	}
@@ -48,17 +48,17 @@ namespace me
 	{
 		std::vector<std::pair<GameObject*, ICollider*> > colliders;
 
-		m_space->each<ColliderCircle>([&](ComponentStorageUnit<ColliderCircle> &unit)
+		m_space->each<ColliderCircle>([&](Component<ColliderCircle> &comp)
 		{
-			colliders.push_back(std::pair<GameObject*, ICollider*>(unit.getParent(), unit.getComponent()));
+			colliders.push_back(std::pair<GameObject*, ICollider*>(comp.getParent(), comp.getComponent()));
 		});
-		m_space->each<ColliderRect>([&](ComponentStorageUnit<ColliderRect> &unit)
+		m_space->each<ColliderRect>([&](Component<ColliderRect> &comp)
 		{
-			colliders.push_back(std::pair<GameObject*, ICollider*>(unit.getParent(), unit.getComponent()));
+			colliders.push_back(std::pair<GameObject*, ICollider*>(comp.getParent(), comp.getComponent()));
 		});
-		m_space->each<ColliderPolygon>([&](ComponentStorageUnit<ColliderPolygon> &unit)
+		m_space->each<ColliderPolygon>([&](Component<ColliderPolygon> &comp)
 		{
-			colliders.push_back(std::pair<GameObject*, ICollider*>(unit.getParent(), unit.getComponent()));
+			colliders.push_back(std::pair<GameObject*, ICollider*>(comp.getParent(), comp.getComponent()));
 		});
 
 		using iter = std::vector<std::pair<GameObject*, ICollider*> >::iterator;

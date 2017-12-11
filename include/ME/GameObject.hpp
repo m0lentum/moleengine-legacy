@@ -10,7 +10,7 @@
 #include <unordered_map>
 #include <typeindex>
 #include "Space.hpp"
-#include "ComponentStorageUnit.hpp"
+#include "Component.hpp"
 #include <iostream>
 
 namespace me
@@ -26,7 +26,7 @@ namespace me
 		/// Tracks how many game objects have been created. Used for generating a unique ID.
 		static unsigned int numExisting;
 
-		std::unordered_map<std::type_index, ComponentStorageUnitBase*> m_components;
+		std::unordered_map<std::type_index, ComponentBase*> m_components;
 		bool m_isAlive;
 
 	public:
@@ -52,7 +52,7 @@ namespace me
 
 		/// Used by ComponentContainer to send info back to the object
 		template <typename T>
-		void registerComponent(ComponentStorageUnit<T> *m_component);
+		void registerComponent(Component<T> *m_component);
 
 
 		
@@ -69,7 +69,7 @@ namespace me
 	template <typename T, typename ...Args>
 	T* GameObject::addComponent(Args&&... args)
 	{
-		ComponentStorageUnit<T>* container = m_space->createComponent<T>(this, args...);
+		Component<T>* container = m_space->createComponent<T>(this, args...);
 		registerComponent<T>(container);
 		return container->getComponent();
 	}
@@ -93,14 +93,14 @@ namespace me
 		
 		if (m_components.count(index) > 0)
 		{
-			return reinterpret_cast<ComponentStorageUnit<T>*>(m_components.at(index))->getComponent();
+			return reinterpret_cast<Component<T>*>(m_components.at(index))->getComponent();
 		}
 
 		return NULL;
 	}
 
 	template <typename T>
-	void GameObject::registerComponent(ComponentStorageUnit<T> *m_component)
+	void GameObject::registerComponent(Component<T> *m_component)
 	{
 		std::type_index index(typeid(T));
 

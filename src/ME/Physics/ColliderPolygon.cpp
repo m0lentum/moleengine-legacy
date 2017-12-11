@@ -7,12 +7,34 @@
 
 namespace me
 {
-	const std::vector<sf::Vector2f>& ColliderPolygon::getEdges() const
+	void ColliderPolygon::checkCollision(const ColliderCircle &other, CollisionInfo &info) const
+	{
+		CollisionChecker::circlePoly(other, *this, info);
+	}
+
+	void ColliderPolygon::checkCollision(const ColliderRect &other, CollisionInfo &info) const
+	{
+		CollisionChecker::rectPoly(other, *this, info);
+	}
+
+	void ColliderPolygon::checkCollision(const ColliderPolygon &other, CollisionInfo &info) const
+	{
+		CollisionChecker::polyPoly(other, *this, info);
+	}
+
+	void ColliderPolygon::findTypeAndCheckCollision(const ICollider &other, CollisionInfo &info) const
+	{
+		other.checkCollision(*this, info);
+	}
+
+
+
+	std::vector<sf::Vector2f> ColliderPolygon::getEdges() const
 	{
 		return m_edges;
 	}
 
-	const std::vector<sf::Vector2f>& ColliderPolygon::getAxes() const
+	std::vector<sf::Vector2f> ColliderPolygon::getAxes() const
 	{
 		return m_axes;
 	}

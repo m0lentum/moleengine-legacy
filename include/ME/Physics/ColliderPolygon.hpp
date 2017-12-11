@@ -5,11 +5,12 @@
 #include <initializer_list>
 #include <SFML/Graphics/VertexArray.hpp>
 #include <SFML/Graphics/Color.hpp>
+#include "ICollider.hpp"
 
 namespace me
 {
 	/// Arbitrary CONVEX polygon collider.
-	class ColliderPolygon
+	class ColliderPolygon : public ICollider
 	{
 	private:
 		
@@ -18,15 +19,22 @@ namespace me
 
 	public:
 
-		const std::vector<sf::Vector2f>& getEdges() const;
-		const std::vector<sf::Vector2f>& getAxes() const;
+		std::vector<sf::Vector2f> getEdges() const;
+		std::vector<sf::Vector2f> getAxes() const;
 
-		const sf::Vector2f& getPosition() const;
 
 		/// Calculate the area of the polygon.
 		float getArea();
 		/// Move the origin of the polygon to its centroid (center of mass).
 		void center();
+
+
+		virtual void findTypeAndCheckCollision(const ICollider &other, CollisionInfo &info) const;
+
+		virtual void checkCollision(const ColliderCircle &other, CollisionInfo &info) const;
+		virtual void checkCollision(const ColliderRect &other, CollisionInfo &info) const;
+		virtual void checkCollision(const ColliderPolygon &other, CollisionInfo &info) const;
+
 
 		sf::VertexArray toVertexArray(const sf::Color &color = sf::Color::White) const;
 

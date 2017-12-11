@@ -4,10 +4,11 @@
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
 #include <SFML/Graphics/Color.hpp>
+#include "ICollider.hpp"
 
 namespace me
 {
-	class ColliderRect
+	class ColliderRect : public ICollider
 	{
 	private:
 
@@ -18,6 +19,13 @@ namespace me
 
 		inline const float getHalfWidth() const { return m_halfWidth; }
 		inline const float getHalfHeight() const { return m_halfHeight; }
+
+
+		virtual void findTypeAndCheckCollision(const ICollider &other, CollisionInfo &info) const;
+
+		virtual void checkCollision(const ColliderCircle &other, CollisionInfo &info) const;
+		virtual void checkCollision(const ColliderRect &other, CollisionInfo &info) const;
+		virtual void checkCollision(const ColliderPolygon &other, CollisionInfo &info) const;
 
 
 		sf::VertexArray toVertexArray(const sf::Color &color = sf::Color::White) const;

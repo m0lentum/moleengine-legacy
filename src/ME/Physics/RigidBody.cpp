@@ -18,7 +18,7 @@ namespace me
 
 
 	RigidBody::RigidBody() :
-		RigidBody(false, false, 1.0f, 0.75f, 0.05f, 0.02f, 0.01f)
+		RigidBody(false, false, 1.0f, 0.75f, 0.05f, 0.002f, 0.001f)
 	{
 	}
 

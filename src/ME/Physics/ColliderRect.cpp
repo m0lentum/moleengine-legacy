@@ -6,6 +6,28 @@
 
 namespace me
 {
+	void ColliderRect::checkCollision(const ColliderCircle &other, CollisionInfo &info) const
+	{
+		CollisionChecker::circleRect(other, *this, info);
+	}
+
+	void ColliderRect::checkCollision(const ColliderRect &other, CollisionInfo &info) const
+	{
+		CollisionChecker::rectRect(other, *this, info);
+	}
+
+	void ColliderRect::checkCollision(const ColliderPolygon &other, CollisionInfo &info) const
+	{
+		CollisionChecker::polyRect(other, *this, info);
+	}
+
+	void ColliderRect::findTypeAndCheckCollision(const ICollider &other, CollisionInfo &info) const
+	{
+		other.checkCollision(*this, info);
+	}
+
+
+
 	sf::VertexArray ColliderRect::toVertexArray(const sf::Color &color) const
 	{
 		return Graphic::makeRect(m_halfWidth * 2, m_halfHeight * 2, color);

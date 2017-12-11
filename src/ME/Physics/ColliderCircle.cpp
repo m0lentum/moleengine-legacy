@@ -4,11 +4,32 @@
 
 namespace me
 {
+	void ColliderCircle::checkCollision(const ColliderCircle &other, CollisionInfo &info) const
+	{
+		CollisionChecker::circleCircle(other, *this, info);
+	}
+
+	void ColliderCircle::checkCollision(const ColliderRect &other, CollisionInfo &info) const
+	{
+		CollisionChecker::rectCircle(other, *this, info);
+	}
+
+	void ColliderCircle::checkCollision(const ColliderPolygon &other, CollisionInfo &info) const
+	{
+		CollisionChecker::polyCircle(other, *this, info);
+	}
+
+	void ColliderCircle::findTypeAndCheckCollision(const ICollider &other, CollisionInfo &info) const
+	{
+		other.checkCollision(*this, info);
+	}
+
+
+
 	const float ColliderCircle::getRadius() const
 	{
 		return m_radius;
 	}
-
 
 	
 	sf::VertexArray ColliderCircle::toVertexArray(const sf::Color &color) const

@@ -78,6 +78,11 @@ namespace me
 			return *this;
 		}
 
+		T* operator->()
+		{
+			return &m_component;
+		}
+
 		virtual ~Component() {}
 	};
 }

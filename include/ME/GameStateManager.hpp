@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <memory>
 #include "IGameState.hpp"
+#include <SFML/Window/Event.hpp>
 #include <typeindex>
 #include <iostream>
 
@@ -31,6 +32,8 @@ namespace me
 		typename std::enable_if<std::is_base_of<IGameState, T>::value, T*>::type
 			createState(Args&&... args);
 		
+
+		void handleWindowEvent(const sf::Event &evt);
 
 		void continuousUpdate(const sf::Time &timeElapsed);
 		void fixedUpdate();

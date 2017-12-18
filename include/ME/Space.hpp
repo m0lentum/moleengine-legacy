@@ -11,6 +11,7 @@
 #include "Component.hpp"
 #include <typeindex>
 #include <functional>
+#include <SFML/Window/Event.hpp>
 
 namespace me
 {
@@ -35,9 +36,12 @@ namespace me
 		void fixedUpdate();
 		void draw(sf::RenderTarget &target, sf::RenderStates states) const;
 
+		void handleWindowEvent(const sf::Event &evt);
+
 
 		GameObject * createObject();
 
+		/// Never call this directly. Use GameObject::addComponent instead.
 		template <typename T, typename... Args>
 		Component<T>* createComponent(GameObject *parent, Args&&... args);
 

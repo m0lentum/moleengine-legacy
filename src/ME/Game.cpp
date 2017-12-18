@@ -11,6 +11,8 @@ namespace me
 		{
 			if (event.type == sf::Event::Closed)
 				m_mainWindow.close();
+			else
+				m_stateManager.handleWindowEvent(event);
 		}
 	}
 

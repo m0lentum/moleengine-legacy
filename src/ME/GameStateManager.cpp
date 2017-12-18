@@ -3,6 +3,10 @@
 
 namespace me
 {
+	void GameStateManager::handleWindowEvent(const sf::Event &evt)
+	{
+		m_currentState->handleWindowEvent(evt);
+	}
 
 	void GameStateManager::continuousUpdate(const sf::Time &timeElapsed)
 	{

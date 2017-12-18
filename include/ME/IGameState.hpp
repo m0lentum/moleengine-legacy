@@ -5,6 +5,7 @@
 #include "SFML/System/Time.hpp"
 #include "SFML/Graphics/RenderTarget.hpp"
 #include "SFML/Graphics/RenderStates.hpp"
+#include <SFML/Window/Event.hpp>
 
 namespace me
 {
@@ -23,6 +24,8 @@ namespace me
 		/// Transition events are not mandatory and do nothing by default
 		virtual void onTransitionIn() {}
 		virtual void onTransitionOut() {}
+
+		virtual void handleWindowEvent(const sf::Event &evt) {}
 
 		// update loops
 		virtual void continuousUpdate(const sf::Time &timeElapsed) = 0;

@@ -1,10 +1,57 @@
 #include <Space.hpp>
 #include <Physics/CollisionChecker.hpp>
 #include <GameObject.hpp>
+#include <Input/KeyboardController.hpp>
+#include <Input/MouseController.hpp>
 //#include <iostream>
 
 namespace me
 {
+	void Space::handleWindowEvent(const sf::Event &evt)
+	{
+		switch (evt.type)
+		{
+		case sf::Event::KeyPressed :
+			each<KeyboardController>([&](Component<KeyboardController> &comp)
+			{
+				if (comp->onKeyPressed) comp->onKeyPressed(evt.key);
+			});
+			break;
+		case sf::Event::KeyReleased :
+			each<KeyboardController>([&](Component<KeyboardController> &comp)
+			{
+				if (comp->onKeyReleased) comp->onKeyReleased(evt.key);
+			});
+			break;
+
+
+		case sf::Event::MouseButtonPressed :
+			each<MouseController>([&](Component<MouseController> &comp)
+			{
+				if (comp->onMouseButtonPressed) comp->onMouseButtonPressed(evt.mouseButton);
+			});
+			break;
+		case sf::Event::MouseButtonReleased:
+			each<MouseController>([&](Component<MouseController> &comp)
+			{
+				if (comp->onMouseButtonReleased) comp->onMouseButtonReleased(evt.mouseButton);
+			});
+			break;
+		case sf::Event::MouseMoved:
+			each<MouseController>([&](Component<MouseController> &comp)
+			{
+				if (comp->onMouseMoved) comp->onMouseMoved(evt.mouseMove);
+			});
+			break;
+		case sf::Event::MouseWheelScrolled:
+			each<MouseController>([&](Component<MouseController> &comp)
+			{
+				if (comp->onMouseWheelScrolled) comp->onMouseWheelScrolled(evt.mouseWheelScroll);
+			});
+			break;
+		}
+	}
+
 	void Space::continuousUpdate(sf::Time timeElapsed)
 	{
 		for (auto &sys : m_systems)

@@ -27,13 +27,13 @@ namespace me
 
 			if (!rb->isStatic)
 			{
-				if (!rb->doesOverrideGravity())
-					rb->accelerate(m_gravity * rb->gravityMultiplier);
-				else
-					rb->accelerate(rb->getGravityOverride());
-
 				if (!rb->isKinematic)
 				{
+					if (!rb->doesOverrideGravity())
+						rb->accelerate(m_gravity * rb->gravityMultiplier);
+					else
+						rb->accelerate(rb->getGravityOverride());
+
 					rb->velocity -= rb->drag * rb->velocity;
 					rb->angularVelocity -= rb->angularDrag * rb->angularVelocity;
 				}

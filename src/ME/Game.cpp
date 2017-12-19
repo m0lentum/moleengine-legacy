@@ -25,8 +25,7 @@ namespace me
 				terminate();
 				continue;
 			}
-			handleWindowEvents();
-
+			
 			sf::Time timeElapsed = m_clock.restart();
 
 			continuousUpdate(timeElapsed);
@@ -35,6 +34,7 @@ namespace me
 			if (m_timeSinceFixedUpdate > m_fixedUpdateInterval)
 			{
 				m_timeSinceFixedUpdate -= m_fixedUpdateInterval;
+				handleWindowEvents();				
 				fixedUpdate();
 
 				Keyboard::updateTracked();

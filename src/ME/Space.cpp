@@ -3,6 +3,7 @@
 #include <GameObject.hpp>
 #include <Input/KeyboardController.hpp>
 #include <Input/MouseController.hpp>
+#include <Utility/UpdateLoopComponent.hpp>
 //#include <iostream>
 
 namespace me
@@ -58,6 +59,11 @@ namespace me
 		{
 			sys.second->continuousUpdate(timeElapsed);
 		}
+
+		each<ContinuousUpdateLoop>([timeElapsed](Component<ContinuousUpdateLoop> &comp)
+		{
+			comp->update(timeElapsed);
+		});
 	}
 
 	void Space::fixedUpdate()
@@ -66,6 +72,11 @@ namespace me
 		{
 			sys.second->fixedUpdate();
 		}
+
+		each<FixedUpdateLoop>([](Component<FixedUpdateLoop> &comp)
+		{
+			comp->update();
+		});
 	}
 
 	void Space::draw(sf::RenderTarget &target, sf::RenderStates states) const

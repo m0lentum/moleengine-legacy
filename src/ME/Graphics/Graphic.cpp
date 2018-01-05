@@ -1,6 +1,7 @@
 #include <Graphics/Graphic.hpp>
 #include <iostream>
 #include <cmath>
+#include <Physics/VectorMath.hpp>
 
 namespace me
 {
@@ -172,5 +173,27 @@ namespace me
 		for (unsigned int i = 0; i < verts.getVertexCount(); i++) verts[i].color = color;
 
 		return verts;
+	}
+
+	sf::VertexArray Graphic::makeLineSegment(float x1, float y1, float x2, float y2, float thickness, const sf::Color &color)
+	{
+		sf::VertexArray verts(sf::PrimitiveType::TriangleFan, 4);
+
+		sf::Vector2f distLeftNormal(y1 - y2, x2 - x1);
+		distLeftNormal *= thickness / VectorMath::getLength(distLeftNormal);
+
+		verts[0].position = sf::Vector2f(x1 + distLeftNormal.x / 2, y1 + distLeftNormal.y / 2);
+		verts[1].position = verts[0].position - distLeftNormal;
+		verts[2].position = verts[1].position + sf::Vector2f(x2 - x1, y2 - y1);
+		verts[3].position = verts[2].position + distLeftNormal;
+
+		for (unsigned int i = 0; i < verts.getVertexCount(); i++) verts[i].color = color;
+
+		return verts;
+	}
+
+	sf::VertexArray Graphic::makeLineSegment(const sf::Vector2f &point1, const sf::Vector2f &point2, float thickness, const sf::Color &color)
+	{
+		return makeLineSegment(point1.x, point1.y, point2.x, point2.y, thickness, color);
 	}
 }

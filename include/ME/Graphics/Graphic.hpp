@@ -51,6 +51,9 @@ namespace me
 		static sf::VertexArray makeRect(float width, float height, const sf::Color &color = sf::Color::White);
 		/// Create a polygon with the given points.
 		static sf::VertexArray makePolygon(const std::vector<sf::Vector2f> &points, const sf::Color &color = sf::Color::White);
+		/// Create a line segment between two given points.
+		static sf::VertexArray makeLineSegment(float x1, float y1, float x2, float y2, float thickness, const sf::Color &color = sf::Color::White);
+		static sf::VertexArray makeLineSegment(const sf::Vector2f &point1, const sf::Vector2f &point2, float thickness, const sf::Color &color = sf::Color::White);
 
 	protected:
 		/// This should be called every time a point's position changes

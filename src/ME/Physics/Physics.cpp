@@ -9,6 +9,7 @@
 #include <Physics/ColliderPolygon.hpp>
 #include <Physics/CollisionChecker.hpp>
 #include <Physics/CollisionInfo.hpp>
+#include <Graphics/DebugMarkerFactory.hpp>
 
 namespace me
 {
@@ -75,6 +76,8 @@ namespace me
 				if (info.areColliding)
 				{
 					info.obj1->move(info.penetration);
+
+					DebugMarkerFactory::makeCollisionLine(m_space, info.obj1->getPosition(), info.obj2->getPosition());
 				}
 			}
 		}

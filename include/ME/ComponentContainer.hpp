@@ -34,9 +34,10 @@ namespace me
 		template <typename... Args>
 		Component<T>* createComponent(GameObject *parent, Args&&... args)
 		{
-			if (m_components.size() < m_components.max_size())
+			if (m_components.size() < m_components.capacity())
 			{
 				m_components.emplace_back(parent, args...);
+
 				return &(m_components.back());
 			}
 			else
@@ -50,7 +51,7 @@ namespace me
 					if (nextIndex >= m_components.capacity()) nextIndex = 0;
 					if (nextIndex == m_currentIndex)
 					{
-						std::cout << "Error: ComponentContainer is full" << std::endl;
+						std::cout << "Error: Container for " << typeid(T).name() << " is full" << std::endl;
 						return NULL;
 					}
 				}

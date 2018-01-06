@@ -10,7 +10,8 @@ namespace me
 
 	namespace DebugMarkerFactory
 	{
-		me::GameObject* makeCollisionLine(me::Space *space, const sf::Vector2f &point1, const sf::Vector2f &point2);
+		me::GameObject* makeLineSegment(me::Space *space, const sf::Vector2f &point1, const sf::Vector2f &point2);
+		me::GameObject* makePoint(me::Space *space, const sf::Vector2f &position);
 	}
 }
 

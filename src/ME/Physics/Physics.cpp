@@ -75,9 +75,13 @@ namespace me
 
 				if (info.areColliding)
 				{
-					info.obj1->move(info.penetration);
+					//info.obj1->move(info.penetration);
 
-					DebugMarkerFactory::makeCollisionLine(m_space, info.obj1->getPosition(), info.obj2->getPosition());
+					//DebugMarkerFactory::makeLineSegment(m_space, info.obj1->getPosition(), info.obj2->getPosition());
+					if (info.manifold[0].x != 0 || info.manifold[0].y != 0)
+					{
+						DebugMarkerFactory::makePoint(m_space, info.manifold[0]);
+					}
 				}
 			}
 		}

@@ -18,11 +18,11 @@ namespace me
 		const float getRadius() const;
 
 
-		virtual void findTypeAndCheckCollision(const ICollider &other, CollisionInfo &info) const;
+		virtual void findTypeAndCheckCollision(const ICollider &other, Contact &info) const;
 
-		virtual void checkCollision(const ColliderCircle &other, CollisionInfo &info) const;
-		virtual void checkCollision(const ColliderRect &other, CollisionInfo &info) const;
-		virtual void checkCollision(const ColliderPolygon &other, CollisionInfo &info) const;
+		virtual void checkCollision(const ColliderCircle &other, Contact &info) const;
+		virtual void checkCollision(const ColliderRect &other, Contact &info) const;
+		virtual void checkCollision(const ColliderPolygon &other, Contact &info) const;
 
 
 		sf::VertexArray toVertexArray(const sf::Color &color = sf::Color::White) const;

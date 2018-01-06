@@ -8,7 +8,7 @@
 #include <Physics/ColliderRect.hpp>
 #include <Physics/ColliderPolygon.hpp>
 #include <Physics/CollisionChecker.hpp>
-#include <Physics/CollisionInfo.hpp>
+#include <Physics/Contact.hpp>
 #include <Graphics/DebugMarkerFactory.hpp>
 
 namespace me
@@ -67,7 +67,7 @@ namespace me
 		{
 			for (iter j = i + 1; j != colliders.end(); j++)
 			{
-				CollisionInfo info;
+				Contact info;
 				info.obj1 = i->first;
 				info.obj2 = j->first;
 				CollisionChecker::checkCollision(*(i->second), *(j->second), info);

@@ -6,22 +6,22 @@
 
 namespace me
 {
-	void ColliderRect::checkCollision(const ColliderCircle &other, CollisionInfo &info) const
+	void ColliderRect::checkCollision(const ColliderCircle &other, Contact &info) const
 	{
 		CollisionChecker::circleRect(other, *this, info);
 	}
 
-	void ColliderRect::checkCollision(const ColliderRect &other, CollisionInfo &info) const
+	void ColliderRect::checkCollision(const ColliderRect &other, Contact &info) const
 	{
 		CollisionChecker::rectRect(other, *this, info);
 	}
 
-	void ColliderRect::checkCollision(const ColliderPolygon &other, CollisionInfo &info) const
+	void ColliderRect::checkCollision(const ColliderPolygon &other, Contact &info) const
 	{
 		CollisionChecker::polyRect(other, *this, info);
 	}
 
-	void ColliderRect::findTypeAndCheckCollision(const ICollider &other, CollisionInfo &info) const
+	void ColliderRect::findTypeAndCheckCollision(const ICollider &other, Contact &info) const
 	{
 		other.checkCollision(*this, info);
 	}

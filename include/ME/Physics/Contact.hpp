@@ -9,7 +9,7 @@ namespace me
 	class GameObject;
 
 	/// Struct containing information about a collision.
-	struct CollisionInfo
+	struct Contact
 	{
 		GameObject *obj1;
 		GameObject *obj2;

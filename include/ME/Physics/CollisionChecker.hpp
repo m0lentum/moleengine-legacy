@@ -10,7 +10,7 @@ namespace me
 	class ColliderRect;
 	class ColliderPolygon;
 	class ICollider;
-	struct CollisionInfo;
+	struct Contact;
 	class GameObject;
 
 	class CollisionChecker
@@ -18,20 +18,20 @@ namespace me
 	public:
 
 		/// Checks for collision between obj1 and obj2.
-		static void checkCollision(const ICollider &coll1, const ICollider &coll2, CollisionInfo &info);
+		static void checkCollision(const ICollider &coll1, const ICollider &coll2, Contact &info);
 
 		// Collision checks for different pairs of colliders.
-		static void circleCircle(const ColliderCircle &circle1, const ColliderCircle &circle2, CollisionInfo &info);
-		static void circleRect(const ColliderCircle &circle, const ColliderRect &rect, CollisionInfo &info);
-		static void circlePoly(const ColliderCircle &circle, const ColliderPolygon &poly, CollisionInfo &info);
+		static void circleCircle(const ColliderCircle &circle1, const ColliderCircle &circle2, Contact &info);
+		static void circleRect(const ColliderCircle &circle, const ColliderRect &rect, Contact &info);
+		static void circlePoly(const ColliderCircle &circle, const ColliderPolygon &poly, Contact &info);
 
-		static void rectCircle(const ColliderRect &rect, const ColliderCircle &circle, CollisionInfo &info);
-		static void rectRect(const ColliderRect &rect1, const ColliderRect &rect2, CollisionInfo &info);
-		static void rectPoly(const ColliderRect &rect, const ColliderPolygon &poly, CollisionInfo &info);
+		static void rectCircle(const ColliderRect &rect, const ColliderCircle &circle, Contact &info);
+		static void rectRect(const ColliderRect &rect1, const ColliderRect &rect2, Contact &info);
+		static void rectPoly(const ColliderRect &rect, const ColliderPolygon &poly, Contact &info);
 
-		static void polyCircle(const ColliderPolygon &poly, const ColliderCircle &circle, CollisionInfo &info);
-		static void polyRect(const ColliderPolygon &poly, const ColliderRect &rect, CollisionInfo &info);
-		static void polyPoly(const ColliderPolygon &poly1, const ColliderPolygon &poly2, CollisionInfo &info);
+		static void polyCircle(const ColliderPolygon &poly, const ColliderCircle &circle, Contact &info);
+		static void polyRect(const ColliderPolygon &poly, const ColliderRect &rect, Contact &info);
+		static void polyPoly(const ColliderPolygon &poly1, const ColliderPolygon &poly2, Contact &info);
 
 	private:
 

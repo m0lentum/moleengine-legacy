@@ -52,6 +52,8 @@ namespace me
 		static PolyAxisInfo polyWidthOnAxis(const std::vector<sf::Vector2f> &edges, const sf::Vector2f &axis);
 		/// Same for a rectangle
 		static PolyAxisInfo rectWidthOnAxis(const sf::Vector2f dimensions[2], const sf::Vector2f &axis);
+
+		CollisionChecker() {} // can't instantiate
 	};
 }
 

@@ -7,19 +7,20 @@
 namespace me
 {
 	class GameObject;
+	class RigidBody;
 
 	/// Struct containing information about a collision.
 	struct Contact
 	{
 		GameObject *obj1;
 		GameObject *obj2;
+		RigidBody *rb1;
+		RigidBody *rb2;
 
 		bool areColliding = false;
 
-		/// The point on object 1 (in local space) where the collision force will be applied
-		sf::Vector2f point1;
-		/// Same as point1 but for object 2
-		sf::Vector2f point2;
+		/// The contact point manifold containing up to 2 points in global space. The points are always on the surface of obj1.
+		sf::Vector2f manifold[2];
 		/// The direction and depth of penetration if the objects are colliding (direction towards obj1).
 		sf::Vector2f penetration;
 	};

@@ -6,6 +6,7 @@
 #include <Physics/Contact.hpp>
 #include <Physics/VectorMath.hpp>
 #include <GameObject.hpp>
+#include <cmath>
 #include <iostream>
 
 namespace me
@@ -29,8 +30,7 @@ namespace me
 		{
 			info.areColliding = true;
 			info.penetration = axis * -penDepth;
-			info.point1 = axis * circle1.getRadius();
-			info.point2 = axis * -circle2.getRadius();
+			info.manifold[0] = info.obj1->getPosition() + axis * circle1.getRadius();
 		}
 	}
 
@@ -54,46 +54,29 @@ namespace me
 	//===================  RECT and X  ===================
 	void CollisionChecker::rectCircle(const ColliderRect &rect, const ColliderCircle &circle, Contact &info)
 	{
-		const sf::Vector2f distance = info.obj2->getPosition() - info.obj1->getPosition();
-
-		float angle = VectorMath::degToRad(info.obj1->getRotation());
-		sf::Vector2f rectWAxis(std::cos(angle), std::sin(angle));
-		sf::Vector2f rectHAxis = VectorMath::leftNormal(rectWAxis);
-
-		sf::Vector2f rectDimensions[2] = { rectWAxis * rect.getHalfWidth(), rectHAxis * rect.getHalfHeight() };
+		sf::Vector2f closest = info.obj1->getInverseTransform() * info.obj2->getPosition();
+		float hw = rect.getHalfWidth();
+		float hh = rect.getHalfHeight();
 		float radius = circle.getRadius();
 
-		sf::Vector2f closestPoint = info.obj1->getPosition() + rectWidthOnAxis(rectDimensions, distance).point1;
-		sf::Vector2f toCircleAxis = VectorMath::normalize(info.obj2->getPosition() - closestPoint);
+		// in the rectangle's local coordinate space, clamp the circle's position to the (now axis-aligned) box
+		if (closest.x > hw) closest.x = hw;
+		else if (closest.x < -hw) closest.x = -hw;
+		if (closest.y > hh) closest.y = hh;
+		else if (closest.y < -hh) closest.y = -hh;
 
-		sf::Vector2f axes[3] = { rectWAxis, rectHAxis, toCircleAxis };
-		float penDepth = 100000;
-		sf::Vector2f penAxis;
-		for (auto &axis : axes)
+		// transform back to global space
+		closest = info.obj1->getTransform() * closest;
+
+		sf::Vector2f distance = closest - info.obj2->getPosition();
+
+		float penSquared = VectorMath::getLengthSquared(distance) - radius * radius;
+		if (penSquared < 0.0f)
 		{
-			float distOnAxis = VectorMath::dot(axis, distance);
-			if (distOnAxis < 0)
-			{
-				axis = -axis; // revert the axis if it faces the wrong way
-				distOnAxis = -distOnAxis;
-			}
-
-			PolyAxisInfo rectW = rectWidthOnAxis(rectDimensions, axis);
-
-			float depth = rectW.width + radius - distOnAxis;
-			if (depth < 0) // no collision on this axis => SAT: no collision at all
-			{
-				return;
-			}
-			else if (depth < penDepth)
-			{
-				penAxis = axis;
-				penDepth = depth;
-			}
+			info.areColliding = true;
+			info.penetration = std::sqrtf(penSquared) * VectorMath::normalize(distance);
+			info.manifold[0] = closest;
 		}
-
-		info.areColliding = true;
-		info.penetration = -penDepth * penAxis;
 	}
 
 	void CollisionChecker::rectRect(const ColliderRect &rect1, const ColliderRect &rect2, Contact &info)

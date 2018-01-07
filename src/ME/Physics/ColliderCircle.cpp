@@ -1,22 +1,22 @@
 #include <Physics/ColliderCircle.hpp>
-#include <Physics/CollisionChecker.hpp>
+#include <Physics/PrimitiveQueries.hpp>
 #include <Graphics/Graphic.hpp>
 
 namespace me
 {
 	void ColliderCircle::checkCollision(const ColliderCircle &other, Contact &info) const
 	{
-		CollisionChecker::circleCircle(other, *this, info);
+		PrimitiveQueries::circleCircle(other, *this, info);
 	}
 
 	void ColliderCircle::checkCollision(const ColliderRect &other, Contact &info) const
 	{
-		CollisionChecker::rectCircle(other, *this, info);
+		PrimitiveQueries::rectCircle(other, *this, info);
 	}
 
 	void ColliderCircle::checkCollision(const ColliderPolygon &other, Contact &info) const
 	{
-		CollisionChecker::polyCircle(other, *this, info);
+		PrimitiveQueries::polyCircle(other, *this, info);
 	}
 
 	void ColliderCircle::findTypeAndCheckCollision(const ICollider &other, Contact &info) const

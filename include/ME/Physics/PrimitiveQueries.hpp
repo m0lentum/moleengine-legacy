@@ -13,7 +13,7 @@ namespace me
 	struct Contact;
 	class GameObject;
 
-	class CollisionChecker
+	class PrimitiveQueries
 	{
 	public:
 
@@ -53,7 +53,7 @@ namespace me
 		/// Same for a rectangle
 		static PolyAxisInfo rectWidthOnAxis(const sf::Vector2f dimensions[2], const sf::Vector2f &axis);
 
-		CollisionChecker() {} // can't instantiate
+		PrimitiveQueries() {} // can't instantiate
 	};
 }
 

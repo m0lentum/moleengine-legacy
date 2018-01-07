@@ -1,5 +1,5 @@
 #include <Space.hpp>
-#include <Physics/CollisionChecker.hpp>
+#include <Physics/PrimitiveQueries.hpp>
 #include <GameObject.hpp>
 #include <Input/KeyboardController.hpp>
 #include <Input/MouseController.hpp>

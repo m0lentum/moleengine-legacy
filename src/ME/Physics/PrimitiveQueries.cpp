@@ -54,21 +54,9 @@ namespace me
 	//===================  RECT and X  ===================
 	void PrimitiveQueries::rectCircle(const ColliderRect &rect, const ColliderCircle &circle, Contact &info)
 	{
-		sf::Vector2f closest = info.obj1->getInverseTransform() * info.obj2->getPosition();
-		float hw = rect.getHalfWidth();
-		float hh = rect.getHalfHeight();
-		float radius = circle.getRadius();
-
-		// in the rectangle's local coordinate space, clamp the circle's position to the (now axis-aligned) box
-		if (closest.x > hw) closest.x = hw;
-		else if (closest.x < -hw) closest.x = -hw;
-		if (closest.y > hh) closest.y = hh;
-		else if (closest.y < -hh) closest.y = -hh;
-
-		// transform back to global space
-		closest = info.obj1->getTransform() * closest;
-
+		sf::Vector2f closest = closestPtRectPoint(info.obj1->getTransform(), rect.getHalfWidth(), rect.getHalfHeight(), info.obj2->getPosition());
 		sf::Vector2f distance = closest - info.obj2->getPosition();
+		float radius = circle.getRadius();
 
 		float penSquared = VectorMath::getLengthSquared(distance) - radius * radius;
 		if (penSquared < 0.0f)
@@ -281,6 +269,43 @@ namespace me
 		info.penetration = -penDepth * penAxis;
 	}
 
+
+
+	// ===================================== CLOSEST POINT ============================================
+
+	sf::Vector2f PrimitiveQueries::closestPtCirclePoint(const sf::Vector2f &circlePos, float circleRadius, const sf::Vector2f &point)
+	{
+		sf::Vector2f diff = point - circlePos;
+		float distSquared = VectorMath::getLengthSquared(diff);
+
+		if (distSquared < circleRadius * circleRadius)
+		{
+			// Point is in circle
+			return point;
+		}
+		else
+		{
+			return circlePos + diff * (circleRadius / std::sqrtf(distSquared));
+		}
+	}
+
+	sf::Vector2f PrimitiveQueries::closestPtRectPoint(const sf::Transform &rectTransform, float rectHalfwidth, float rectHalfheight, const sf::Vector2f &point)
+	{
+		// transform to rect local space
+		sf::Vector2f closest = rectTransform.getInverse() * point;
+
+		// in the rectangle's local coordinate space, clamp the circle's position to the (now axis-aligned) box
+		if (closest.x > rectHalfwidth) closest.x = rectHalfwidth;
+		else if (closest.x < -rectHalfwidth) closest.x = -rectHalfwidth;
+		if (closest.y > rectHalfheight) closest.y = rectHalfheight;
+		else if (closest.y < -rectHalfheight) closest.y = -rectHalfheight;
+
+		// transform back to global space
+		return rectTransform * closest;
+	}
+
+
+	// ======================================= INTERNAL ===============================================
 
 	void PrimitiveQueries::transformVectors(std::vector<sf::Vector2f> &vecs, GameObject *obj)
 	{

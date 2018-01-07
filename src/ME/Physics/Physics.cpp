@@ -7,7 +7,7 @@
 #include <Physics/ColliderCircle.hpp>
 #include <Physics/ColliderRect.hpp>
 #include <Physics/ColliderPolygon.hpp>
-#include <Physics/CollisionChecker.hpp>
+#include <Physics/PrimitiveQueries.hpp>
 #include <Physics/Contact.hpp>
 #include <Graphics/DebugMarkerFactory.hpp>
 
@@ -70,7 +70,7 @@ namespace me
 				Contact info;
 				info.obj1 = i->first;
 				info.obj2 = j->first;
-				CollisionChecker::checkCollision(*(i->second), *(j->second), info);
+				PrimitiveQueries::checkCollision(*(i->second), *(j->second), info);
 
 
 				if (info.areColliding)

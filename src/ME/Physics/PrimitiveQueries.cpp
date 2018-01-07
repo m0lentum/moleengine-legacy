@@ -1,4 +1,4 @@
-#include <Physics/CollisionChecker.hpp>
+#include <Physics/PrimitiveQueries.hpp>
 #include <Physics/ColliderCircle.hpp>
 #include <Physics/ColliderRect.hpp>
 #include <Physics/ColliderPolygon.hpp>
@@ -11,16 +11,16 @@
 
 namespace me
 {
-	float CollisionChecker::EPSILON = 0.001f;
+	float PrimitiveQueries::EPSILON = 0.001f;
 
 
-	void CollisionChecker::checkCollision(const ICollider &coll1, const ICollider &coll2, Contact &info)
+	void PrimitiveQueries::checkCollision(const ICollider &coll1, const ICollider &coll2, Contact &info)
 	{
 		coll1.findTypeAndCheckCollision(coll2, info);
 	}
 
 	//===================  CIRCLE and X  ===================
-	void CollisionChecker::circleCircle(const ColliderCircle &circle1, const ColliderCircle &circle2, Contact &info)
+	void PrimitiveQueries::circleCircle(const ColliderCircle &circle1, const ColliderCircle &circle2, Contact &info)
 	{
 		sf::Vector2f distance = info.obj2->getPosition() - info.obj1->getPosition();
 		sf::Vector2f axis = VectorMath::normalize(distance);
@@ -34,7 +34,7 @@ namespace me
 		}
 	}
 
-	void CollisionChecker::circleRect(const ColliderCircle &circle, const ColliderRect &rect, Contact &info)
+	void PrimitiveQueries::circleRect(const ColliderCircle &circle, const ColliderRect &rect, Contact &info)
 	{
 		std::swap(info.obj1, info.obj2);
 		rectCircle(rect, circle, info);
@@ -42,7 +42,7 @@ namespace me
 		info.penetration = -info.penetration;
 	}
 
-	void CollisionChecker::circlePoly(const ColliderCircle &circle, const ColliderPolygon &poly, Contact &info)
+	void PrimitiveQueries::circlePoly(const ColliderCircle &circle, const ColliderPolygon &poly, Contact &info)
 	{
 		std::swap(info.obj1, info.obj2);
 		polyCircle(poly, circle, info);
@@ -52,7 +52,7 @@ namespace me
 
 
 	//===================  RECT and X  ===================
-	void CollisionChecker::rectCircle(const ColliderRect &rect, const ColliderCircle &circle, Contact &info)
+	void PrimitiveQueries::rectCircle(const ColliderRect &rect, const ColliderCircle &circle, Contact &info)
 	{
 		sf::Vector2f closest = info.obj1->getInverseTransform() * info.obj2->getPosition();
 		float hw = rect.getHalfWidth();
@@ -79,7 +79,7 @@ namespace me
 		}
 	}
 
-	void CollisionChecker::rectRect(const ColliderRect &rect1, const ColliderRect &rect2, Contact &info)
+	void PrimitiveQueries::rectRect(const ColliderRect &rect1, const ColliderRect &rect2, Contact &info)
 	{
 		sf::Vector2f distance = info.obj2->getPosition() - info.obj1->getPosition();
 
@@ -133,7 +133,7 @@ namespace me
 		// TODO: calculate points of impact
 	}
 
-	void CollisionChecker::rectPoly(const ColliderRect &rect, const ColliderPolygon &poly, Contact &info)
+	void PrimitiveQueries::rectPoly(const ColliderRect &rect, const ColliderPolygon &poly, Contact &info)
 	{
 		std::swap(info.obj1, info.obj2);
 		polyRect(poly, rect, info);
@@ -143,7 +143,7 @@ namespace me
 
 
 	//===================  POLY and X  ===================
-	void CollisionChecker::polyCircle(const ColliderPolygon &poly, const ColliderCircle &circle, Contact &info)
+	void PrimitiveQueries::polyCircle(const ColliderPolygon &poly, const ColliderCircle &circle, Contact &info)
 	{
 		sf::Vector2f distance = info.obj2->getPosition() - info.obj1->getPosition();
 		
@@ -187,7 +187,7 @@ namespace me
 		info.penetration = -penAxis * penDepth;
 	}
 
-	void CollisionChecker::polyRect(const ColliderPolygon &poly, const ColliderRect &rect, Contact &info)
+	void PrimitiveQueries::polyRect(const ColliderPolygon &poly, const ColliderRect &rect, Contact &info)
 	{
 		sf::Vector2f distance = info.obj2->getPosition() - info.obj1->getPosition();
 
@@ -235,7 +235,7 @@ namespace me
 
 	}
 
-	void CollisionChecker::polyPoly(const ColliderPolygon &poly1, const ColliderPolygon &poly2, Contact &info)
+	void PrimitiveQueries::polyPoly(const ColliderPolygon &poly1, const ColliderPolygon &poly2, Contact &info)
 	{
 		sf::Vector2f distance = info.obj2->getPosition() - info.obj1->getPosition();
 
@@ -282,7 +282,7 @@ namespace me
 	}
 
 
-	void CollisionChecker::transformVectors(std::vector<sf::Vector2f> &vecs, GameObject *obj)
+	void PrimitiveQueries::transformVectors(std::vector<sf::Vector2f> &vecs, GameObject *obj)
 	{
 		for (auto &vec : vecs)
 		{
@@ -290,7 +290,7 @@ namespace me
 		}
 	}
 
-	void CollisionChecker::rotateVectors(std::vector<sf::Vector2f> &vecs, float angle)
+	void PrimitiveQueries::rotateVectors(std::vector<sf::Vector2f> &vecs, float angle)
 	{
 		for (auto &vec : vecs)
 		{
@@ -298,7 +298,7 @@ namespace me
 		}
 	}
 
-	CollisionChecker::PolyAxisInfo CollisionChecker::polyWidthOnAxis(const std::vector<sf::Vector2f> &edges, const sf::Vector2f &axis)
+	PrimitiveQueries::PolyAxisInfo PrimitiveQueries::polyWidthOnAxis(const std::vector<sf::Vector2f> &edges, const sf::Vector2f &axis)
 	{
 		PolyAxisInfo info;
 
@@ -326,7 +326,7 @@ namespace me
 		return info;
 	}
 
-	CollisionChecker::PolyAxisInfo CollisionChecker::rectWidthOnAxis(const sf::Vector2f dimensions[2], const sf::Vector2f &axis)
+	PrimitiveQueries::PolyAxisInfo PrimitiveQueries::rectWidthOnAxis(const sf::Vector2f dimensions[2], const sf::Vector2f &axis)
 	{
 		PolyAxisInfo info;
 

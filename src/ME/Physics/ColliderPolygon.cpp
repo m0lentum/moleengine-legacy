@@ -1,5 +1,5 @@
 #include <Physics/ColliderPolygon.hpp>
-#include <Physics/CollisionChecker.hpp>
+#include <Physics/PrimitiveQueries.hpp>
 #include <Physics/VectorMath.hpp>
 #include <cmath>
 #include <Graphics/Graphic.hpp>
@@ -9,17 +9,17 @@ namespace me
 {
 	void ColliderPolygon::checkCollision(const ColliderCircle &other, Contact &info) const
 	{
-		CollisionChecker::circlePoly(other, *this, info);
+		PrimitiveQueries::circlePoly(other, *this, info);
 	}
 
 	void ColliderPolygon::checkCollision(const ColliderRect &other, Contact &info) const
 	{
-		CollisionChecker::rectPoly(other, *this, info);
+		PrimitiveQueries::rectPoly(other, *this, info);
 	}
 
 	void ColliderPolygon::checkCollision(const ColliderPolygon &other, Contact &info) const
 	{
-		CollisionChecker::polyPoly(other, *this, info);
+		PrimitiveQueries::polyPoly(other, *this, info);
 	}
 
 	void ColliderPolygon::findTypeAndCheckCollision(const ICollider &other, Contact &info) const

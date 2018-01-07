@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <SFML/System/Vector2.hpp>
+#include <SFML/Graphics/Transform.hpp>
 
 namespace me
 {
@@ -17,7 +18,7 @@ namespace me
 	{
 	public:
 
-		/// Checks for collision between obj1 and obj2.
+		/// Checks for collision between two colliders.
 		static void checkCollision(const ICollider &coll1, const ICollider &coll2, Contact &info);
 
 		// Collision checks for different pairs of colliders.
@@ -32,6 +33,10 @@ namespace me
 		static void polyCircle(const ColliderPolygon &poly, const ColliderCircle &circle, Contact &info);
 		static void polyRect(const ColliderPolygon &poly, const ColliderRect &rect, Contact &info);
 		static void polyPoly(const ColliderPolygon &poly1, const ColliderPolygon &poly2, Contact &info);
+
+		// Closest-point queries
+		static sf::Vector2f closestPtCirclePoint(const sf::Vector2f &circlePos, float circleRadius, const sf::Vector2f &point);
+		static sf::Vector2f closestPtRectPoint(const sf::Transform &rectTransform, float rectHalfwidth, float rectHalfheight, const sf::Vector2f &point);
 
 	private:
 

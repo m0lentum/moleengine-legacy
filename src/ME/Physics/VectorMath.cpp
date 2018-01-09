@@ -19,6 +19,11 @@ namespace me
 		return sf::Vector2f(vector.x / length, vector.y / length);
 	}
 
+	sf::Vector2f VectorMath::abs(const sf::Vector2f &vector)
+	{
+		return sf::Vector2f(std::abs(vector.x), std::abs(vector.y));
+	}
+
 	float VectorMath::dot(const sf::Vector2f &v1, const sf::Vector2f &v2)
 	{
 		return v1.x * v2.x + v1.y * v2.y;

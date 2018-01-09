@@ -47,7 +47,7 @@ namespace me
 			sf::Vector2f point2; // Other farthest point if two are an equal distance away
 		};
 
-		static float EPSILON; // Threshold to determine whether two distances are the same
+		static float EPSILON; // Tolerance to determine whether two directions are the same
 
 		/// Rotate and scale all vectors by the object's values, but do not move them
 		static void transformVectors(std::vector<sf::Vector2f> &vecs, GameObject *obj);
@@ -55,8 +55,7 @@ namespace me
 
 		/// Distance from the origin of a polygon to the farthest point when projected to an axis.
 		static PolyAxisInfo polyWidthOnAxis(const std::vector<sf::Vector2f> &edges, const sf::Vector2f &axis);
-		/// Same for a rectangle
-		static PolyAxisInfo rectWidthOnAxis(const sf::Vector2f dimensions[2], const sf::Vector2f &axis);
+		static float rectWidthOnAxis(const sf::Vector2f &hw, const sf::Vector2f &hh, const sf::Vector2f &axis);
 
 		PrimitiveQueries() {} // can't instantiate
 	};

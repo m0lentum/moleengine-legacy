@@ -11,7 +11,7 @@
 
 namespace me
 {
-	float PrimitiveQueries::EPSILON = 0.001f;
+	float PrimitiveQueries::EPSILON = 0.01f;
 
 
 	void PrimitiveQueries::checkCollision(const ICollider &coll1, const ICollider &coll2, Contact &info)
@@ -38,16 +38,12 @@ namespace me
 	{
 		std::swap(info.obj1, info.obj2);
 		rectCircle(rect, circle, info);
-		std::swap(info.obj1, info.obj2);
-		info.penetration = -info.penetration;
 	}
 
 	void PrimitiveQueries::circlePoly(const ColliderCircle &circle, const ColliderPolygon &poly, Contact &info)
 	{
 		std::swap(info.obj1, info.obj2);
 		polyCircle(poly, circle, info);
-		std::swap(info.obj1, info.obj2);
-		info.penetration = -info.penetration;
 	}
 
 
@@ -69,56 +65,82 @@ namespace me
 
 	void PrimitiveQueries::rectRect(const ColliderRect &rect1, const ColliderRect &rect2, Contact &info)
 	{
-		sf::Vector2f distance = info.obj2->getPosition() - info.obj1->getPosition();
+		sf::Vector2f distance(info.obj2->getPosition() - info.obj1->getPosition());
 
-		float dimensions[2][2] = { { rect1.getHalfWidth() * info.obj1->getScale().x, rect1.getHalfHeight() * info.obj1->getScale().y },
-			{ rect2.getHalfWidth() * info.obj2->getScale().x, rect2.getHalfHeight() * info.obj2->getScale().y } };
+		sf::Vector2f axes[4];
+		axes[0] = VectorMath::rotateDeg(sf::Vector2f(1, 0), info.obj1->getRotation());
+		axes[1] = VectorMath::leftNormal(axes[0]);
+		axes[2] = VectorMath::rotateDeg(sf::Vector2f(1, 0), info.obj2->getRotation());
+		axes[3] = VectorMath::leftNormal(axes[2]);
 
-		sf::Vector2f axes[2][2];
-		float angle1 = VectorMath::degToRad(info.obj1->getRotation());
-		axes[0][0] = sf::Vector2f(std::cos(angle1), std::sin(angle1)); // axes[0] == first rect's axes, axes[1] == second rect's
-		axes[0][1] = VectorMath::leftNormal(axes[0][0]);
-		float angle2 = VectorMath::degToRad(info.obj2->getRotation());
-		axes[1][0] = sf::Vector2f(std::cos(angle2), std::sin(angle2));
-		axes[1][1] = VectorMath::leftNormal(axes[1][0]);
+		float halfwidths[4] = { rect1.getHalfWidth(), rect1.getHalfHeight(), rect2.getHalfWidth(), rect2.getHalfHeight() };
 
 
-		float penDepth = 1000000;
-		int axisOwner = 0;
-		int axisIndex = 0;
-		bool negateAxis = false;
-
-		for (int i = 0; i < 2; i++) // i == which rect we're looking at
+		if (std::abs(VectorMath::dot(axes[0], axes[3])) < EPSILON)
 		{
-			int other = (i + 1) % 2;
-			for (int j = 0; j < 2; j++) // j == which axis of the rect we're looking at
+			// Boxes are parallel, two contact points
+		}
+		else if (std::abs(VectorMath::dot(axes[0], axes[2])) < EPSILON)
+		{
+			// Boxes are perpendicular, two contact points
+		}
+		else
+		{
+			// Boxes differ in orientation (one contact point). Go through each of the four potential separating axes
+			
+			sf::Vector2f dimensions[4];
+			for (int i = 0; i < 4; i++) dimensions[i] = axes[i] * halfwidths[i];
+
+			// flip all the axes to point away from obj1 and towards obj2
+			for (int i = 0; i < 4; i++)
 			{
-				float axisDistance = VectorMath::dot(axes[i][j], distance);
-				float axisWidthSum = dimensions[i][j]
-					+ std::abs(VectorMath::dot(axes[other][0], axes[i][j])) * dimensions[other][0] // project width axis of other rect
-					+ std::abs(VectorMath::dot(axes[other][1], axes[i][j])) * dimensions[other][1];
-				
-				float depth = axisWidthSum - std::abs(axisDistance);
-				if (depth <= 0)
-				{ // no collision on this axis => SAT: no collision at all
-					return;
-				}
-				else if (depth < penDepth)
+				if (VectorMath::dot(axes[i], distance) < 0)
 				{
-					penDepth = depth;
-					axisOwner = i;
-					axisIndex = j;
-					negateAxis = axisDistance > 0; // Penetration should always be towards rectect 1
+					axes[i] = -axes[i];
 				}
 			}
+
+			int penAxis = 0;
+			float penDepth = 100000;
+			for (int i = 0; i < 4; i++)
+			{
+				int startIndex = i < 2 ? 2 : 0;
+
+				float pen = rectWidthOnAxis(dimensions[startIndex], dimensions[startIndex + 1], axes[i]) + halfwidths[i] - std::abs(VectorMath::dot(distance, axes[i]));
+				
+				if (pen < 0) return;
+				else if (pen < penDepth)
+				{
+					penDepth = pen;
+					penAxis = i;
+				}
+			}
+
+			info.areColliding = true;
+			info.penetration = -penDepth * axes[penAxis];
+
+			// point of contact is on the box that doesn't own the axis of shortest separation
+			bool pointOnObj2 = penAxis < 2;
+
+			// find the extreme point on the box that owns the contact point in the direction opposite to the penetration
+			if (pointOnObj2)
+			{
+				for (int i = 2; i <= 3; i++) if (VectorMath::dot(dimensions[i], info.penetration) < 0) dimensions[i] = -dimensions[i];
+
+				info.manifold[0] = info.obj2->getPosition() + dimensions[2] + dimensions[3] - info.penetration; // this works because the axes have been flipped towards obj2
+			}
+			else
+			{
+				for (int i = 0; i <= 1; i++) if (VectorMath::dot(dimensions[i], info.penetration) < 0) dimensions[i] = -dimensions[i];
+
+				info.manifold[0] = info.obj1->getPosition() + dimensions[0] + dimensions[1];
+			}
 		}
+	}
 
-		info.areColliding = true;
-		info.penetration = penDepth * axes[axisOwner][axisIndex];
-
-		if (negateAxis) info.penetration = -info.penetration;
-
-		// TODO: calculate points of impact
+	float PrimitiveQueries::rectWidthOnAxis(const sf::Vector2f &hw, const sf::Vector2f &hh, const sf::Vector2f &axis)
+	{
+		return std::abs(VectorMath::dot(hw, axis)) + std::abs(VectorMath::dot(hh, axis));
 	}
 
 	void PrimitiveQueries::rectPoly(const ColliderRect &rect, const ColliderPolygon &poly, Contact &info)
@@ -177,6 +199,7 @@ namespace me
 
 	void PrimitiveQueries::polyRect(const ColliderPolygon &poly, const ColliderRect &rect, Contact &info)
 	{
+		//BROKEN
 		sf::Vector2f distance = info.obj2->getPosition() - info.obj1->getPosition();
 
 		std::vector<sf::Vector2f> edges = poly.getEdges();
@@ -204,7 +227,7 @@ namespace me
 			}
 
 			PolyAxisInfo w1 = polyWidthOnAxis(edges, axis);
-			PolyAxisInfo w2 = rectWidthOnAxis(rectDimensions, axis);
+			PolyAxisInfo w2;// = rectWidthOnAxis(rectDimensions, axis);
 
 			float depth = w1.width + w2.width - distOnAxis;
 			if (depth < 0) // no collision on this axis => SAT: no collision at all
@@ -346,41 +369,6 @@ namespace me
 				info.hasPoint2 = false;
 				info.point1 = curr;
 			}
-		}
-
-		return info;
-	}
-
-	PrimitiveQueries::PolyAxisInfo PrimitiveQueries::rectWidthOnAxis(const sf::Vector2f dimensions[2], const sf::Vector2f &axis)
-	{
-		PolyAxisInfo info;
-
-		float wLength = VectorMath::dot(dimensions[0], axis);
-		float hLength = VectorMath::dot(dimensions[1], axis);
-
-		info.width = std::abs(wLength) + std::abs(hLength);
-
-		// Find the farthest point(s) along this axis
-		float wDir = wLength > 0 ? 1.0f : -1.0f;
-		float hDir = hLength > 0 ? 1.0f : -1.0f;
-
-		if (std::abs(wLength) < EPSILON)
-		{
-			info.hasPoint2 = true;
-			sf::Vector2f middle = dimensions[0] * wDir;
-			info.point1 = middle + dimensions[1];
-			info.point2 = middle - dimensions[1];
-		}
-		else if (std::abs(hLength) < EPSILON)
-		{
-			info.hasPoint2 = true;
-			sf::Vector2f middle = dimensions[1] * hDir;
-			info.point1 = middle + dimensions[0];
-			info.point2 = middle - dimensions[0];
-		}
-		else
-		{
-			info.point1 = wDir * dimensions[0] + hDir * dimensions[1];
 		}
 
 		return info;

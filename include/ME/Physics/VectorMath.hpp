@@ -15,6 +15,8 @@ namespace me
 		float getLengthSquared(const sf::Vector2f &vector);
 		/// Returns a vector with the same direction as this one but a length of 1.
 		sf::Vector2f normalize(const sf::Vector2f &vector);
+		/// std::abs both coordinates
+		sf::Vector2f abs(const sf::Vector2f &vector);
 
 		/// Dot product of two vectors.
 		float dot(const sf::Vector2f &v1, const sf::Vector2f &v2);

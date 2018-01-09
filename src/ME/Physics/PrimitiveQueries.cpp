@@ -54,12 +54,20 @@ namespace me
 		sf::Vector2f distance = closest - info.obj2->getPosition();
 		float radius = circle.getRadius();
 
-		float penSquared = VectorMath::getLengthSquared(distance) - radius * radius;
-		if (penSquared < 0.0f)
+		if (VectorMath::getLengthSquared(distance) > 0.0001f)
 		{
-			info.areColliding = true;
-			info.penetration = std::sqrtf(penSquared) * VectorMath::normalize(distance);
-			info.manifold[0] = closest;
+			float pen = radius - VectorMath::getLength(distance);
+			if (pen > 0.0f)
+			{
+				info.areColliding = true;
+				info.penetration = pen * VectorMath::normalize(distance);
+				info.manifold[0] = closest;
+			}
+		}
+		else
+		{
+			// Circle center is inside the rect (deep penetration)
+
 		}
 	}
 
@@ -131,7 +139,7 @@ namespace me
 			}
 			else
 			{
-				for (int i = 0; i <= 1; i++) if (VectorMath::dot(dimensions[i], info.penetration) < 0) dimensions[i] = -dimensions[i];
+				for (int i = 0; i <= 1; i++) if (VectorMath::dot(dimensions[i], info.penetration) > 0) dimensions[i] = -dimensions[i];
 
 				info.manifold[0] = info.obj1->getPosition() + dimensions[0] + dimensions[1];
 			}

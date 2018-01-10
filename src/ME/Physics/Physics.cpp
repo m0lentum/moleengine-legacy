@@ -82,6 +82,10 @@ namespace me
 					{
 						DebugMarkerFactory::makePoint(m_space, info.manifold[0]);
 					}
+					if (info.manifold[1].x != 0 || info.manifold[1].y != 0)
+					{
+						DebugMarkerFactory::makePoint(m_space, info.manifold[1]);
+					}
 				}
 			}
 		}

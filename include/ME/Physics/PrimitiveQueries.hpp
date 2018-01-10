@@ -14,6 +14,15 @@ namespace me
 	struct Contact;
 	class GameObject;
 
+	struct EdgeEdgeIntersection
+	{
+		// When two edges are parallel we need two contact points
+		bool doesIntersect = false;
+		sf::Vector2f penetration;
+		sf::Vector2f point1;
+		sf::Vector2f point2;
+	};
+
 	class PrimitiveQueries
 	{
 	public:
@@ -38,6 +47,11 @@ namespace me
 		static sf::Vector2f closestPtOnCircleToPoint(const sf::Vector2f &circlePos, float circleRadius, const sf::Vector2f &point);
 		static sf::Vector2f closestPtOnRectToPoint(const sf::Transform &rectTransform, float rectHalfwidth, float rectHalfheight, const sf::Vector2f &point);
 
+		// AABB queries
+
+		/// Returns whether or not two AABBs intersect and if so, the two points where they do, projected onto the surface of the first box
+		static EdgeEdgeIntersection intersectAABBs(const sf::Vector2f &pos1, float hw1, float hh1, const sf::Vector2f &pos2, float hw2, float hh2);
+
 	private:
 
 		struct PolyAxisInfo {
@@ -56,6 +70,9 @@ namespace me
 		/// Distance from the origin of a polygon to the farthest point when projected to an axis.
 		static PolyAxisInfo polyWidthOnAxis(const std::vector<sf::Vector2f> &edges, const sf::Vector2f &axis);
 		static float rectWidthOnAxis(const sf::Vector2f &hw, const sf::Vector2f &hh, const sf::Vector2f &axis);
+
+		/// Helper function to treat two parallel OBBs as AABBs
+		static EdgeEdgeIntersection intersectParallelRects(const sf::Transform &transform, const sf::Vector2f &pos1, const sf::Vector2f &pos2, float hw1, float hw2, float hw3, float hw4);
 
 		PrimitiveQueries() {} // can't instantiate
 	};

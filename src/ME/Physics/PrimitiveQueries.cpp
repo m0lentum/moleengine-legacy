@@ -11,7 +11,7 @@
 
 namespace me
 {
-	float PrimitiveQueries::EPSILON = 0.01f;
+	float PrimitiveQueries::EPSILON = 0.03f;
 
 
 	void PrimitiveQueries::checkCollision(const ICollider &coll1, const ICollider &coll2, Contact &info)
@@ -105,23 +105,44 @@ namespace me
 		axes[2] = VectorMath::rotateDeg(sf::Vector2f(1, 0), info.obj2->getRotation());
 		axes[3] = VectorMath::leftNormal(axes[2]);
 
-		float halfwidths[4] = { rect1.getHalfWidth(), rect1.getHalfHeight(), rect2.getHalfWidth(), rect2.getHalfHeight() };
+		float hw[4] = { rect1.getHalfWidth() * info.obj1->getScale().x,
+			rect1.getHalfHeight() * info.obj1->getScale().y, 
+			rect2.getHalfWidth() * info.obj2->getScale().x,
+			rect2.getHalfHeight() * info.obj2->getScale().y };
 
 
 		if (std::abs(VectorMath::dot(axes[0], axes[3])) < EPSILON)
 		{
 			// Boxes are parallel, two contact points
+			EdgeEdgeIntersection is = intersectParallelRects(info.obj1->getTransform(), info.obj1->getPosition(), 
+				info.obj2->getPosition(), hw[0], hw[1], hw[2], hw[3]);
+			
+			if (!is.doesIntersect) return;
+
+			info.areColliding = true;
+			info.penetration = is.penetration;
+			info.manifold[0] = is.point1;
+			info.manifold[1] = is.point2;
 		}
 		else if (std::abs(VectorMath::dot(axes[0], axes[2])) < EPSILON)
 		{
 			// Boxes are perpendicular, two contact points
+			EdgeEdgeIntersection is = intersectParallelRects(info.obj1->getTransform(), info.obj1->getPosition(), 
+				info.obj2->getPosition(), hw[0], hw[1], hw[3], hw[2]);
+
+			if (!is.doesIntersect) return;
+
+			info.areColliding = true;
+			info.penetration = is.penetration;
+			info.manifold[0] = is.point1;
+			info.manifold[1] = is.point2;
 		}
 		else
 		{
 			// Boxes differ in orientation (one contact point). Go through each of the four potential separating axes
 			
 			sf::Vector2f dimensions[4];
-			for (int i = 0; i < 4; i++) dimensions[i] = axes[i] * halfwidths[i];
+			for (int i = 0; i < 4; i++) dimensions[i] = axes[i] * hw[i];
 
 			// flip all the axes to point away from obj1 and towards obj2
 			for (int i = 0; i < 4; i++)
@@ -138,7 +159,7 @@ namespace me
 			{
 				int startIndex = i < 2 ? 2 : 0;
 
-				float pen = rectWidthOnAxis(dimensions[startIndex], dimensions[startIndex + 1], axes[i]) + halfwidths[i] - std::abs(VectorMath::dot(distance, axes[i]));
+				float pen = rectWidthOnAxis(dimensions[startIndex], dimensions[startIndex + 1], axes[i]) + hw[i] - std::abs(VectorMath::dot(distance, axes[i]));
 				
 				if (pen < 0) return;
 				else if (pen < penDepth)
@@ -168,6 +189,19 @@ namespace me
 				info.manifold[0] = info.obj1->getPosition() + dimensions[0] + dimensions[1];
 			}
 		}
+	}
+
+	EdgeEdgeIntersection PrimitiveQueries::intersectParallelRects(const sf::Transform &transform, const sf::Vector2f &pos1, const sf::Vector2f &pos2, float hw1, float hw2, float hw3, float hw4)
+	{
+		EdgeEdgeIntersection is = intersectAABBs(sf::Vector2f(0, 0), hw1, hw2, transform.getInverse() * pos2, hw3, hw4);
+
+		if (!is.doesIntersect) return is;
+
+		is.penetration = transform * is.penetration - pos1;
+		is.point1 = transform * is.point1;
+		is.point2 = transform * is.point2;
+
+		return is;
 	}
 
 	float PrimitiveQueries::rectWidthOnAxis(const sf::Vector2f &hw, const sf::Vector2f &hh, const sf::Vector2f &axis)
@@ -360,7 +394,49 @@ namespace me
 	}
 
 
-	// ======================================= INTERNAL ===============================================
+	// ======================================= OTHER ===============================================
+
+	EdgeEdgeIntersection PrimitiveQueries::intersectAABBs(const sf::Vector2f &pos1, float hw1, float hh1, const sf::Vector2f &pos2, float hw2, float hh2)
+	{
+		EdgeEdgeIntersection intersection;
+
+		float distX = pos2.x - pos1.x;
+		float penX = (hw1 + hw2) - std::abs(distX);
+		if (penX < 0) return intersection;
+
+		float distY = pos2.y - pos1.y;
+		float penY = (hh1 + hh2) - std::abs(distY);
+		if (penY < 0) return intersection;
+
+		// there is an intersection, figure out which axis has the least penetration
+		intersection.doesIntersect = true;
+		if (penX > penY)
+		{
+			float x[4] = { pos1.x - hw1, pos2.x - hw2, pos1.x + hw1, pos2.x + hw2 };
+			float y = pos1.y + (distY > 0 ? hh1 : -hh1);
+			intersection.point1.x = x[0] > x[1] ? x[0] : x[1];
+			intersection.point2.x = x[2] < x[3] ? x[2] : x[3];
+			intersection.point1.y = y;
+			intersection.point2.y = y;
+			
+			intersection.penetration.y = distY > 0 ? -penY : penY;
+			intersection.penetration.x = 0;
+		}
+		else
+		{
+			float y[4] = { pos1.y - hh1, pos2.y - hh2, pos1.y + hh1, pos2.y + hh2 };
+			float x = pos1.x + (distX > 0 ? hw1 : -hw1);
+			intersection.point1.y = y[0] > y[1] ? y[0] : y[1];
+			intersection.point2.y = y[2] < y[3] ? y[2] : y[3];
+			intersection.point1.x = x;
+			intersection.point2.x = x;
+
+			intersection.penetration.x = distX > 0 ? -penX : penX;
+			intersection.penetration.y = 0;
+		}
+
+		return intersection;
+	}
 
 	void PrimitiveQueries::transformVectors(std::vector<sf::Vector2f> &vecs, GameObject *obj)
 	{

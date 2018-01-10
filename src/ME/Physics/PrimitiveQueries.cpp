@@ -316,7 +316,7 @@ namespace me
 		}
 		else
 		{
-			return circlePos + diff * (circleRadius / std::sqrtf(distSquared));
+			return circlePos + diff * (circleRadius / std::sqrt(distSquared));
 		}
 	}
 

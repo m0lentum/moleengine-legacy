@@ -50,7 +50,7 @@ namespace me
 	//===================  RECT and X  ===================
 	void PrimitiveQueries::rectCircle(const ColliderRect &rect, const ColliderCircle &circle, Contact &info)
 	{
-		sf::Vector2f closest = closestPtRectPoint(info.obj1->getTransform(), rect.getHalfWidth(), rect.getHalfHeight(), info.obj2->getPosition());
+		sf::Vector2f closest = closestPtOnRectToPoint(info.obj1->getTransform(), rect.getHalfWidth(), rect.getHalfHeight(), info.obj2->getPosition());
 		sf::Vector2f distance = closest - info.obj2->getPosition();
 		float radius = circle.getRadius();
 
@@ -66,8 +66,32 @@ namespace me
 		}
 		else
 		{
-			// Circle center is inside the rect (deep penetration)
+			info.areColliding = true;
 
+			// Circle center is inside the rect (deep penetration). The axis of minimum penetration is one of the rect's normals.
+			sf::Vector2f axis1 = VectorMath::rotateDeg(sf::Vector2f(1, 0), info.obj1->getRotation());
+			sf::Vector2f axis2 = VectorMath::leftNormal(axis1);
+
+			sf::Vector2f diff = closest - info.obj1->getPosition();
+
+			float dot1 = VectorMath::dot(axis1, diff);
+			float dot2 = VectorMath::dot(axis2, diff);
+
+			float pen1 = rect.getHalfWidth() - std::abs(dot1);
+			float pen2 = rect.getHalfHeight() - std::abs(dot2);
+
+			if (pen1 < pen2)
+			{
+				float sign = dot1 > 0 ? 1.0f : -1.0f;
+				info.penetration = -sign * (pen1 + radius) * axis1;
+				info.manifold[0] = closest + sign * pen1 * axis1;
+			}
+			else
+			{
+				float sign = dot2 > 0 ? 1.0f : -1.0f;
+				info.penetration = -sign * (pen2 + radius) * axis2;
+				info.manifold[0] = closest + sign * pen2 * axis2;
+			}
 		}
 	}
 
@@ -304,7 +328,7 @@ namespace me
 
 	// ===================================== CLOSEST POINT ============================================
 
-	sf::Vector2f PrimitiveQueries::closestPtCirclePoint(const sf::Vector2f &circlePos, float circleRadius, const sf::Vector2f &point)
+	sf::Vector2f PrimitiveQueries::closestPtOnCircleToPoint(const sf::Vector2f &circlePos, float circleRadius, const sf::Vector2f &point)
 	{
 		sf::Vector2f diff = point - circlePos;
 		float distSquared = VectorMath::getLengthSquared(diff);
@@ -320,7 +344,7 @@ namespace me
 		}
 	}
 
-	sf::Vector2f PrimitiveQueries::closestPtRectPoint(const sf::Transform &rectTransform, float rectHalfwidth, float rectHalfheight, const sf::Vector2f &point)
+	sf::Vector2f PrimitiveQueries::closestPtOnRectToPoint(const sf::Transform &rectTransform, float rectHalfwidth, float rectHalfheight, const sf::Vector2f &point)
 	{
 		// transform to rect local space
 		sf::Vector2f closest = rectTransform.getInverse() * point;

@@ -35,8 +35,8 @@ namespace me
 		static void polyPoly(const ColliderPolygon &poly1, const ColliderPolygon &poly2, Contact &info);
 
 		// Closest-point queries
-		static sf::Vector2f closestPtCirclePoint(const sf::Vector2f &circlePos, float circleRadius, const sf::Vector2f &point);
-		static sf::Vector2f closestPtRectPoint(const sf::Transform &rectTransform, float rectHalfwidth, float rectHalfheight, const sf::Vector2f &point);
+		static sf::Vector2f closestPtOnCircleToPoint(const sf::Vector2f &circlePos, float circleRadius, const sf::Vector2f &point);
+		static sf::Vector2f closestPtOnRectToPoint(const sf::Transform &rectTransform, float rectHalfwidth, float rectHalfheight, const sf::Vector2f &point);
 
 	private:
 

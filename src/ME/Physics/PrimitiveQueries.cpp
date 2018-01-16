@@ -223,7 +223,7 @@ namespace me
 	{
 		sf::Vector2f distance = info.obj2->getPosition() - info.obj1->getPosition();
 		
-		std::vector<sf::Vector2f> edges = poly.getEdges();
+		/*std::vector<sf::Vector2f> edges = poly.getEdges();
 		transformVectors(edges, info.obj1);
 		std::vector<sf::Vector2f> axes = poly.getAxes();
 		rotateVectors(axes, info.obj1->getRotation());
@@ -260,7 +260,7 @@ namespace me
 		}
 
 		info.areColliding = true;
-		info.penetration = -penAxis * penDepth;
+		info.penetration = -penAxis * penDepth;*/
 	}
 
 	void PrimitiveQueries::polyRect(const ColliderPolygon &poly, const ColliderRect &rect, Contact &info)
@@ -268,7 +268,7 @@ namespace me
 		//BROKEN
 		sf::Vector2f distance = info.obj2->getPosition() - info.obj1->getPosition();
 
-		std::vector<sf::Vector2f> edges = poly.getEdges();
+		/*std::vector<sf::Vector2f> edges = poly.getEdges();
 		transformVectors(edges, info.obj1);
 		std::vector<sf::Vector2f> axes = poly.getAxes();
 		rotateVectors(axes, info.obj1->getRotation());
@@ -308,7 +308,7 @@ namespace me
 		}
 
 		info.areColliding = true;
-		info.penetration = -penDepth * penAxis;
+		info.penetration = -penDepth * penAxis;*/
 
 	}
 
@@ -316,7 +316,7 @@ namespace me
 	{
 		sf::Vector2f distance = info.obj2->getPosition() - info.obj1->getPosition();
 
-		std::vector<sf::Vector2f> edges1 = poly1.getEdges();
+		/*std::vector<sf::Vector2f> edges1 = poly1.getEdges();
 		std::vector<sf::Vector2f> edges2 = poly2.getEdges();
 		transformVectors(edges1, info.obj1);
 		transformVectors(edges2, info.obj2);
@@ -355,7 +355,7 @@ namespace me
 		}
 
 		info.areColliding = true;
-		info.penetration = -penDepth * penAxis;
+		info.penetration = -penDepth * penAxis;*/
 	}
 
 

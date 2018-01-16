@@ -14,13 +14,13 @@ namespace me
 	{
 	private:
 		
-		std::vector<sf::Vector2f> m_edges;
-		std::vector<sf::Vector2f> m_axes;
+		std::vector<sf::Vector2f> m_points;
+		std::vector<sf::Vector2f> m_normals;
 
 	public:
 
-		std::vector<sf::Vector2f> getEdges() const;
-		std::vector<sf::Vector2f> getAxes() const;
+		std::vector<sf::Vector2f> getPoints() const;
+		std::vector<sf::Vector2f> getNormals() const;
 
 
 		/// Calculate the area of the polygon.
@@ -46,8 +46,7 @@ namespace me
 		/// PointsToEdges in reverse
 		static std::vector<sf::Vector2f> edgesToPoints(const std::vector<sf::Vector2f> &edges);
 
-		/// Calculate axes from edges
-		void calculateAxes();
+		void calculateNormals();
 
 	public:
 

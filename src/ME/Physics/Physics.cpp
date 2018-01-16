@@ -75,7 +75,7 @@ namespace me
 
 				if (info.areColliding)
 				{
-					info.obj1->move(info.penetration);
+					//info.obj1->move(info.penetration);
 
 					//DebugMarkerFactory::makeLineSegment(m_space, info.obj1->getPosition(), info.obj2->getPosition());
 					if (info.manifold[0].x != 0 || info.manifold[0].y != 0)

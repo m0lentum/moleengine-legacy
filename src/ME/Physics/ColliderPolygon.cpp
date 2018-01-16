@@ -29,52 +29,56 @@ namespace me
 
 
 
-	std::vector<sf::Vector2f> ColliderPolygon::getEdges() const
+	std::vector<sf::Vector2f> ColliderPolygon::getPoints() const
 	{
-		return m_edges;
+		return m_points;
 	}
 
-	std::vector<sf::Vector2f> ColliderPolygon::getAxes() const
+	std::vector<sf::Vector2f> ColliderPolygon::getNormals() const
 	{
-		return m_axes;
+		return m_normals;
 	}
 
 
 	float ColliderPolygon::getArea()
 	{
-		float getArea = 0;
-		sf::Vector2f curr, next; // the sum of edges so far == vector from the first point to the current one
-		for (std::vector<sf::Vector2f>::size_type i = 1; i < m_edges.size() - 1; i++)
+		float area = 0;
+		auto last = m_points.size() - 1;
+		for (std::vector<sf::Vector2f>::size_type i = 1; i <= last; i++)
 		{
-			curr += m_edges[i];
-			next = curr + m_edges[i + 1];
-
-			getArea += std::abs(curr.x * next.y - curr.y * next.x);
+			area += m_points[i-1].x * m_points[i].y - m_points[i-1].y * m_points[i].x;
 		}
+		area += m_points[last].x * m_points[0].y - m_points[last].y * m_points[0].x;
 
-		return getArea / 2;
+		if (area < 0) area = -area;
+		return area / 2;
 	}
 
 	void ColliderPolygon::center()
 	{
-		float area = getArea();
+		float areaTimes2 = 0;
 
 		// Calculate the centroid relative to the first point of the polygon
-		sf::Vector2f weightedSumOfC, curr, next;
-		for (std::vector<sf::Vector2f>::size_type i = 1; i < m_edges.size() - 1; i++)
+		sf::Vector2f weightedSumOfC;
+		auto last = m_points.size() - 1;
+		for (std::vector<sf::Vector2f>::size_type i = 1; i <= last; i++)
 		{
-			curr += m_edges[i];
-			next = curr + m_edges[i + 1];
-
-			sf::Vector2f ctr = curr + next; // this is actually 3 times the centroid, but we will do the division later
-			float weight = std::abs(curr.x * next.y - curr.y * next.x);
+			sf::Vector2f ctr = m_points[i-1] + m_points[i]; // this is actually 3 times the centroid, but we will do the division later
+			float weight = m_points[i-1].x * m_points[i].y - m_points[i-1].y * m_points[i].x;
+			areaTimes2 += weight;
 
 			weightedSumOfC += ctr * weight;
 		}
+		sf::Vector2f ctr = m_points[last] + m_points[0]; // last pair : last to first
+		float weight = m_points[last].x * m_points[0].y - m_points[last].y * m_points[0].x;
+		areaTimes2 += weight;
+		weightedSumOfC += ctr * weight;
 
-		sf::Vector2f centroid = weightedSumOfC / (6 * area);
 
-		m_edges[0] = -centroid; // the first point in the edges represents the centroid
+		sf::Vector2f centroid = weightedSumOfC / (3 * areaTimes2);
+
+		// move each point so they're placed relative to the centroid
+		for (auto &point : m_points) point -= centroid;
 	}
 
 
@@ -82,7 +86,7 @@ namespace me
 
 	sf::VertexArray ColliderPolygon::toVertexArray(const sf::Color &color) const
 	{
-		return Graphic::makePolygon(edgesToPoints(m_edges), color);
+		return Graphic::makePolygon(m_points, color);
 	}
 
 
@@ -116,30 +120,28 @@ namespace me
 	}
 
 
-	void ColliderPolygon::calculateAxes()
+	void ColliderPolygon::calculateNormals()
 	{
-		// Determine which direction the edges are going so we know which way is out. 1 = clockwise, -1 = counter-clockwise
-		float direction = VectorMath::dot(VectorMath::leftNormal(m_edges[2]), m_edges[1]) > 0 ? 1.0f : -1.0f;
+		m_normals.reserve(m_points.size());
+		// use left normal of each edge if edges are clockwise, otherwise right normal
+		float direction = m_points[1].x * m_points[0].y - m_points[1].y * m_points[0].x > 0 ? 1.0f : -1.0f;
 
-		sf::Vector2f sum; // The last edge is not stored so we calculate it
-		for (std::vector<sf::Vector2f>::size_type i = 1; i < m_edges.size(); i++)
+		for (std::vector<sf::Vector2f>::size_type i = 1; i < m_points.size(); i++)
 		{
-			m_axes.push_back(VectorMath::normalize(VectorMath::leftNormal(m_edges[i]) * direction));
-
-			sum -= m_edges[i]; // negative sum ends up being the vector from the last point to the first
+			m_normals.push_back(VectorMath::normalize(VectorMath::leftNormal(m_points[i] - m_points[i-1]) * direction));
 		}
 		
 		// Last edge
-		m_axes.push_back(VectorMath::normalize(VectorMath::leftNormal(sum) * direction));
+		m_normals.push_back(VectorMath::normalize(VectorMath::leftNormal(m_points[0] - m_points[m_points.size() - 1]) * direction));
 	}
 
 
 	ColliderPolygon::ColliderPolygon(std::initializer_list<sf::Vector2f> points, bool autoCenter) :
-		m_edges(pointsToEdges(points))
+		m_points(points)
 	{
 		if (autoCenter) center();
 
-		calculateAxes();
+		calculateNormals();
 	}
 
 	ColliderPolygon::ColliderPolygon(std::initializer_list<float> coords, bool autoCenter)
@@ -151,21 +153,19 @@ namespace me
 			std::cerr << "Warning: odd number of coordinates given to ColliderPolygon." << std::endl;
 		}
 
-		std::vector<sf::Vector2f> points;
+		m_points.reserve(coords.size() / 2);
 		for (auto i = coords.begin(); i != end; i += 2) {
-			points.push_back(sf::Vector2f(*i, *(i + 1)));
+			m_points.push_back(sf::Vector2f(*i, *(i + 1)));
 		}
-
-		m_edges = pointsToEdges(points);
 
 		if (autoCenter) center();
 
-		calculateAxes();
+		calculateNormals();
 	}
 
 	ColliderPolygon::ColliderPolygon(const ColliderPolygon &copy) :
-		m_edges(copy.m_edges),
-		m_axes(copy.m_axes)
+		m_points(copy.m_points),
+		m_normals(copy.m_normals)
 	{
 	}
 }

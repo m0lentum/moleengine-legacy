@@ -29,12 +29,12 @@ namespace me
 
 
 
-	std::vector<sf::Vector2f> ColliderPolygon::getPoints() const
+	const std::vector<sf::Vector2f>& ColliderPolygon::getPoints() const
 	{
 		return m_points;
 	}
 
-	std::vector<sf::Vector2f> ColliderPolygon::getNormals() const
+	const std::vector<sf::Vector2f>& ColliderPolygon::getNormals() const
 	{
 		return m_normals;
 	}

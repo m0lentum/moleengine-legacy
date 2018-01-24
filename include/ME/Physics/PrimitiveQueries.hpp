@@ -54,21 +54,14 @@ namespace me
 
 	private:
 
-		struct PolyAxisInfo {
-			float width = 0; // Width when projected to the given axis
-			sf::Vector2f point1; // Farthest point along the axis
-			bool hasPoint2 = false;
-			sf::Vector2f point2; // Other farthest point if two are an equal distance away
-		};
-
 		static float EPSILON; // Tolerance to determine whether two directions are the same
 
 		/// Rotate and scale all vectors by the object's values, but do not move them
-		static void transformVectors(std::vector<sf::Vector2f> &vecs, GameObject *obj);
-		static void rotateVectors(std::vector<sf::Vector2f> &vecs, float angle);
+		static std::vector<sf::Vector2f> transformPolyPoints(const std::vector<sf::Vector2f> &vecs, GameObject *obj);
+		static std::vector<sf::Vector2f> rotatePolyNormals(const std::vector<sf::Vector2f> &vecs, float angle);
 
 		/// Distance from the origin of a polygon to the farthest point when projected to an axis.
-		static PolyAxisInfo polyWidthOnAxis(const std::vector<sf::Vector2f> &edges, const sf::Vector2f &axis);
+		static float polyHalfwidthOnAxis(const std::vector<sf::Vector2f> &points, const sf::Vector2f &axis);
 		static float rectWidthOnAxis(const sf::Vector2f &hw, const sf::Vector2f &hh, const sf::Vector2f &axis);
 
 		/// Helper function to treat two parallel OBBs as AABBs

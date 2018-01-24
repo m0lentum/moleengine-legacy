@@ -19,8 +19,8 @@ namespace me
 
 	public:
 
-		std::vector<sf::Vector2f> getPoints() const;
-		std::vector<sf::Vector2f> getNormals() const;
+		const std::vector<sf::Vector2f>& getPoints() const;
+		const std::vector<sf::Vector2f>& getNormals() const;
 
 
 		/// Calculate the area of the polygon.

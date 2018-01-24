@@ -99,11 +99,11 @@ namespace me
 	{
 		sf::Vector2f distance(info.obj2->getPosition() - info.obj1->getPosition());
 
-		sf::Vector2f axes[4];
-		axes[0] = VectorMath::rotateDeg(sf::Vector2f(1, 0), info.obj1->getRotation());
-		axes[1] = VectorMath::leftNormal(axes[0]);
-		axes[2] = VectorMath::rotateDeg(sf::Vector2f(1, 0), info.obj2->getRotation());
-		axes[3] = VectorMath::leftNormal(axes[2]);
+		sf::Vector2f normals[4];
+		normals[0] = VectorMath::rotateDeg(sf::Vector2f(1, 0), info.obj1->getRotation());
+		normals[1] = VectorMath::leftNormal(normals[0]);
+		normals[2] = VectorMath::rotateDeg(sf::Vector2f(1, 0), info.obj2->getRotation());
+		normals[3] = VectorMath::leftNormal(normals[2]);
 
 		float hw[4] = { rect1.getHalfWidth() * info.obj1->getScale().x,
 			rect1.getHalfHeight() * info.obj1->getScale().y, 
@@ -111,7 +111,7 @@ namespace me
 			rect2.getHalfHeight() * info.obj2->getScale().y };
 
 
-		if (std::abs(VectorMath::dot(axes[0], axes[3])) < EPSILON)
+		if (std::abs(VectorMath::dot(normals[0], normals[3])) < EPSILON)
 		{
 			// Boxes are parallel, two contact points
 			EdgeEdgeIntersection is = intersectParallelRects(info.obj1->getTransform(), info.obj1->getPosition(), 
@@ -124,7 +124,7 @@ namespace me
 			info.manifold[0] = is.point1;
 			info.manifold[1] = is.point2;
 		}
-		else if (std::abs(VectorMath::dot(axes[0], axes[2])) < EPSILON)
+		else if (std::abs(VectorMath::dot(normals[0], normals[2])) < EPSILON)
 		{
 			// Boxes are perpendicular, two contact points
 			EdgeEdgeIntersection is = intersectParallelRects(info.obj1->getTransform(), info.obj1->getPosition(), 
@@ -139,17 +139,17 @@ namespace me
 		}
 		else
 		{
-			// Boxes differ in orientation (one contact point). Go through each of the four potential separating axes
+			// Boxes differ in orientation (one contact point). Go through each of the four potential separating normals
 			
 			sf::Vector2f dimensions[4];
-			for (int i = 0; i < 4; i++) dimensions[i] = axes[i] * hw[i];
+			for (int i = 0; i < 4; i++) dimensions[i] = normals[i] * hw[i];
 
-			// flip all the axes to point away from obj1 and towards obj2
+			// flip all the normals to point away from obj1 and towards obj2
 			for (int i = 0; i < 4; i++)
 			{
-				if (VectorMath::dot(axes[i], distance) < 0)
+				if (VectorMath::dot(normals[i], distance) < 0)
 				{
-					axes[i] = -axes[i];
+					normals[i] = -normals[i];
 				}
 			}
 
@@ -159,7 +159,7 @@ namespace me
 			{
 				int startIndex = i < 2 ? 2 : 0;
 
-				float pen = rectWidthOnAxis(dimensions[startIndex], dimensions[startIndex + 1], axes[i]) + hw[i] - std::abs(VectorMath::dot(distance, axes[i]));
+				float pen = rectWidthOnAxis(dimensions[startIndex], dimensions[startIndex + 1], normals[i]) + hw[i] - std::abs(VectorMath::dot(distance, normals[i]));
 				
 				if (pen < 0) return;
 				else if (pen < penDepth)
@@ -170,7 +170,7 @@ namespace me
 			}
 
 			info.areColliding = true;
-			info.penetration = -penDepth * axes[penAxis];
+			info.penetration = -penDepth * normals[penAxis];
 
 			// point of contact is on the box that doesn't own the axis of shortest separation
 			bool pointOnObj2 = penAxis < 2;
@@ -180,7 +180,7 @@ namespace me
 			{
 				for (int i = 2; i <= 3; i++) if (VectorMath::dot(dimensions[i], info.penetration) < 0) dimensions[i] = -dimensions[i];
 
-				info.manifold[0] = info.obj2->getPosition() + dimensions[2] + dimensions[3] - info.penetration; // this works because the axes have been flipped towards obj2
+				info.manifold[0] = info.obj2->getPosition() + dimensions[2] + dimensions[3] - info.penetration; // this works because the normals have been flipped towards obj2
 			}
 			else
 			{
@@ -224,19 +224,19 @@ namespace me
 		sf::Vector2f distance = info.obj2->getPosition() - info.obj1->getPosition();
 		
 		/*std::vector<sf::Vector2f> edges = poly.getEdges();
-		transformVectors(edges, info.obj1);
-		std::vector<sf::Vector2f> axes = poly.getAxes();
-		rotateVectors(axes, info.obj1->getRotation());
+		transformPolyPoints(edges, info.obj1);
+		std::vector<sf::Vector2f> normals = poly.getAxes();
+		rotatePolyNormals(normals, info.obj1->getRotation());
 		float radius = circle.getRadius();
 
 		// With the circle we also need to check the axis between its center and the closest point to it
 		sf::Vector2f closestPoint = info.obj1->getPosition() + polyWidthOnAxis(edges, distance).point1;
 		sf::Vector2f toCircle = info.obj2->getPosition() - closestPoint;
-		axes.push_back(VectorMath::normalize(toCircle));
+		normals.push_back(VectorMath::normalize(toCircle));
 
 		float penDepth = 100000;
 		sf::Vector2f penAxis;
-		for (auto &axis : axes)
+		for (auto &axis : normals)
 		{
 			float distOnAxis = VectorMath::dot(axis, distance);
 			if (distOnAxis < 0)
@@ -269,21 +269,21 @@ namespace me
 		sf::Vector2f distance = info.obj2->getPosition() - info.obj1->getPosition();
 
 		/*std::vector<sf::Vector2f> edges = poly.getEdges();
-		transformVectors(edges, info.obj1);
-		std::vector<sf::Vector2f> axes = poly.getAxes();
-		rotateVectors(axes, info.obj1->getRotation());
+		transformPolyPoints(edges, info.obj1);
+		std::vector<sf::Vector2f> normals = poly.getAxes();
+		rotatePolyNormals(normals, info.obj1->getRotation());
 
 		float angle = VectorMath::degToRad(info.obj2->getRotation());
 		sf::Vector2f rectWAxis = sf::Vector2f(std::cos(angle), std::sin(angle));
 		sf::Vector2f rectHAxis = VectorMath::leftNormal(rectWAxis);
-		axes.push_back(rectWAxis);
-		axes.push_back(rectHAxis);
+		normals.push_back(rectWAxis);
+		normals.push_back(rectHAxis);
 
 		sf::Vector2f rectDimensions[2] = { rectWAxis * rect.getHalfWidth(), rectHAxis * rect.getHalfHeight() };
 
 		float penDepth = 100000;
 		sf::Vector2f penAxis;
-		for (auto &axis : axes)
+		for (auto &axis : normals)
 		{
 			float distOnAxis = VectorMath::dot(axis, distance);
 			if (distOnAxis < 0)
@@ -316,46 +316,42 @@ namespace me
 	{
 		sf::Vector2f distance = info.obj2->getPosition() - info.obj1->getPosition();
 
-		/*std::vector<sf::Vector2f> edges1 = poly1.getEdges();
-		std::vector<sf::Vector2f> edges2 = poly2.getEdges();
-		transformVectors(edges1, info.obj1);
-		transformVectors(edges2, info.obj2);
-
-		std::vector<sf::Vector2f> axes = poly1.getAxes();
-		std::vector<sf::Vector2f> otherAxes = poly2.getAxes();
-		rotateVectors(axes, info.obj1->getRotation());
-		rotateVectors(otherAxes, info.obj2->getRotation());
-		axes.insert(axes.end(), otherAxes.begin(), otherAxes.end()); // Put all axes into one vector for easy iteration
+		std::vector<sf::Vector2f> points[2] = { transformPolyPoints(poly1.getPoints(), info.obj1), transformPolyPoints(poly2.getPoints(), info.obj2) };
+		std::vector<sf::Vector2f> normals[2] = { rotatePolyNormals(poly1.getNormals(), info.obj1->getRotation()), rotatePolyNormals(poly2.getNormals(), info.obj2->getRotation()) };
 
 
 		float penDepth = 100000;
-		sf::Vector2f penAxis;
-		for (auto &axis : axes)
+		int penAxisIndex;
+		int penAxisOwner;
+		for (int owner = 0, other = 1; owner <= 1; owner++, other--)
 		{
-			float distOnAxis = VectorMath::dot(axis, distance);
-			if (distOnAxis < 0)
+			for (std::vector<sf::Vector2f>::size_type i = 0; i < normals[owner].size(); i++)
 			{
-				axis = -axis; // revert the axis if it faces the wrong way
-				distOnAxis = -distOnAxis;
+				float distOnAxis = VectorMath::dot(normals[owner][i], distance);
+
+				if (distOnAxis < 0) continue; // (test, might not work) discard the axis immediately if it faces away from the other object
+
+				float w1 = VectorMath::dot(normals[owner][i], points[owner][i]);
+				float w2 = polyHalfwidthOnAxis(points[other], -normals[owner][i]);
+
+				float pen = w1 + w2 - distOnAxis;
+
+				if (pen < 0) return;
+
+				if (pen < penDepth)
+				{
+					penAxisIndex = i;
+					penAxisOwner = owner;
+					penDepth = pen;
+				}
 			}
 
-			PolyAxisInfo w1 = polyWidthOnAxis(edges1, axis);
-			PolyAxisInfo w2 = polyWidthOnAxis(edges2, -axis);
-
-			float depth = w1.width + w2.width - distOnAxis;
-			if (depth < 0) // no collision on this axis => SAT: no collision at all
-			{
-				return;
-			}
-			else if (depth < penDepth)
-			{
-				penAxis = axis;
-				penDepth = depth;
-			}
+			distance = -distance;
 		}
 
+		// there is a collision, figure out the point(s)
 		info.areColliding = true;
-		info.penetration = -penDepth * penAxis;*/
+		info.penetration = normals[penAxisOwner][penAxisIndex] * (penAxisOwner == 0 ? -penDepth : penDepth);
 	}
 
 
@@ -438,48 +434,54 @@ namespace me
 		return intersection;
 	}
 
-	void PrimitiveQueries::transformVectors(std::vector<sf::Vector2f> &vecs, GameObject *obj)
+	std::vector<sf::Vector2f> PrimitiveQueries::transformPolyPoints(const std::vector<sf::Vector2f> &vecs, GameObject *obj)
 	{
+		std::vector<sf::Vector2f> result;
+		result.reserve(vecs.size());
 		for (auto &vec : vecs)
 		{
-			vec = obj->getTransform() * vec - obj->getPosition();
+			result.push_back(obj->getTransform() * vec - obj->getPosition());
 		}
+
+		return result;
 	}
 
-	void PrimitiveQueries::rotateVectors(std::vector<sf::Vector2f> &vecs, float angle)
+	std::vector<sf::Vector2f> PrimitiveQueries::rotatePolyNormals(const std::vector<sf::Vector2f> &vecs, float angle)
 	{
+		std::vector<sf::Vector2f> result;
+		result.reserve(vecs.size());
 		for (auto &vec : vecs)
 		{
-			vec = VectorMath::rotateDeg(vec, angle);
+			result.push_back(VectorMath::rotateDeg(vec, angle));
 		}
+
+		return result;
 	}
 
-	PrimitiveQueries::PolyAxisInfo PrimitiveQueries::polyWidthOnAxis(const std::vector<sf::Vector2f> &edges, const sf::Vector2f &axis)
+	float PrimitiveQueries::polyHalfwidthOnAxis(const std::vector<sf::Vector2f> &points, const sf::Vector2f &axis)
 	{
-		PolyAxisInfo info;
+		// hill-climb to find the farthest point in the direction
+		float curr = VectorMath::dot(axis, points[0]);
+		float next = VectorMath::dot(axis, points[1]);
 
-		sf::Vector2f curr;
+		int i = 1, increment = 1;
+
+		if (next < curr)
+		{
+			increment = -1;
+			i = points.size() - 1;
+			next = VectorMath::dot(axis, points[i]);
+		}
+
+		while (next > curr)
+		{
+			curr = next;
+			i += increment;
+			if (i >= points.size()) break;
+			next = VectorMath::dot(axis, points[i]);
+		}
 		
-		for (std::vector<sf::Vector2f>::size_type i = 0; i < edges.size(); i++)
-		{
-			curr += edges[i];
-			float projLength = VectorMath::dot(curr, axis);
-			
-			if (std::abs(projLength - info.width) < EPSILON) { // This edge is perpendicular to the axis, make both ends of the edge the farthest points
-				info.width = projLength;
-				info.hasPoint2 = true;
-				info.point1 = curr - edges[i];
-				info.point2 = curr;
-			}
-			else if (projLength > info.width)
-			{
-				info.width = projLength;
-				info.hasPoint2 = false;
-				info.point1 = curr;
-			}
-		}
-
-		return info;
+		return curr;
 	}
 
 }

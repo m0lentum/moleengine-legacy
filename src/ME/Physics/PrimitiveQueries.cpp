@@ -352,6 +352,50 @@ namespace me
 		// there is a collision, figure out the point(s)
 		info.areColliding = true;
 		info.penetration = normals[penAxisOwner][penAxisIndex] * (penAxisOwner == 0 ? -penDepth : penDepth);
+
+		int other = penAxisOwner == 0 ? 1 : 0;
+		int otherEdgeIndex = findOppositePolyEdge(normals[other], normals[penAxisOwner][penAxisIndex]);
+
+		if (std::abs(VectorMath::dot(VectorMath::leftNormal(normals[penAxisOwner][penAxisIndex]), normals[other][otherEdgeIndex])) < EPSILON)
+		{
+			// two parallel edges, two contact points
+			sf::Vector2f pos[2] = { info.obj1->getPosition(), info.obj2->getPosition() };
+			int sizes[2] = { points[0].size(), points[1].size() };
+			sf::Vector2f pts[4] =
+			{	pos[penAxisOwner] + points[penAxisOwner][penAxisIndex],
+				pos[penAxisOwner] + points[penAxisOwner][(penAxisIndex + 1) % sizes[penAxisOwner]],
+				pos[other] + points[other][otherEdgeIndex],
+				pos[other] + points[other][(otherEdgeIndex + 1) % sizes[other]] };
+			
+			
+			sf::Vector2f edge1 = pts[1] - pts[0];
+			sf::Vector2f dir = VectorMath::normalize(edge1);
+			float dot = VectorMath::dot(dir, pts[3] - pts[0]);
+			
+			if (dot > 0) info.manifold[0] = pts[0] + dot * dir;
+			else info.manifold[0] = pts[0];
+
+			dot = VectorMath::dot(dir, pts[2] - pts[0]);
+			if (dot < VectorMath::dot(dir, edge1)) info.manifold[1] = pts[0] + dot * dir;
+			else info.manifold[1] = pts[1];
+
+			for (auto &vec : info.manifold)
+			{
+				vec += info.penetration / (other == 0 ? -2.0f : 2.0f);
+			}
+		}
+		else
+		{
+			// single contact point. test both ends of the closest edge
+			float p1 = VectorMath::dot(normals[penAxisOwner][penAxisIndex], points[other][otherEdgeIndex]);
+			int p2Index = (otherEdgeIndex + 1) % points[other].size();
+			float p2 = VectorMath::dot(normals[penAxisOwner][penAxisIndex], points[other][p2Index]);
+			
+			sf::Vector2f p = p1 < p2 ? points[other][otherEdgeIndex] : points[other][p2Index];
+			sf::Vector2f pos = other == 0 ? info.obj1->getPosition() : info.obj2->getPosition();
+
+			info.manifold[0] = pos + p + info.penetration / (other == 0 ? 2.0f : -2.0f);
+		}
 	}
 
 
@@ -462,14 +506,15 @@ namespace me
 	{
 		// hill-climb to find the farthest point in the direction
 		float curr = VectorMath::dot(axis, points[0]);
-		float next = VectorMath::dot(axis, points[1]);
+		int last = points.size() - 1;
+		float next = VectorMath::dot(axis, points[last]);
 
-		int i = 1, increment = 1;
+		int i = last, increment =  -1;
 
 		if (next < curr)
 		{
-			increment = -1;
-			i = points.size() - 1;
+			increment = 1;
+			i = 1;
 			next = VectorMath::dot(axis, points[i]);
 		}
 
@@ -477,11 +522,37 @@ namespace me
 		{
 			curr = next;
 			i += increment;
-			if (i >= points.size()) break;
 			next = VectorMath::dot(axis, points[i]);
 		}
 		
 		return curr;
+	}
+
+	int PrimitiveQueries::findOppositePolyEdge(const std::vector<sf::Vector2f> &normals, const sf::Vector2f &axis)
+	{
+		// hill-climb to find the normal closest to opposite the axis
+		float curr = VectorMath::dot(axis, normals[0]);
+		int last = normals.size() - 1;
+		float next = VectorMath::dot(axis, normals[last]);
+
+		int i = 0, nextI = last, increment = -1;
+
+		if (next > curr)
+		{
+			increment = 1;
+			nextI = 1;
+			next = VectorMath::dot(axis, normals[nextI]);
+		}
+
+		while (next < curr)
+		{
+			curr = next;
+			i = nextI;
+			nextI += increment;
+			next = VectorMath::dot(axis, normals[nextI]);
+		}
+
+		return i;
 	}
 
 }

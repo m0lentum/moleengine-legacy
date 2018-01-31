@@ -52,6 +52,7 @@ namespace me
 
 		/// Constructor that takes vectors.
 		/// If autoCenter, the collider will be centered around its center of mass.
+		/// Points must be given in counterclockwise order
 		ColliderPolygon(std::initializer_list<sf::Vector2f> points, bool autoCenter = true);
 		/// Constructor that takes a list of coordinates
 		ColliderPolygon(std::initializer_list<float> coords, bool autoCenter = true);

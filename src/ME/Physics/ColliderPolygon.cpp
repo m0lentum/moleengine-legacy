@@ -3,6 +3,7 @@
 #include <Physics/VectorMath.hpp>
 #include <cmath>
 #include <Graphics/Graphic.hpp>
+#include <cassert>
 #include <iostream>
 
 namespace me
@@ -123,16 +124,14 @@ namespace me
 	void ColliderPolygon::calculateNormals()
 	{
 		m_normals.reserve(m_points.size());
-		// use left normal of each edge if edges are clockwise, otherwise right normal
-		float direction = m_points[1].x * m_points[0].y - m_points[1].y * m_points[0].x > 0 ? 1.0f : -1.0f;
 
 		for (std::vector<sf::Vector2f>::size_type i = 1; i < m_points.size(); i++)
 		{
-			m_normals.push_back(VectorMath::normalize(VectorMath::leftNormal(m_points[i] - m_points[i-1]) * direction));
+			m_normals.push_back(VectorMath::normalize(VectorMath::leftNormal(m_points[i] - m_points[i-1])));
 		}
 		
 		// Last edge
-		m_normals.push_back(VectorMath::normalize(VectorMath::leftNormal(m_points[0] - m_points[m_points.size() - 1]) * direction));
+		m_normals.push_back(VectorMath::normalize(VectorMath::leftNormal(m_points[0] - m_points[m_points.size() - 1])));
 	}
 
 
@@ -159,6 +158,8 @@ namespace me
 		}
 
 		if (autoCenter) center();
+
+		assert(VectorMath::det(m_points[1] - m_points[0], m_points[2] - m_points[0]) < 0 && "Polygon points must be given in counterclockwise order");
 
 		calculateNormals();
 	}

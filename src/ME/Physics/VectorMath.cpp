@@ -62,6 +62,11 @@ namespace me
 		return sf::Vector2f(vector.y, -vector.x);
 	}
 
+	float VectorMath::det(const sf::Vector2f &v1, const sf::Vector2f &v2)
+	{
+		return v1.x * v2.y - v1.y * v2.x;
+	}
+
 	float VectorMath::radToDeg(float radians)
 	{
 		return radians * 180 / PI;

@@ -34,6 +34,9 @@ namespace me
 		/// Right normal of the vector
 		sf::Vector2f rightNormal(const sf::Vector2f &vector);
 
+		/// The signed area of the parallelogram defined by two vectors
+		float det(const sf::Vector2f &v1, const sf::Vector2f &v2);
+
 		/// Turn radians to degrees.
 		float radToDeg(float radians);
 		/// Turn degrees to radians.

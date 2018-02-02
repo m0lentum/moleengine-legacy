@@ -360,7 +360,7 @@ namespace me
 		{
 			// two parallel edges, two contact points
 			sf::Vector2f pos[2] = { info.obj1->getPosition(), info.obj2->getPosition() };
-			int sizes[2] = { points[0].size(), points[1].size() };
+			std::vector<sf::Vector2f>::size_type sizes[2] = { points[0].size(), points[1].size() };
 			sf::Vector2f pts[4] =
 			{	pos[penAxisOwner] + points[penAxisOwner][penAxisIndex],
 				pos[penAxisOwner] + points[penAxisOwner][(penAxisIndex + 1) % sizes[penAxisOwner]],

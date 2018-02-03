@@ -57,17 +57,20 @@ namespace me
 		static float EPSILON; // Tolerance to determine whether two directions are the same
 
 		/// Rotate and scale all vectors by the object's values, but do not move them
-		static std::vector<sf::Vector2f> transformPolyPoints(const std::vector<sf::Vector2f> &vecs, GameObject *obj);
-		static std::vector<sf::Vector2f> rotatePolyNormals(const std::vector<sf::Vector2f> &vecs, float angle);
+		static void transformPolyPoints(std::vector<sf::Vector2f> &vecs, GameObject *obj);
+		static void rotatePolyNormals(std::vector<sf::Vector2f> &vecs, float angle);
 
 		/// Distance from the origin of a polygon to the farthest point when projected to an axis.
 		static float polyHalfwidthOnAxis(const std::vector<sf::Vector2f> &points, const sf::Vector2f &axis);
-		static float rectWidthOnAxis(const sf::Vector2f &hw, const sf::Vector2f &hh, const sf::Vector2f &axis);
+		static float rectHalfwidthOnAxis(const sf::Vector2f &hw, const sf::Vector2f &hh, const sf::Vector2f &axis);
 		/// Returns the index of the normal nearest to opposite of the axis direction
 		static int findOppositePolyEdge(const std::vector<sf::Vector2f> &normals, const sf::Vector2f &axis);
 
 		/// Helper function to treat two parallel OBBs as AABBs
 		static EdgeEdgeIntersection intersectParallelRects(const sf::Transform &transform, const sf::Vector2f &pos1, const sf::Vector2f &pos2, float hw1, float hw2, float hw3, float hw4);
+
+		/// Finds the overlapping segement of two parallel edges, projected onto the first. Assumes the edges run in opposing directions.
+		static void findOverlapOfEdges(const sf::Vector2f points[4], sf::Vector2f &out1, sf::Vector2f &out2);
 
 		PrimitiveQueries() {} // can't instantiate
 	};

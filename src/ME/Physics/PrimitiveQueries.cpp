@@ -30,7 +30,7 @@ namespace me
 		{
 			info.areColliding = true;
 			info.penetration = axis * -penDepth;
-			info.manifold[0] = info.obj1->getPosition() + axis * circle1.getRadius();
+			info.manifold[0] = info.obj1->getPosition() + axis * circle1.getRadius() + (info.penetration * 0.5f);
 		}
 	}
 
@@ -50,48 +50,60 @@ namespace me
 	//===================  RECT and X  ===================
 	void PrimitiveQueries::rectCircle(const ColliderRect &rect, const ColliderCircle &circle, Contact &info)
 	{
-		sf::Vector2f closest = closestPtOnRectToPoint(info.obj1->getTransform(), rect.getHalfWidth(), rect.getHalfHeight(), info.obj2->getPosition());
-		sf::Vector2f distance = closest - info.obj2->getPosition();
+		sf::Vector2f distance = info.obj2->getPosition() - info.obj1->getPosition();
+
+		float rectDimensions[2] = { rect.getHalfWidth(), rect.getHalfHeight() };
+		sf::Vector2f rectNormals[2];
+		rectNormals[0] = VectorMath::rotateDeg(sf::Vector2f(1, 0), info.obj1->getRotation());
+		rectNormals[1] = VectorMath::leftNormal(rectNormals[0]);
 		float radius = circle.getRadius();
 
-		if (VectorMath::lengthSquared(distance) > 0.0001f)
+		float penDepth = 100000;
+		int penAxisIndex;
+		for (int i = 0; i < 2; i++)
 		{
-			float pen = radius - VectorMath::length(distance);
-			if (pen > 0.0f)
+			float distOnAxis = VectorMath::dot(distance, rectNormals[i]);
+
+			if (distOnAxis < 0)
 			{
-				info.areColliding = true;
-				info.penetration = pen * VectorMath::normalize(distance);
-				info.manifold[0] = closest;
+				distOnAxis = -distOnAxis;
+				rectNormals[i] = -rectNormals[i];
 			}
+
+			float pen = rectDimensions[i] + radius - distOnAxis;
+
+			if (pen < 0) return;
+
+			if (pen < penDepth)
+			{
+				penDepth = pen;
+				penAxisIndex = i;
+			}
+		}
+
+		// check the axis defined by the closest point to the circle
+		sf::Vector2f closest = rectNormals[0] * rectDimensions[0] + rectNormals[1] * rectDimensions[1];
+		sf::Vector2f axis = VectorMath::normalize(distance - closest);
+
+		float distOnAxis = std::abs(VectorMath::dot(distance, axis));
+		float rectW = std::abs(VectorMath::dot(rectNormals[0], axis)) * rectDimensions[0] + std::abs(VectorMath::dot(rectNormals[1], axis)) * rectDimensions[1];
+
+		float pen = rectW + radius - distOnAxis;
+
+		if (pen < 0) return;
+
+
+		info.areColliding = true;
+
+		if (pen < penDepth)
+		{
+			info.penetration = -pen * axis;
+			info.manifold[0] = info.obj1->getPosition() + closest + (info.penetration * 0.5f);
 		}
 		else
 		{
-			info.areColliding = true;
-
-			// Circle center is inside the rect (deep penetration). The axis of minimum penetration is one of the rect's normals.
-			sf::Vector2f axis1 = VectorMath::rotateDeg(sf::Vector2f(1, 0), info.obj1->getRotation());
-			sf::Vector2f axis2 = VectorMath::leftNormal(axis1);
-
-			sf::Vector2f diff = closest - info.obj1->getPosition();
-
-			float dot1 = VectorMath::dot(axis1, diff);
-			float dot2 = VectorMath::dot(axis2, diff);
-
-			float pen1 = rect.getHalfWidth() - std::abs(dot1);
-			float pen2 = rect.getHalfHeight() - std::abs(dot2);
-
-			if (pen1 < pen2)
-			{
-				float sign = dot1 > 0 ? 1.0f : -1.0f;
-				info.penetration = -sign * (pen1 + radius) * axis1;
-				info.manifold[0] = closest + sign * pen1 * axis1;
-			}
-			else
-			{
-				float sign = dot2 > 0 ? 1.0f : -1.0f;
-				info.penetration = -sign * (pen2 + radius) * axis2;
-				info.manifold[0] = closest + sign * pen2 * axis2;
-			}
+			info.penetration = -penDepth * rectNormals[penAxisIndex];
+			info.manifold[0] = info.obj2->getPosition() - (radius * rectNormals[penAxisIndex]) - (info.penetration * 0.5f);
 		}
 	}
 
@@ -121,8 +133,8 @@ namespace me
 
 			info.areColliding = true;
 			info.penetration = is.penetration;
-			info.manifold[0] = is.point1;
-			info.manifold[1] = is.point2;
+			info.manifold[0] = is.point1 + (info.penetration * 0.5f);
+			info.manifold[1] = is.point2 + (info.penetration * 0.5f);
 		}
 		else if (std::abs(VectorMath::dot(normals[0], normals[2])) < EPSILON)
 		{
@@ -134,8 +146,8 @@ namespace me
 
 			info.areColliding = true;
 			info.penetration = is.penetration;
-			info.manifold[0] = is.point1;
-			info.manifold[1] = is.point2;
+			info.manifold[0] = is.point1 + (info.penetration * 0.5f);
+			info.manifold[1] = is.point2 + (info.penetration * 0.5f);
 		}
 		else
 		{
@@ -180,33 +192,15 @@ namespace me
 			{
 				for (int i = 2; i <= 3; i++) if (VectorMath::dot(dimensions[i], info.penetration) < 0) dimensions[i] = -dimensions[i];
 
-				info.manifold[0] = info.obj2->getPosition() + dimensions[2] + dimensions[3] - info.penetration; // this works because the normals have been flipped towards obj2
+				info.manifold[0] = info.obj2->getPosition() + dimensions[2] + dimensions[3] - (info.penetration * 0.5f); // this works because the normals have been flipped towards obj2
 			}
 			else
 			{
 				for (int i = 0; i <= 1; i++) if (VectorMath::dot(dimensions[i], info.penetration) > 0) dimensions[i] = -dimensions[i];
 
-				info.manifold[0] = info.obj1->getPosition() + dimensions[0] + dimensions[1];
+				info.manifold[0] = info.obj1->getPosition() + dimensions[0] + dimensions[1] + (info.penetration * 0.5f);
 			}
 		}
-	}
-
-	EdgeEdgeIntersection PrimitiveQueries::intersectParallelRects(const sf::Transform &transform, const sf::Vector2f &pos1, const sf::Vector2f &pos2, float hw1, float hw2, float hw3, float hw4)
-	{
-		EdgeEdgeIntersection is = intersectAABBs(sf::Vector2f(0, 0), hw1, hw2, transform.getInverse() * pos2, hw3, hw4);
-
-		if (!is.doesIntersect) return is;
-
-		is.penetration = transform * is.penetration - pos1;
-		is.point1 = transform * is.point1;
-		is.point2 = transform * is.point2;
-
-		return is;
-	}
-
-	float PrimitiveQueries::rectHalfwidthOnAxis(const sf::Vector2f &hw, const sf::Vector2f &hh, const sf::Vector2f &axis)
-	{
-		return std::abs(VectorMath::dot(hw, axis)) + std::abs(VectorMath::dot(hh, axis));
 	}
 
 	void PrimitiveQueries::rectPoly(const ColliderRect &rect, const ColliderPolygon &poly, Contact &info)
@@ -629,6 +623,24 @@ namespace me
 		}
 		
 		return curr;
+	}
+
+	float PrimitiveQueries::rectHalfwidthOnAxis(const sf::Vector2f &hw, const sf::Vector2f &hh, const sf::Vector2f &axis)
+	{
+		return std::abs(VectorMath::dot(hw, axis)) + std::abs(VectorMath::dot(hh, axis));
+	}
+
+	EdgeEdgeIntersection PrimitiveQueries::intersectParallelRects(const sf::Transform &transform, const sf::Vector2f &pos1, const sf::Vector2f &pos2, float hw1, float hw2, float hw3, float hw4)
+	{
+		EdgeEdgeIntersection is = intersectAABBs(sf::Vector2f(0, 0), hw1, hw2, transform.getInverse() * pos2, hw3, hw4);
+
+		if (!is.doesIntersect) return is;
+
+		is.penetration = transform * is.penetration - pos1;
+		is.point1 = transform * is.point1;
+		is.point2 = transform * is.point2;
+
+		return is;
 	}
 
 	int PrimitiveQueries::findOppositePolyEdge(const std::vector<sf::Vector2f> &normals, const sf::Vector2f &axis)

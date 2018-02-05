@@ -65,6 +65,8 @@ namespace me
 		static float rectHalfwidthOnAxis(const sf::Vector2f &hw, const sf::Vector2f &hh, const sf::Vector2f &axis);
 		/// Returns the index of the normal nearest to opposite of the axis direction
 		static int findOppositePolyEdge(const std::vector<sf::Vector2f> &normals, const sf::Vector2f &axis);
+		/// Returns the index of the polygon endpoint (not necessarily closest point on the polygon) closest to the given point
+		static int findClosestPolyPoint(const std::vector<sf::Vector2f> &points, const sf::Vector2f &target);
 
 		/// Helper function to treat two parallel OBBs as AABBs
 		static EdgeEdgeIntersection intersectParallelRects(const sf::Transform &transform, const sf::Vector2f &pos1, const sf::Vector2f &pos2, float hw1, float hw2, float hw3, float hw4);

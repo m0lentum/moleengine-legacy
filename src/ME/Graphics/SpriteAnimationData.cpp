@@ -39,7 +39,7 @@ namespace me
 		return m_frames[index].duration;
 	}
 
-	unsigned int SpriteAnimationData::getLength() const
+	unsigned int SpriteAnimationData::length() const
 	{
 		return m_frames.size();
 	}

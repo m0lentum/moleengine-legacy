@@ -25,7 +25,7 @@ namespace me
 		sf::Vector2f distance = info.obj2->getPosition() - info.obj1->getPosition();
 		sf::Vector2f axis = VectorMath::normalize(distance);
 
-		float penDepth = circle1.getRadius() + circle2.getRadius() - VectorMath::getLength(distance);
+		float penDepth = circle1.getRadius() + circle2.getRadius() - VectorMath::length(distance);
 		if (penDepth > 0) // A collision occurred
 		{
 			info.areColliding = true;
@@ -54,9 +54,9 @@ namespace me
 		sf::Vector2f distance = closest - info.obj2->getPosition();
 		float radius = circle.getRadius();
 
-		if (VectorMath::getLengthSquared(distance) > 0.0001f)
+		if (VectorMath::lengthSquared(distance) > 0.0001f)
 		{
-			float pen = radius - VectorMath::getLength(distance);
+			float pen = radius - VectorMath::length(distance);
 			if (pen > 0.0f)
 			{
 				info.areColliding = true;
@@ -223,44 +223,60 @@ namespace me
 	{
 		sf::Vector2f distance = info.obj2->getPosition() - info.obj1->getPosition();
 		
-		/*std::vector<sf::Vector2f> edges = poly.getEdges();
-		transformPolyPoints(edges, info.obj1);
-		std::vector<sf::Vector2f> normals = poly.getAxes();
-		rotatePolyNormals(normals, info.obj1->getRotation());
+		std::vector<sf::Vector2f> polyPoints = poly.getPoints();
+		transformPolyPoints(polyPoints, info.obj1);
+		std::vector<sf::Vector2f> polyNormals = poly.getNormals();
+		rotatePolyNormals(polyNormals, info.obj1->getRotation());
 		float radius = circle.getRadius();
 
-		// With the circle we also need to check the axis between its center and the closest point to it
-		sf::Vector2f closestPoint = info.obj1->getPosition() + polyWidthOnAxis(edges, distance).point1;
-		sf::Vector2f toCircle = info.obj2->getPosition() - closestPoint;
-		normals.push_back(VectorMath::normalize(toCircle));
-
 		float penDepth = 100000;
-		sf::Vector2f penAxis;
-		for (auto &axis : normals)
+		int penAxisIndex;
+		for (std::vector<sf::Vector2f>::size_type i = 0; i < polyNormals.size(); i++)
 		{
-			float distOnAxis = VectorMath::dot(axis, distance);
-			if (distOnAxis < 0)
-			{
-				axis = -axis; // revert the axis if it faces the wrong way
-				distOnAxis = -distOnAxis;
-			}
+			float distOnAxis = VectorMath::dot(distance, polyNormals[i]);
 
-			PolyAxisInfo polyW = polyWidthOnAxis(edges, axis);
+			// discard the axis immediately if it faces away from the other object
+			// (I don't have proof that this always works but it seems to)
+			if (distOnAxis < 0) continue;
 
-			float depth = polyW.width + radius - distOnAxis;
-			if (depth < 0) // no collision on this axis => SAT: no collision at all
+			float polyW = VectorMath::dot(polyPoints[i], polyNormals[i]);
+
+			float pen = polyW + radius - distOnAxis;
+
+			if (pen < 0) return;
+
+			if (pen < penDepth)
 			{
-				return;
-			}
-			else if (depth < penDepth)
-			{
-				penAxis = axis;
-				penDepth = depth;
+				penDepth = pen;
+				penAxisIndex = i;
 			}
 		}
 
+		// we also need to test the axis defined by the vector between the circle center and the closest poly point
+		int closestPt = findClosestPolyPoint(polyPoints, distance);
+		sf::Vector2f toCircle = distance - polyPoints[closestPt];
+		sf::Vector2f axis = VectorMath::normalize(toCircle);
+
+		float polyW = polyHalfwidthOnAxis(polyPoints, axis);
+
+		float pen = polyW + radius - VectorMath::dot(distance, axis);
+
+		if (pen < 0) return;
+
+
 		info.areColliding = true;
-		info.penetration = -penAxis * penDepth;*/
+
+		if (pen < penDepth)
+		{
+			// last axis was the one with shortest penetration
+			info.penetration = -pen * axis;
+			info.manifold[0] = info.obj1->getPosition() + polyPoints[closestPt] + (info.penetration * 0.5f);
+		}
+		else
+		{
+			info.penetration = -penDepth * polyNormals[penAxisIndex];
+			info.manifold[0] = info.obj2->getPosition() - (radius * polyNormals[penAxisIndex]) - (info.penetration * 0.5f);
+		}
 	}
 
 	void PrimitiveQueries::polyRect(const ColliderPolygon &poly, const ColliderRect &rect, Contact &info)
@@ -308,8 +324,6 @@ namespace me
 		{
 			float distOnAxis = VectorMath::dot(polyNormals[i], distance);
 
-			// discard the axis immediately if it faces away from the other object
-			// (I don't have proof that this always works but it seems to)
 			if (distOnAxis < 0) continue;
 
 			float w1 = rectHalfwidthOnAxis(rectDimensions[0], rectDimensions[1], polyNormals[i]);
@@ -352,8 +366,8 @@ namespace me
 				int next = (otherEdge + 1) % polyPoints.size();
 				float d2 = -VectorMath::dot(polyPoints[next], rectAxes[penAxisIndex]);
 
-				if (d1 > d2) info.manifold[0] = polyPoints[otherEdge] + info.obj1->getPosition() + (info.penetration / 2.0f);
-				else info.manifold[0] = polyPoints[next] + info.obj1->getPosition() + (info.penetration / 2.0f);
+				if (d1 > d2) info.manifold[0] = polyPoints[otherEdge] + info.obj1->getPosition() + (info.penetration * 0.5f);
+				else info.manifold[0] = polyPoints[next] + info.obj1->getPosition() + (info.penetration * 0.5f);
 
 				return;
 			}
@@ -378,7 +392,7 @@ namespace me
 					if (VectorMath::dot(polyNormals[penAxisIndex], dim) > 0) dim = -dim;
 				}
 
-				info.manifold[0] = rectDimensions[0] + rectDimensions[1] + info.obj2->getPosition() - (info.penetration / 2.0f);
+				info.manifold[0] = rectDimensions[0] + rectDimensions[1] + info.obj2->getPosition() - (info.penetration * 0.5f);
 
 				return;
 			}
@@ -398,7 +412,7 @@ namespace me
 
 		for (auto &vec : info.manifold)
 		{
-			vec += info.penetration / 2.0f;
+			vec += info.penetration * 0.5f;
 		}
 	}
 
@@ -464,7 +478,7 @@ namespace me
 
 			for (auto &vec : info.manifold)
 			{
-				vec += info.penetration / (other == 0 ? -2.0f : 2.0f);
+				vec += info.penetration * (other == 0 ? -0.5f : 0.5f);
 			}
 		}
 		else
@@ -477,7 +491,7 @@ namespace me
 			sf::Vector2f p = p1 < p2 ? points[other][otherEdgeIndex] : points[other][p2Index];
 			sf::Vector2f pos = other == 0 ? info.obj1->getPosition() : info.obj2->getPosition();
 
-			info.manifold[0] = pos + p + info.penetration / (other == 0 ? 2.0f : -2.0f);
+			info.manifold[0] = pos + p + info.penetration * (other == 0 ? 0.5f : -0.5f);
 		}
 	}
 
@@ -488,7 +502,7 @@ namespace me
 	sf::Vector2f PrimitiveQueries::closestPtOnCircleToPoint(const sf::Vector2f &circlePos, float circleRadius, const sf::Vector2f &point)
 	{
 		sf::Vector2f diff = point - circlePos;
-		float distSquared = VectorMath::getLengthSquared(diff);
+		float distSquared = VectorMath::lengthSquared(diff);
 
 		if (distSquared < circleRadius * circleRadius)
 		{
@@ -644,4 +658,29 @@ namespace me
 		return i;
 	}
 
+	int PrimitiveQueries::findClosestPolyPoint(const std::vector<sf::Vector2f> &points, const sf::Vector2f &target)
+	{
+		float curr = VectorMath::lengthSquared(target - points[0]);
+		int last = points.size() - 1;
+		float next = VectorMath::lengthSquared(target - points[last]);
+
+		int i = 0, nextI = last, increment = -1;
+
+		if (next > curr)
+		{
+			increment = 1;
+			nextI = 1;
+			next = VectorMath::lengthSquared(target - points[1]);
+		}
+
+		while (next < curr)
+		{
+			curr = next;
+			i = nextI;
+			nextI += increment;
+			next = VectorMath::lengthSquared(target - points[nextI]);
+		}
+
+		return i;
+	}
 }

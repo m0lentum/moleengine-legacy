@@ -14,7 +14,7 @@ namespace me
 			{
 				m_currentFrame++;
 				m_currentTime -= frameDuration;
-				if (m_currentFrame >= m_anim.getLength())
+				if (m_currentFrame >= m_anim.length())
 				{
 					m_currentFrame = 0;
 					if (--m_numLoops == 0)

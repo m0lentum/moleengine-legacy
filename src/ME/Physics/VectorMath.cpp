@@ -3,20 +3,20 @@
 namespace me
 {
 
-	float VectorMath::getLength(const sf::Vector2f &vector)
+	float VectorMath::length(const sf::Vector2f &vector)
 	{
 		return std::sqrt(vector.x * vector.x + vector.y * vector.y);
 	}
 
-	float VectorMath::getLengthSquared(const sf::Vector2f &vector)
+	float VectorMath::lengthSquared(const sf::Vector2f &vector)
 	{
 		return vector.x * vector.x + vector.y * vector.y;
 	}
 
 	sf::Vector2f VectorMath::normalize(const sf::Vector2f &vector)
 	{
-		float length = getLength(vector);
-		return sf::Vector2f(vector.x / length, vector.y / length);
+		float len = length(vector);
+		return sf::Vector2f(vector.x / len, vector.y / len);
 	}
 
 	sf::Vector2f VectorMath::abs(const sf::Vector2f &vector)

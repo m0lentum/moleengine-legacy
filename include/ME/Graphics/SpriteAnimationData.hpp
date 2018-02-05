@@ -37,7 +37,7 @@ namespace me
 		/// Duration of frame specified by index
 		sf::Time getDuration(unsigned int index) const;
 		/// Number of frames in the animation
-		unsigned int getLength() const;
+		unsigned int length() const;
 
 
 		SpriteAnimationData();

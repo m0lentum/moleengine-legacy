@@ -11,8 +11,8 @@ namespace me
 	{
 		const float PI = 3.1415927f;
 
-		float getLength(const sf::Vector2f &vector);
-		float getLengthSquared(const sf::Vector2f &vector);
+		float length(const sf::Vector2f &vector);
+		float lengthSquared(const sf::Vector2f &vector);
 		/// Returns a vector with the same direction as this one but a length of 1.
 		sf::Vector2f normalize(const sf::Vector2f &vector);
 		/// std::abs both coordinates

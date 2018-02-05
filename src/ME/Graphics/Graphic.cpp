@@ -180,7 +180,7 @@ namespace me
 		sf::VertexArray verts(sf::PrimitiveType::TriangleFan, 4);
 
 		sf::Vector2f distLeftNormal(y1 - y2, x2 - x1);
-		distLeftNormal *= thickness / VectorMath::getLength(distLeftNormal);
+		distLeftNormal *= thickness / VectorMath::length(distLeftNormal);
 
 		verts[0].position = sf::Vector2f(x1 + distLeftNormal.x / 2, y1 + distLeftNormal.y / 2);
 		verts[1].position = verts[0].position - distLeftNormal;

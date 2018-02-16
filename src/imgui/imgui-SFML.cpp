@@ -316,7 +316,7 @@ void Shutdown()
         s_fontTexture = NULL;
     }
 
-    ImGui::Shutdown(); // need to specify namespace here, otherwise ImGui::SFML::Shutdown would be called
+    ImGui::DestroyContext(); // need to specify namespace here, otherwise ImGui::SFML::Shutdown would be called
 }
 
 void UpdateFontTexture()

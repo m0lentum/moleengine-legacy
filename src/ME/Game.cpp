@@ -1,6 +1,8 @@
 #include <Game.hpp>
 #include "Input/Keyboard.hpp"
-//#include <iostream>
+#include "../imgui/imgui.h"
+#include "../imgui/imgui-SFML.h"
+#include <iostream>
 
 namespace me
 {
@@ -9,6 +11,8 @@ namespace me
 		sf::Event event;
 		while (m_mainWindow.pollEvent(event))
 		{
+			ImGui::SFML::ProcessEvent(event);
+
 			if (event.type == sf::Event::Closed)
 				m_mainWindow.close();
 			else
@@ -52,6 +56,8 @@ namespace me
 
 	void Game::begin()
 	{
+		init();
+		ImGui::SFML::Init(m_mainWindow);
 		gameLoop();
 	}
 

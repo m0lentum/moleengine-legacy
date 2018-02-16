@@ -13,9 +13,9 @@ namespace me
 		Game();
 
 		/// Do all the initial setup (create windows and setup states etc.) here.
-		/// Alternatively, states could be created in the constructor.
-		/// Call Game::begin() at the end of your override to start the game loop.
-		virtual void begin();
+		virtual void init() {}
+		/// Call this in your main file to start the game loop.
+		void begin();
 		/// Make the game close itself.
 		virtual void terminate();
 

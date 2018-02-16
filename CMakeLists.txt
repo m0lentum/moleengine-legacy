@@ -11,7 +11,7 @@ endif()
 project(MoleEngine)
 
 # Define sources and library
-set(LIBRARY_NAME "LibMoleEngine")
+set(LIBRARY_NAME "MoleEngine")
 file(GLOB_RECURSE SOURCES src/ME/*.cpp)
 file(GLOB_RECURSE IMGUI_SRC src/imgui/*.cpp)
 include_directories(include/ME include/imgui)

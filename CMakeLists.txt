@@ -23,13 +23,16 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE
 #Find any version 2.X of SFML
 #See the FindSFML.cmake file for additional details and instructions
 find_package(SFML 2.4 REQUIRED network audio graphics window system)
-if(SFML_FOUND)
-  include_directories(${SFML_INCLUDE_DIR})
-  target_link_libraries(${LIBRARY_NAME} ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})
-  #from Stack Overflow: expose includes to other projects
-  set(${PROJECT_NAME}_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/include ${SFML_INCLUDE_DIR}
-    CACHE INTERNAL "${PROJECT_NAME}: Include Directories" FORCE)
-endif()
+find_package(OpenGL REQUIRED)
+
+include_directories(${SFML_INCLUDE_DIR} ${OPENGL_INCLUDE_DIRS})
+
+target_link_libraries(${LIBRARY_NAME} ${SFML_LIBRARIES} ${SFML_DEPENDENCIES} ${OPENGL_LIBRARIES})
+#from Stack Overflow: expose includes to other projects
+set(${PROJECT_NAME}_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/include ${SFML_INCLUDE_DIR}
+CACHE INTERNAL "${PROJECT_NAME}: Include Directories" FORCE)
+
+
 
 # Install library
 install(TARGETS ${LIBRARY_NAME} DESTINATION lib)

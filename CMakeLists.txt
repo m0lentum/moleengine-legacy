@@ -13,9 +13,9 @@ project(MoleEngine)
 # Define sources and library
 set(LIBRARY_NAME "LibMoleEngine")
 file(GLOB_RECURSE SOURCES src/ME/*.cpp)
-file(GLOB_RECURSE HEADERS include/ME/*.hpp)
-include_directories(include/ME)
-add_library(${LIBRARY_NAME} STATIC ${SOURCES})
+file(GLOB_RECURSE IMGUI_SRC src/imgui/*.cpp)
+include_directories(include/ME include/imgui)
+add_library(${LIBRARY_NAME} STATIC ${SOURCES} ${IMGUI_SRC})
 
 set(SFML_ROOT "" CACHE PATH "Specify your SFML install folder here if not found automatically")
 # Detect and add SFML

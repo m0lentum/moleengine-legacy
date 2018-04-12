@@ -5,21 +5,25 @@ physics simulation and various animation tools. It is early in development and n
 Currently implemented features:
 * Game state management
 * Texture loading
-* Game objects and object grouping
-* Fixed and uncapped framerate update loops to separate game logic and rendering
-* Some (work-in-progress) collision detection capabilities
+* Game objects and object management
+* Game object architecture based on the Entity-Component-System model (https://en.wikipedia.org/wiki/Entity%E2%80%93component%E2%80%93system)
+* Separate update loops with fixed and uncapped framerate to separate game logic and rendering
+* Collision detection for circles, rectangles and convex polygons
 * Sprite-sheet animation
-* Component-based game object architecture (https://en.wikipedia.org/wiki/Entity%E2%80%93component%E2%80%93system)
+* Ability to easily create development and debugging tools using ImGui
 
 Planned features:
 * Optimization of collision detection via spatial partitioning
 * Physics simulation for rigid bodies
-* Level data format
+* Level data format for loading scenes from file
 * Base classes for a user interface
 * Keyframe-based animation of various object properties
+* Multithreaded optimization where applicable
 
-## Dependencies
+## 3rd Party Libraries
 SFML (https://www.sfml-dev.org/)
+Dear ImGui (https://github.com/ocornut/imgui)
++ ImGui SFML Binding (https://github.com/eliasdaler/imgui-sfml)
 
 ## Installation
 Note: You probably shouldn't yet. Here are the instructions nonetheless.

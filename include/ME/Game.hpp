@@ -44,6 +44,7 @@ namespace me
 		virtual void draw() = 0;
 
 		void handleWindowEvents();
+		virtual void handleWindowEvent(sf::Event &evt);
 	};
 }
 #endif //GAME_HPP

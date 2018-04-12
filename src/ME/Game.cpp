@@ -16,8 +16,13 @@ namespace me
 			if (event.type == sf::Event::Closed)
 				m_mainWindow.close();
 			else
-				m_stateManager.handleWindowEvent(event);
+				handleWindowEvent(event);
 		}
+	}
+
+	void Game::handleWindowEvent(sf::Event &evt)
+	{
+		m_stateManager.handleWindowEvent(evt);
 	}
 
 	void Game::gameLoop()

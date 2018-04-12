@@ -16,15 +16,20 @@ namespace me
 
 		GameObject *m_parent;
 		bool m_isAlive;
+		bool m_isEnabled;
 
 	public:
 
 		inline bool isAlive() const { return m_isAlive; }
+		inline bool isEnabled() const { return m_isEnabled; }
+		inline void enable() { m_isEnabled = true; }
+		inline void disable() { m_isEnabled = false; }
 		inline GameObject * getParent() const { return m_parent; }
 
 		ComponentBase(GameObject *m_parent) :
 			m_parent(m_parent),
-			m_isAlive(true)
+			m_isAlive(true),
+			m_isEnabled(true)
 		{
 		}
 

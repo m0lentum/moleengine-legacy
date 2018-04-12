@@ -27,12 +27,18 @@ namespace me
 		static unsigned int numExisting;
 
 		std::unordered_map<std::type_index, ComponentBase*> m_components;
+
+		bool m_isEnabled;
 		bool m_isAlive;
 
 	public:
 
 		void destroy();
 		inline bool isAlive() { return m_isAlive; }
+		
+		void disable();
+		void enable();
+		inline bool isEnabled() { return m_isEnabled; }
 
 		inline const unsigned int getID() const { return m_id; }
 

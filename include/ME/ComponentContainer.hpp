@@ -68,7 +68,7 @@ namespace me
 		{
 			for (auto &unit : m_components)
 			{
-				if (unit.isAlive())
+				if (unit.isEnabled() && unit.isAlive())
 				{
 					function(unit);
 				}

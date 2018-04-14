@@ -21,9 +21,9 @@ Planned features:
 * Multithreaded optimization where applicable
 
 ## 3rd Party Libraries
-SFML (https://www.sfml-dev.org/)
-Dear ImGui (https://github.com/ocornut/imgui)
-+ ImGui SFML Binding (https://github.com/eliasdaler/imgui-sfml)
+SFML (https://www.sfml-dev.org/)  
+Dear ImGui (https://github.com/ocornut/imgui)  
+ImGui SFML Binding (https://github.com/eliasdaler/imgui-sfml)
 
 ## Installation
 Note: You probably shouldn't yet. Here are the instructions nonetheless.

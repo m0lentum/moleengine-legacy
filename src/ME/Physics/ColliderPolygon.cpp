@@ -168,5 +168,29 @@ namespace me
 		m_points(copy.m_points),
 		m_normals(copy.m_normals)
 	{
+		linkRigidBody(copy.m_rigidBody);
+	}
+
+	ColliderPolygon::ColliderPolygon(ColliderPolygon &&move) :
+		m_points(std::move(move.m_points)),
+		m_normals(std::move(move.m_normals))
+	{
+		linkRigidBody(move.m_rigidBody);
+	}
+
+	ColliderPolygon::~ColliderPolygon()
+	{
+	}
+
+	ColliderPolygon& ColliderPolygon::operator=(ColliderPolygon &&other)
+	{
+		if (&other != this)
+		{
+			m_points = std::move(other.m_points);
+			m_normals = std::move(other.m_normals);
+			m_rigidBody = std::move(other.m_rigidBody);
+		}
+
+		return *this;
 	}
 }

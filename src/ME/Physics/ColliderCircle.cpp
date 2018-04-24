@@ -46,11 +46,13 @@ namespace me
 	ColliderCircle::ColliderCircle(const ColliderCircle &copy) :
 		m_radius(copy.m_radius)
 	{
+		linkRigidBody(copy.m_rigidBody);
 	}
 
 	ColliderCircle::ColliderCircle(ColliderCircle&& move) :
 		m_radius(std::move(move.m_radius))
 	{
+		linkRigidBody(move.m_rigidBody);
 	}
 
 	ColliderCircle& ColliderCircle::operator=(ColliderCircle&& other)
@@ -58,6 +60,7 @@ namespace me
 		if (this != &other)
 		{
 			m_radius = std::move(other.m_radius);
+			linkRigidBody(other.m_rigidBody);
 		}
 
 		return *this;

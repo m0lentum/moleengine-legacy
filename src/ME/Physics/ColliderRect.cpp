@@ -44,12 +44,14 @@ namespace me
 		m_halfWidth(copy.m_halfWidth),
 		m_halfHeight(copy.m_halfHeight)
 	{
+		linkRigidBody(copy.m_rigidBody);
 	}
 
 	ColliderRect::ColliderRect(ColliderRect&& move) :
 		m_halfWidth(std::move(move.m_halfWidth)),
 		m_halfHeight(std::move(move.m_halfHeight))
 	{
+		linkRigidBody(move.m_rigidBody);
 	}
 
 	ColliderRect& ColliderRect::operator=(ColliderRect&& other)
@@ -58,6 +60,7 @@ namespace me
 		{
 			m_halfWidth = std::move(other.m_halfWidth);
 			m_halfHeight = std::move(other.m_halfHeight);
+			m_rigidBody = std::move(other.m_rigidBody);
 		}
 
 		return *this;

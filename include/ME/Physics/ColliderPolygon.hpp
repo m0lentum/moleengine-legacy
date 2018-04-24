@@ -58,7 +58,10 @@ namespace me
 		ColliderPolygon(std::initializer_list<float> coords, bool autoCenter = true);
 
 		ColliderPolygon(const ColliderPolygon &copy);
-		virtual ~ColliderPolygon() {}
+		ColliderPolygon(ColliderPolygon &&move);
+		virtual ~ColliderPolygon();
+
+		ColliderPolygon& operator=(ColliderPolygon &&other);
 	};
 }
 

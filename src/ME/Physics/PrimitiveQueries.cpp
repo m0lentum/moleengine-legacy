@@ -38,12 +38,16 @@ namespace me
 	{
 		std::swap(info.obj1, info.obj2);
 		rectCircle(rect, circle, info);
+		std::swap(info.obj1, info.obj2);
+		info.penetration = -info.penetration;
 	}
 
 	void PrimitiveQueries::circlePoly(const ColliderCircle &circle, const ColliderPolygon &poly, Contact &info)
 	{
 		std::swap(info.obj1, info.obj2);
 		polyCircle(poly, circle, info);
+		std::swap(info.obj1, info.obj2);
+		info.penetration = -info.penetration;
 	}
 
 

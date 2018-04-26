@@ -19,6 +19,7 @@ namespace me
 		// When two edges are parallel we need two contact points
 		bool doesIntersect = false;
 		sf::Vector2f penetration;
+		sf::Vector2f normal;
 		sf::Vector2f point1;
 		sf::Vector2f point2;
 	};

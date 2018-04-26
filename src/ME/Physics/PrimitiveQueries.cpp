@@ -30,6 +30,7 @@ namespace me
 		{
 			info.areColliding = true;
 			info.penetration = axis * -penDepth;
+			info.normal = -axis;
 			info.manifold[0] = info.obj1->getPosition() + axis * circle1.getRadius() + (info.penetration * 0.5f);
 		}
 	}
@@ -40,6 +41,7 @@ namespace me
 		rectCircle(rect, circle, info);
 		std::swap(info.obj1, info.obj2);
 		info.penetration = -info.penetration;
+		info.normal = -info.normal;
 	}
 
 	void PrimitiveQueries::circlePoly(const ColliderCircle &circle, const ColliderPolygon &poly, Contact &info)
@@ -48,6 +50,7 @@ namespace me
 		polyCircle(poly, circle, info);
 		std::swap(info.obj1, info.obj2);
 		info.penetration = -info.penetration;
+		info.normal = -info.normal;
 	}
 
 
@@ -102,11 +105,13 @@ namespace me
 		if (pen < penDepth)
 		{
 			info.penetration = -pen * axis;
+			info.normal = -axis;
 			info.manifold[0] = info.obj1->getPosition() + closest + (info.penetration * 0.5f);
 		}
 		else
 		{
 			info.penetration = -penDepth * rectNormals[penAxisIndex];
+			info.normal = -rectNormals[penAxisIndex];
 			info.manifold[0] = info.obj2->getPosition() - (radius * rectNormals[penAxisIndex]) - (info.penetration * 0.5f);
 		}
 	}
@@ -137,6 +142,7 @@ namespace me
 
 			info.areColliding = true;
 			info.penetration = is.penetration;
+			info.normal = is.normal;
 			info.manifold[0] = is.point1 + (info.penetration * 0.5f);
 			info.manifold[1] = is.point2 + (info.penetration * 0.5f);
 		}
@@ -150,6 +156,7 @@ namespace me
 
 			info.areColliding = true;
 			info.penetration = is.penetration;
+			info.normal = is.normal;
 			info.manifold[0] = is.point1 + (info.penetration * 0.5f);
 			info.manifold[1] = is.point2 + (info.penetration * 0.5f);
 		}
@@ -187,6 +194,7 @@ namespace me
 
 			info.areColliding = true;
 			info.penetration = -penDepth * normals[penAxis];
+			info.normal = -normals[penAxis];
 
 			// point of contact is on the box that doesn't own the axis of shortest separation
 			bool pointOnObj2 = penAxis < 2;
@@ -213,6 +221,7 @@ namespace me
 		polyRect(poly, rect, info);
 		std::swap(info.obj1, info.obj2);
 		info.penetration = -info.penetration;
+		info.normal = -info.normal;
 	}
 
 
@@ -268,11 +277,13 @@ namespace me
 		{
 			// last axis was the one with shortest penetration
 			info.penetration = -pen * axis;
+			info.normal = -axis;
 			info.manifold[0] = info.obj1->getPosition() + polyPoints[closestPt] + (info.penetration * 0.5f);
 		}
 		else
 		{
 			info.penetration = -penDepth * polyNormals[penAxisIndex];
+			info.normal = -polyNormals[penAxisIndex];
 			info.manifold[0] = info.obj2->getPosition() - (radius * polyNormals[penAxisIndex]) - (info.penetration * 0.5f);
 		}
 	}
@@ -342,8 +353,16 @@ namespace me
 		// There is a collision
 
 		info.areColliding = true;
-		if (rectOwnsAxis) info.penetration = rectAxes[penAxisIndex] * penDepth;
-		else info.penetration = polyNormals[penAxisIndex] * -penDepth;
+		if (rectOwnsAxis)
+		{
+			info.penetration = rectAxes[penAxisIndex] * penDepth;
+			info.normal = rectAxes[penAxisIndex];
+		}
+		else
+		{
+			info.penetration = polyNormals[penAxisIndex] * -penDepth;
+			info.normal = -polyNormals[penAxisIndex];
+		}
 
 		// find out whether or not the colliding edges are parallel
 		sf::Vector2f points[4];
@@ -456,7 +475,17 @@ namespace me
 
 		// there is a collision, figure out the point(s)
 		info.areColliding = true;
-		info.penetration = normals[penAxisOwner][penAxisIndex] * (penAxisOwner == 0 ? -penDepth : penDepth);
+		if (penAxisOwner == 0)
+		{
+			info.penetration = normals[penAxisOwner][penAxisIndex] * -penDepth;
+			info.normal = -normals[penAxisOwner][penAxisIndex];
+		}
+		else
+		{
+			info.penetration = normals[penAxisOwner][penAxisIndex] * penDepth;
+			info.normal = normals[penAxisOwner][penAxisIndex];
+		}
+		
 
 		int other = penAxisOwner == 0 ? 1 : 0;
 		int otherEdgeIndex = findOppositePolyEdge(normals[other], normals[penAxisOwner][penAxisIndex]);
@@ -570,6 +599,8 @@ namespace me
 			
 			intersection.penetration.y = distY > 0 ? -penY : penY;
 			intersection.penetration.x = 0;
+			intersection.normal.x = 0;
+			intersection.normal.y = distY > 0 ? -1 : 1;
 		}
 		else
 		{
@@ -582,6 +613,8 @@ namespace me
 
 			intersection.penetration.x = distX > 0 ? -penX : penX;
 			intersection.penetration.y = 0;
+			intersection.normal.y = 0;
+			intersection.normal.x = distX > 0 ? -1 : 1;
 		}
 
 		return intersection;
@@ -641,6 +674,7 @@ namespace me
 		if (!is.doesIntersect) return is;
 
 		is.penetration = transform * is.penetration - pos1;
+		is.normal = VectorMath::normalize(is.penetration);
 		is.point1 = transform * is.point1;
 		is.point2 = transform * is.point2;
 

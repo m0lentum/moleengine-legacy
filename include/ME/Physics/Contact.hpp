@@ -23,6 +23,7 @@ namespace me
 		sf::Vector2f manifold[2];
 		/// The direction and depth of penetration if the objects are colliding (direction towards obj1).
 		sf::Vector2f penetration;
+		sf::Vector2f normal;
 	};
 }
 

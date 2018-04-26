@@ -18,17 +18,16 @@ namespace me
 
 
 	RigidBody::RigidBody() :
-		RigidBody(false, false, 1.0f, 0.75f, 0.05f, 0.002f, 0.001f)
+		RigidBody(false, 1.0f, 0.75f, 0.05f, 0.002f, 0.001f)
 	{
 	}
 
 	RigidBody::RigidBody(float mass, float elasticity, float friction, float drag, float angularDrag) :
-		RigidBody(false, false, mass, elasticity, friction, drag, angularDrag)
+		RigidBody(false, mass, elasticity, friction, drag, angularDrag)
 	{
 	}
 
-	RigidBody::RigidBody(bool isStatic, bool isKinematic, float mass, float elasticity, float friction, float drag, float angularDrag) :
-		isStatic(isStatic),
+	RigidBody::RigidBody(bool isKinematic, float mass, float elasticity, float friction, float drag, float angularDrag) :
 		isKinematic(isKinematic),
 		angularVelocity(0),
 		mass(mass),
@@ -42,7 +41,6 @@ namespace me
 	}
 
 	RigidBody::RigidBody(const RigidBody &copy) :
-		isStatic(copy.isStatic),
 		isKinematic(copy.isKinematic),
 		velocity(copy.velocity),
 		angularVelocity(copy.angularVelocity),
@@ -58,7 +56,6 @@ namespace me
 	}
 
 	RigidBody::RigidBody(RigidBody&& move) :
-		isStatic(std::move(move.isStatic)),
 		isKinematic(std::move(move.isKinematic)),
 		velocity(std::move(move.velocity)),
 		angularVelocity(std::move(move.angularVelocity)),
@@ -77,7 +74,6 @@ namespace me
 	{
 		if (this != &other)
 		{
-			isStatic = std::move(other.isStatic);
 			isKinematic = std::move(other.isKinematic);
 			velocity = std::move(other.velocity);
 			angularVelocity = std::move(other.angularVelocity);

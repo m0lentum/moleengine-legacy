@@ -11,7 +11,6 @@ namespace me
 	{
 	public: 
 
-		bool isStatic; // if true, object will not move during physics checks
 		bool isKinematic; // if true, object will not be affected by collisions
 
 		sf::Vector2f velocity;
@@ -44,7 +43,7 @@ namespace me
 
 		RigidBody();
 		RigidBody(float mass, float elasticity, float friction, float drag, float angularDrag);
-		RigidBody(bool isStatic, bool isKinematic, float mass, float elasticity, float friction, float drag, float angularDrag);
+		RigidBody(bool isKinematic, float mass, float elasticity, float friction, float drag, float angularDrag);
 		RigidBody(const RigidBody &copy);
 		RigidBody(RigidBody&& move);
 		RigidBody& operator=(RigidBody&& other);

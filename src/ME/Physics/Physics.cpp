@@ -9,7 +9,10 @@
 #include <Physics/ColliderPolygon.hpp>
 #include <Physics/PrimitiveQueries.hpp>
 #include <Physics/Contact.hpp>
+#include <Physics/Collision.hpp>
 #include <Graphics/DebugMarkerFactory.hpp>
+#include <Physics/VectorMath.hpp>
+#include <GameObject.hpp>
 
 namespace me
 {
@@ -17,7 +20,7 @@ namespace me
 	{
 		applyMovement();
 		findContacts();
-		solveContacts();
+		solveCollisions();
 	}
 
 	void Physics::applyMovement()
@@ -27,29 +30,28 @@ namespace me
 			RigidBody *rb = comp.getComponent();
 			GameObject *parent = comp.getParent();
 
-			if (!rb->isStatic)
+			if (!rb->isKinematic)
 			{
-				if (!rb->isKinematic)
-				{
-					if (!rb->doesOverrideGravity())
-						rb->accelerate(m_gravity * rb->gravityMultiplier);
-					else
-						rb->accelerate(rb->getGravityOverride());
+				if (!rb->doesOverrideGravity())
+					rb->accelerate(m_gravity * rb->gravityMultiplier);
+				else
+					rb->accelerate(rb->getGravityOverride());
 
-					rb->velocity -= rb->drag * rb->velocity;
-					rb->angularVelocity -= rb->angularDrag * rb->angularVelocity;
-				}
-				
-				parent->move(rb->velocity);
-				parent->rotate(rb->angularVelocity);
+				rb->velocity -= rb->drag * rb->velocity;
+				rb->angularVelocity -= rb->angularDrag * rb->angularVelocity;
 			}
+				
+			parent->move(rb->velocity);
+			if (rb->angularVelocity != 0) parent->rotate(VectorMath::radToDeg(rb->angularVelocity));
 		});
 	}
 
 	void Physics::findContacts()
 	{
 		std::vector<std::pair<GameObject*, ICollider*> > colliders;
-		std::unordered_map<long int, Contact> contacts;
+		std::unordered_map<long int, Contact> misses;
+		m_collisions.clear();
+
 
 		// gather all different types of colliders into one vector for iteration
 		m_space->each<ColliderCircle>([&](Component<ColliderCircle> &comp)
@@ -78,45 +80,56 @@ namespace me
 
 				if (con.areColliding)
 				{
-					// immediately resolve penetration
-					RigidBody *rb1 = i->second->getRigidBody();
-					RigidBody *rb2 = j->second->getRigidBody();
+					con.rb1 = i->second->getRigidBody();
+					con.rb2 = j->second->getRigidBody();
 
-					if (rb1 && rb2)
-					{
-						if (rb1->isStatic || rb1->isKinematic)
-						{
-							if (!(rb2->isStatic || rb2->isKinematic))
-								con.obj2->move(-penResolveFactor * con.penetration);
-						}
-						else if (rb2->isStatic || rb2->isKinematic)
-						{
-							con.obj1->move(penResolveFactor * con.penetration);
-						}
-						else
-						{
-							con.obj1->move(penResolveFactor * 0.5f * con.penetration);
-							con.obj2->move(penResolveFactor * -0.5f * con.penetration);
-						}
-					}
+					m_collisions.push_back(con);
 				}
-
-				contacts.emplace(contactID(con.obj1->getID(), con.obj2->getID()), con);
+				else
+				{
+					misses.emplace(contactID(con.obj1->getID(), con.obj2->getID()), con);
+				}
 			}
 		}
 
-		m_contacts = contacts;
+		m_missedPairs = misses;
 	}
 
-	void Physics::solveContacts()
+	void Physics::solveCollisions()
 	{
 		for (int i = 0; i < m_solverIterations; i++)
 		{
-			for (auto &con : m_contacts)
+			for (auto &coll : m_collisions)
 			{
-				if (con.second.areColliding)
+				if (coll.rb1 && coll.rb2)
 				{
-					// TODO continue from here
+					float collVel = VectorMath::dot(coll.rb2->velocity - coll.rb1->velocity, coll.normal);
+
+					if (collVel > 0)
+					{
+						if (!coll.rb1->isKinematic || !coll.rb2->isKinematic)
+						{
+							float e = std::min(coll.rb1->elasticity, coll.rb2->elasticity);
+
+							float imp = (1.0f + e) * collVel;
+							if (coll.rb1->isKinematic)
+							{
+								imp *= coll.rb2->mass;
+								coll.rb2->applyForce(-imp * coll.normal);
+							}
+							else if (coll.rb2->isKinematic)
+							{
+								imp *= coll.rb1->mass;
+								coll.rb1->applyForce(imp * coll.normal);
+							}
+							else
+							{
+								imp /= 1 / coll.rb1->mass + 1 / coll.rb2->mass;
+								coll.rb1->applyForce(imp * coll.normal);
+								coll.rb2->applyForce(-imp * coll.normal);
+							}
+						}
+					}
 				}
 			}
 		}

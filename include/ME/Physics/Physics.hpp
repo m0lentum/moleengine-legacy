@@ -4,10 +4,13 @@
 #include "../ISystem.hpp"
 #include <SFML/System/Vector2.hpp>
 #include <unordered_map>
+#include <vector>
 
 namespace me
 {
 	struct Contact;
+	struct Collision;
+	class GameObject;
 
 	const int defaultSolverIterations = 4;
 	// how much of the penetration of two objects should be resolved each frame (0..1)
@@ -20,7 +23,9 @@ namespace me
 		sf::Vector2f m_gravity;
 
 		// contacts are stored between frames to make use of temporal coherence in collision detection
-		std::unordered_map<long int, Contact> m_contacts;
+		std::unordered_map<long int, Contact> m_missedPairs;
+		std::vector<Contact> m_collisions;
+
 		int m_solverIterations;
 
 	public:
@@ -34,7 +39,7 @@ namespace me
 		void applyMovement();
 
 		void findContacts();
-		void solveContacts();
+		void solveCollisions();
 
 		/// Contacts are identified by a single long 32-bit int composed of the two contacting objects'
 		/// IDs with the lower one shifted to the left 16 bits

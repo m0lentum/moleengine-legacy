@@ -3,12 +3,12 @@
 
 #include "../ISystem.hpp"
 #include <SFML/System/Vector2.hpp>
+#include "Contact.hpp"
 #include <unordered_map>
 #include <vector>
 
 namespace me
 {
-	struct Contact;
 	struct Collision;
 	class GameObject;
 

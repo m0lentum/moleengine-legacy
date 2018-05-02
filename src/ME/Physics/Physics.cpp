@@ -8,7 +8,6 @@
 #include <Physics/ColliderRect.hpp>
 #include <Physics/ColliderPolygon.hpp>
 #include <Physics/PrimitiveQueries.hpp>
-#include <Physics/Contact.hpp>
 #include <Physics/Collision.hpp>
 #include <Graphics/DebugMarkerFactory.hpp>
 #include <Physics/VectorMath.hpp>

@@ -62,9 +62,19 @@ namespace me
 		return sf::Vector2f(vector.y, -vector.x);
 	}
 
-	float VectorMath::det(const sf::Vector2f &v1, const sf::Vector2f &v2)
+	float VectorMath::cross2D(const sf::Vector2f &v1, const sf::Vector2f &v2)
 	{
 		return v1.x * v2.y - v1.y * v2.x;
+	}
+
+	sf::Vector2f VectorMath::cross2D(const sf::Vector2f &v, float s)
+	{
+		return sf::Vector2f(s * v.y, -s * v.x);
+	}
+
+	sf::Vector2f VectorMath::cross2D(float s, const sf::Vector2f &v)
+	{
+		return sf::Vector2f(-s * v.y, s * v.x);
 	}
 
 	float VectorMath::radToDeg(float radians)

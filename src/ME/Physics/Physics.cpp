@@ -3,6 +3,7 @@
 #include <Space.hpp>
 #include <Physics/RigidBody.hpp>
 #include <vector>
+#include <cmath>
 #include <Physics/ICollider.hpp>
 #include <Physics/ColliderCircle.hpp>
 #include <Physics/ColliderRect.hpp>
@@ -96,13 +97,19 @@ namespace me
 
 	void Physics::solveCollisions()
 	{
+		// solve contact forces
 		for (int i = 0; i < m_solverIterations; i++)
 		{
 			for (auto &coll : m_collisions)
 			{
 				if (coll.rb1 && coll.rb2)
 				{
-					float collVel = VectorMath::dot(coll.rb2->velocity - coll.rb1->velocity, coll.normal);
+					sf::Vector2f offset1 = coll.manifold[0] - coll.obj1->getPosition();
+					sf::Vector2f offset2 = coll.manifold[0] - coll.obj2->getPosition();
+
+					sf::Vector2f pointVel1 = coll.rb1->getPointVelocity(offset1);
+					sf::Vector2f pointVel2 = coll.rb2->getPointVelocity(offset2);
+					float collVel = VectorMath::dot(coll.rb2->getPointVelocity(offset2) - coll.rb1->getPointVelocity(offset1), coll.normal);
 
 					if (collVel > 0)
 					{
@@ -113,22 +120,45 @@ namespace me
 							float imp = (1.0f + e) * collVel;
 							if (coll.rb1->isKinematic)
 							{
-								imp *= coll.rb2->mass;
-								coll.rb2->applyForce(-imp * coll.normal);
+								imp /= coll.rb2->mass.inverted + coll.rb2->momentOfInertia.inverted * std::pow(VectorMath::cross2D(offset2, coll.normal), 2);
+								coll.rb2->applyImpulse(-imp * coll.normal, offset2);
 							}
 							else if (coll.rb2->isKinematic)
 							{
-								imp *= coll.rb1->mass;
-								coll.rb1->applyForce(imp * coll.normal);
+								imp /= coll.rb1->mass.inverted + coll.rb1->momentOfInertia.inverted * std::pow(VectorMath::cross2D(offset1, coll.normal), 2);
+								coll.rb1->applyImpulse(imp * coll.normal, offset1);
 							}
 							else
 							{
-								imp /= 1 / coll.rb1->mass + 1 / coll.rb2->mass;
-								coll.rb1->applyForce(imp * coll.normal);
-								coll.rb2->applyForce(-imp * coll.normal);
+								imp /= coll.rb1->mass.inverted + coll.rb2->mass.inverted
+									+ coll.rb1->momentOfInertia.inverted * std::pow(VectorMath::cross2D(offset1, coll.normal), 2)
+									+ coll.rb2->momentOfInertia.inverted * std::pow(VectorMath::cross2D(offset2, coll.normal), 2);
+								coll.rb1->applyImpulse(imp * coll.normal, offset1);
+								coll.rb2->applyImpulse(-imp * coll.normal, offset2);
 							}
 						}
 					}
+				}
+			}
+		}
+
+		// resolve penetration if necessary, using linear projection
+		for (auto &coll : m_collisions)
+		{
+			if (coll.rb1 && coll.rb2 && VectorMath::lengthSquared(coll.penetration) > 0.01f)
+			{
+				if (coll.rb1->isKinematic)
+				{
+					if (!coll.rb2->isKinematic) coll.obj2->move(coll.penetration * -penResolveFactor);
+				}
+				else if (coll.rb2->isKinematic)
+				{
+					coll.obj1->move(coll.penetration * penResolveFactor);
+				}
+				else
+				{
+					coll.obj1->move(coll.penetration * penResolveFactor * 0.5f);
+					coll.obj2->move(coll.penetration * penResolveFactor * -0.5f);
 				}
 			}
 		}

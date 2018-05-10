@@ -7,16 +7,31 @@
 
 namespace me
 {
+	/// Inverted mass is needed often so we precompute it into a data structure
+	struct MassInfo
+	{
+		float actual;
+		float inverted;
+
+		MassInfo& operator=(float mass)
+		{
+			actual = mass;
+			inverted = 1 / mass;
+			return *this;
+		}
+	};
+
 	class RigidBody
 	{
-	public: 
+	public:
 
-		bool isKinematic; // if true, object will not be affected by collisions
+		bool isKinematic; // if true, object can only be moved by directly changing its velocity or position
 
 		sf::Vector2f velocity;
 		float angularVelocity;
 
-		float mass;
+		MassInfo mass;
+		MassInfo momentOfInertia;
 		float elasticity;
 		float friction;
 		float drag;
@@ -31,10 +46,15 @@ namespace me
 
 	public:
 
-		/// Apply a force to this object, meaning mass and (TODO) point of impact will be considered.
-		void applyForce(const sf::Vector2f &force);
+		/// Apply a force at the center of mass (not affecting rotation)
+		void applyImpulse(const sf::Vector2f &force);
+		/// Apply a force at an offset from the center of mass
+		void applyImpulse(const sf::Vector2f &force, const sf::Vector2f &offset);
 		/// Add a vector to the velocity of the object without regard to physical properties.
 		inline void accelerate(const sf::Vector2f &acc) { velocity += acc; }
+
+
+		sf::Vector2f getPointVelocity(const sf::Vector2f &offset) const;
 
 		void setGravityOverride(sf::Vector2f gravity);
 		inline bool doesOverrideGravity() { return overridesGravity; }
@@ -42,8 +62,8 @@ namespace me
 		inline void removeGravityOverride() { overridesGravity = false; }
 
 		RigidBody();
-		RigidBody(float mass, float elasticity, float friction, float drag, float angularDrag);
-		RigidBody(bool isKinematic, float mass, float elasticity, float friction, float drag, float angularDrag);
+		RigidBody(float mass, float momentOfInertia, float elasticity, float friction, float drag, float angularDrag);
+		RigidBody(bool isKinematic, float mass, float momentOfInertia, float elasticity, float friction, float drag, float angularDrag);
 		RigidBody(const RigidBody &copy);
 		RigidBody(RigidBody&& move);
 		RigidBody& operator=(RigidBody&& other);

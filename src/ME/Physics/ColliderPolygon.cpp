@@ -159,7 +159,7 @@ namespace me
 
 		if (autoCenter) center();
 
-		assert(VectorMath::det(m_points[1] - m_points[0], m_points[2] - m_points[0]) < 0 && "Polygon points must be given in counterclockwise order");
+		assert(VectorMath::cross2D(m_points[1] - m_points[0], m_points[2] - m_points[0]) < 0 && "Polygon points must be given in counterclockwise order");
 
 		calculateNormals();
 	}

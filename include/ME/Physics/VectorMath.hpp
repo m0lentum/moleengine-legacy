@@ -35,7 +35,11 @@ namespace me
 		sf::Vector2f rightNormal(const sf::Vector2f &vector);
 
 		/// The signed area of the parallelogram defined by two vectors
-		float det(const sf::Vector2f &v1, const sf::Vector2f &v2);
+		/// aka 2D cross product, aka determinant of the 2x2 matrix defined by v1 & v2
+		float cross2D(const sf::Vector2f &v1, const sf::Vector2f &v2);
+		/// 2D cross product with a scalar (necessary in point velocity calculations)
+		sf::Vector2f cross2D(const sf::Vector2f &v, float s);
+		sf::Vector2f cross2D(float s, const sf::Vector2f &v);
 
 		/// Turn radians to degrees.
 		float radToDeg(float radians);

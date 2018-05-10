@@ -104,8 +104,12 @@ namespace me
 			{
 				if (coll.rb1 && coll.rb2)
 				{
-					sf::Vector2f offset1 = coll.manifold[0] - coll.obj1->getPosition();
-					sf::Vector2f offset2 = coll.manifold[0] - coll.obj2->getPosition();
+					sf::Vector2f point = coll.manifold[0];
+					// apply force at the average of the two contact points. naive, not final
+					if (coll.manifold[1].x != 0 || coll.manifold[1].y != 0) point = (coll.manifold[0] + coll.manifold[1]) * 0.5f;
+
+					sf::Vector2f offset1 = point - coll.obj1->getPosition();
+					sf::Vector2f offset2 = point - coll.obj2->getPosition();
 
 					sf::Vector2f pointVel1 = coll.rb1->getPointVelocity(offset1);
 					sf::Vector2f pointVel2 = coll.rb2->getPointVelocity(offset2);

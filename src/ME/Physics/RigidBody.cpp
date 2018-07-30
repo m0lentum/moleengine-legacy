@@ -5,6 +5,9 @@
 
 namespace me
 {
+    const PhysicsMaterial RigidBody::defaultMaterial = PhysicsMaterial(0.75f, 0.05f, 0.002f, 0.001f, 0.1f);
+
+    
 	void RigidBody::applyImpulse(const sf::Vector2f &force)
 	{
 		velocity += force * mass.inverted;
@@ -30,25 +33,23 @@ namespace me
 
 
 	RigidBody::RigidBody() :
-		RigidBody(false, 1.0f, 300.0f, 0.75f, 0.05f, 0.002f, 0.001f)
+		RigidBody(false, 1.0f, defaultMaterial)
 	{
 	}
 
-	RigidBody::RigidBody(float mass, float momentOfInertia, float elasticity, float friction, float drag, float angularDrag) :
-		RigidBody(false, mass, momentOfInertia, elasticity, friction, drag, angularDrag)
+	RigidBody::RigidBody(float mass, float momentOfInertia, PhysicsMaterial material) :
+		RigidBody(false, mass, momentOfInertia, material)
 	{
 	}
 
-	RigidBody::RigidBody(bool isKinematic, float mass, float momentOfInertia, float elasticity, float friction, float drag, float angularDrag) :
+	RigidBody::RigidBody(bool isKinematic, float mass, float momentOfInertia, PhysicsMaterial material) :
 		isKinematic(isKinematic),
 		angularVelocity(0),
-		elasticity(elasticity),
-		friction(friction),
-		drag(drag),
-		angularDrag(angularDrag),
+        material(material),
 		gravityMultiplier(1),
 		overridesGravity(false)
 	{
+        // assignment like this automatically calculates and stores the inverses
 		this->mass = mass;
 		this->momentOfInertia = momentOfInertia;
 	}
@@ -58,11 +59,8 @@ namespace me
 		velocity(copy.velocity),
 		angularVelocity(copy.angularVelocity),
 		mass(copy.mass),
-		momentOfInertia(copy.momentOfInertia),
-		elasticity(copy.elasticity),
-		friction(copy.friction),
-		drag(copy.drag),
-		angularDrag(copy.angularDrag),
+        momentOfInertia(copy.momentOfInertia),
+        material(copy.material),
 		gravityOverride(copy.gravityOverride),
 		gravityMultiplier(copy.gravityMultiplier),
 		overridesGravity(copy.overridesGravity)
@@ -75,10 +73,7 @@ namespace me
 		angularVelocity(std::move(move.angularVelocity)),
 		mass(std::move(move.mass)),
 		momentOfInertia(std::move(move.momentOfInertia)),
-		elasticity(std::move(move.elasticity)),
-		friction(std::move(move.friction)),
-		drag(std::move(move.drag)),
-		angularDrag(std::move(move.angularDrag)),
+        material(std::move(move.material)),
 		gravityOverride(std::move(move.gravityOverride)),
 		gravityMultiplier(std::move(move.gravityMultiplier)),
 		overridesGravity(std::move(move.overridesGravity))
@@ -94,10 +89,7 @@ namespace me
 			angularVelocity = std::move(other.angularVelocity);
 			mass = std::move(other.mass);
 			momentOfInertia = std::move(other.momentOfInertia);
-			elasticity = std::move(other.elasticity);
-			friction = std::move(other.friction);
-			drag = std::move(other.drag);
-			angularDrag = std::move(other.angularDrag);
+            material = std::move(other.material);
 			gravityOverride = std::move(other.gravityOverride);
 			gravityMultiplier = std::move(other.gravityMultiplier);
 			overridesGravity = std::move(other.overridesGravity);

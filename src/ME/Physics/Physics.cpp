@@ -13,6 +13,7 @@
 #include <Graphics/DebugMarkerFactory.hpp>
 #include <Physics/VectorMath.hpp>
 #include <GameObject.hpp>
+#include <iostream>
 
 namespace me
 {
@@ -37,8 +38,8 @@ namespace me
 				else
 					rb->accelerate(rb->getGravityOverride());
 
-				rb->velocity -= rb->drag * rb->velocity;
-				rb->angularVelocity -= rb->angularDrag * rb->angularVelocity;
+				rb->velocity -= rb->material.drag * rb->velocity;
+				rb->angularVelocity -= rb->material.angularDrag * rb->angularVelocity;
 			}
 				
 			parent->move(rb->velocity);
@@ -119,7 +120,7 @@ namespace me
 					{
 						if (!coll.rb1->isKinematic || !coll.rb2->isKinematic)
 						{
-							float e = std::min(coll.rb1->elasticity, coll.rb2->elasticity);
+							float e = std::min(coll.rb1->material.elasticity, coll.rb2->material.elasticity);
 
 							float imp = (1.0f + e) * collVel;
 							if (coll.rb1->isKinematic)

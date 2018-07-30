@@ -4,6 +4,7 @@
 #include "../GameObject.hpp"
 #include <SFML/System/Vector2.hpp>
 #include <memory>
+#include "PhysicsMaterial.hpp"
 
 namespace me
 {
@@ -32,12 +33,13 @@ namespace me
 
 		MassInfo mass;
 		MassInfo momentOfInertia;
-		float elasticity;
-		float friction;
-		float drag;
-		float angularDrag;
+
+        PhysicsMaterial material;
 
 		float gravityMultiplier; // Multiply Space gravity
+
+
+        static const PhysicsMaterial defaultMaterial;
 
 	private:
 
@@ -62,8 +64,8 @@ namespace me
 		inline void removeGravityOverride() { overridesGravity = false; }
 
 		RigidBody();
-		RigidBody(float mass, float momentOfInertia, float elasticity, float friction, float drag, float angularDrag);
-		RigidBody(bool isKinematic, float mass, float momentOfInertia, float elasticity, float friction, float drag, float angularDrag);
+		RigidBody(float mass, float momentOfInertia, PhysicsMaterial material);
+		RigidBody(bool isKinematic, float mass, float momentOfInertia, PhysicsMaterial material);
 		RigidBody(const RigidBody &copy);
 		RigidBody(RigidBody&& move);
 		RigidBody& operator=(RigidBody&& other);

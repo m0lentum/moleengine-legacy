@@ -89,28 +89,29 @@ namespace me
 
 	GameObject * Space::createObject()
 	{
-		if (m_objects.size() < m_objects.capacity())
+		if (m_size < m_capacity)
 		{
-			m_objects.emplace_back(this);
-			return &(m_objects.back());
+			m_alloc_traits.construct(m_allocator, &(m_objects[m_size]), std::forward<Space*>(this));
+			return &(m_objects[m_size++]);
 		}
 		else
 		{
-			// we've filled up the vector, find a dead object and replace it
+			// we've filled up the array, find a dead object and replace it
 
 			std::size_t nextIndex = m_currentObjIndex;
 			while (m_objects[nextIndex].isAlive())
 			{
 				nextIndex++;
-				if (nextIndex >= m_objects.capacity()) nextIndex = 0;
+				if (nextIndex >= m_capacity) nextIndex = 0;
 				if (nextIndex == m_currentObjIndex)
 				{
-					std::cout << "Error: Space is full" << std::endl;
+					std::cerr << "Error: Space is full" << std::endl;
 					return NULL;
 				}
 			}
 
-			m_objects[nextIndex] = GameObject(this);
+			m_alloc_traits.destroy(m_allocator, &(m_objects[nextIndex]));
+			m_alloc_traits.construct(m_allocator, &(m_objects[nextIndex]), std::forward<Space*>(this));
 			m_currentObjIndex = nextIndex;
 
 			return &(m_objects[nextIndex]);
@@ -124,21 +125,29 @@ namespace me
 			cont.second->clear();
 		}
 
-		m_objects.clear();
+		m_alloc_traits.deallocate(m_allocator, m_objects, m_capacity);
+		m_objects = m_alloc_traits.allocate(m_allocator, m_capacity);
+		m_size = 0;
+		m_currentObjIndex = 0;
 	}
 
 	void Space::hardClear()
 	{
 		m_containers.clear();
-		m_objects.clear();
+		
+		m_alloc_traits.deallocate(m_allocator, m_objects, m_capacity);
+		m_objects = m_alloc_traits.allocate(m_allocator, m_capacity);
+		m_size = 0;
+		m_currentObjIndex = 0;
 	}
 
 
-	Space::Space(std::size_t maxObjects) :
-		m_maxObjects(maxObjects),
+	Space::Space(std::size_t capacity) :
+		m_size(0),
+		m_capacity(capacity),
 		m_currentObjIndex(0)
 	{
-		m_objects.reserve(maxObjects); // Reserve room for all objects now so reallocations won't happen later
+		m_objects = m_alloc_traits.allocate(m_allocator, capacity);
 	}
 
 	Space::~Space()

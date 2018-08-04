@@ -6,6 +6,7 @@
 #include <functional>
 #include <iostream>
 #include <algorithm>
+#include <memory>
 
 namespace me
 {
@@ -26,7 +27,12 @@ namespace me
 	{
 	private:
 
-		std::vector<Component<T> > m_components;
+		std::allocator_traits<std::allocator<Component<T>>> m_alloc_traits;
+		std::allocator<Component<T>> m_allocator;
+
+		Component<T>* m_components;
+		std::size_t m_size;
+		const std::size_t m_capacity;
 		std::size_t m_currentIndex;
 
 	public:
@@ -34,29 +40,30 @@ namespace me
 		template <typename... Args>
 		Component<T>* createComponent(GameObject *parent, Args&&... args)
 		{
-			if (m_components.size() < m_components.capacity())
+			if (m_size < m_capacity)
 			{
-				m_components.emplace_back(parent, args...);
+				 m_alloc_traits.construct(m_allocator, &(m_components[m_size]), std::forward<GameObject*>(parent), std::forward<Args>(args)...);
 
-				return &(m_components.back());
+				return &(m_components[m_size++]);
 			}
 			else
 			{
-				// we've filled up the vector, find a dead component and replace it
+				// we've filled up the array, find a dead component and replace it
 
 				std::size_t nextIndex = m_currentIndex;
 				while (m_components[nextIndex].isAlive())
 				{
 					nextIndex++;
-					if (nextIndex >= m_components.capacity()) nextIndex = 0;
+					if (nextIndex >= m_size) nextIndex = 0;
 					if (nextIndex == m_currentIndex)
 					{
-						std::cout << "Error: Container for " << typeid(T).name() << " is full" << std::endl;
+						std::cerr << "Error: Container for " << typeid(T).name() << " is full" << std::endl;
 						return NULL;
 					}
 				}
 
-				m_components[nextIndex] = Component<T>(parent, args...);
+				m_alloc_traits.destroy(m_allocator, &(m_components[nextIndex]));
+				m_alloc_traits.construct(m_allocator, &(m_components[nextIndex]), std::forward<GameObject*>(parent), std::forward<Args>(args)...);
 				m_currentIndex = nextIndex;
 
 				return &(m_components[nextIndex]);
@@ -66,11 +73,11 @@ namespace me
 		/// Execute a function on every (alive) Component in the Container
 		void each(std::function<void(Component<T>&)> function)
 		{
-			for (auto &unit : m_components)
+			for (int i = 0; i < m_size; i++)
 			{
-				if (unit.isEnabled() && unit.isAlive())
+				if (m_components[i].isEnabled() && m_components[i].isAlive())
 				{
-					function(unit);
+					function(m_components[i]);
 				}
 			}
 		}
@@ -78,18 +85,25 @@ namespace me
 		/// Delete everything in the Container.
 		virtual void clear()
 		{
-			m_components.clear();
+			// just reallocate the whole thing (is this better than destroying everything in place?)
+			m_alloc_traits.deallocate(m_allocator, m_components, m_capacity);
+			m_components = m_alloc_traits.allocate(m_allocator, m_capacity);
+			m_size = 0;
+			m_currentIndex = 0;
 		}
 
 
-		ComponentContainer(std::size_t maxSize) :
-			m_currentIndex(0)
+		ComponentContainer(int capacity) :
+			m_currentIndex(0),
+			m_size(0),
+			m_capacity(capacity)
 		{
-			m_components.reserve(maxSize);
+			m_components = m_alloc_traits.allocate(m_allocator, capacity);
 		}
 
 		~ComponentContainer()
 		{
+			m_alloc_traits.deallocate(m_allocator, m_components, m_capacity);
 		}
 	};
 }

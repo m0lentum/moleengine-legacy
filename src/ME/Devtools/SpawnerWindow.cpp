@@ -45,7 +45,7 @@ namespace me
                 case sf::Mouse::Left:
                 {
                     GameObject *obj = m_currentItem->createFunction(m_space);
-                    obj->setPosition(evt.x, evt.y);
+					if (obj) obj->setPosition(evt.x, evt.y);
                     m_isPlacingItem = false;
                     break;
                 }

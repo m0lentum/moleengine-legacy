@@ -11,6 +11,7 @@
 #include "Component.hpp"
 #include <typeindex>
 #include <functional>
+#include <memory>
 #include <SFML/Window/Event.hpp>
 
 namespace me
@@ -22,13 +23,15 @@ namespace me
 	{
 	private:
 
-		std::size_t m_maxObjects;
+		std::allocator_traits<std::allocator<GameObject>> m_alloc_traits;
+		std::allocator<GameObject> m_allocator;
+		std::size_t m_capacity;
+		std::size_t m_size;
+		std::size_t m_currentObjIndex;
+		GameObject* m_objects;
 
 		std::unordered_map<std::type_index, std::unique_ptr<ISystem> > m_systems;
 		std::unordered_map<std::type_index, std::unique_ptr<ComponentContainerBase> > m_containers;
-		std::vector<GameObject> m_objects;
-
-		std::size_t m_currentObjIndex;
 
 	public:
 
@@ -77,7 +80,7 @@ namespace me
 
 	public:
 
-		Space(std::size_t maxObjects);
+		Space(std::size_t capacity);
 		~Space();
 	};
 
@@ -109,7 +112,7 @@ namespace me
 	template <typename T>
 	void Space::createContainer()
 	{
-		createContainer<T>(m_maxObjects);
+		createContainer<T>(m_capacity);
 	}
 
 	template <typename T>
